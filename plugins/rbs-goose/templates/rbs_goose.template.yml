@@ -1,0 +1,5 @@
+# Type checking command
+typecheck_command: "steep check"
+
+# Type Annotation Mode (:inline, :file)
+type_annotation_mode: :inline

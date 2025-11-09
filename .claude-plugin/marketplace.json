@@ -1,0 +1,24 @@
+{
+  "name": "kokuyouwind-plugins",
+  "owner": {
+    "name": "kokuyouwind",
+    "url": "https://github.com/kokuyouwind"
+  },
+  "metadata": {
+    "description": "Claude Code plugins maintained by kokuyouwind",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "rbs-goose",
+      "source": "./plugins/rbs-goose",
+      "description": "Setup rbs type definitions for steep and automatically fix type errors",
+      "version": "1.0.0",
+      "author": "kokuyouwind",
+      "license": "MIT",
+      "keywords": ["ruby", "rbs", "steep", "type-checking"],
+      "category": "development"
+    }
+  ]
+}
