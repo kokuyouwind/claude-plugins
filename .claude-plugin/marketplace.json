@@ -15,7 +15,10 @@
       "source": "./plugins/rbs-goose",
       "description": "Setup rbs type definitions for steep and automatically fix type errors",
       "version": "1.0.0",
-      "author": "kokuyouwind",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
       "license": "MIT",
       "keywords": ["ruby", "rbs", "steep", "type-checking"],
       "category": "development"

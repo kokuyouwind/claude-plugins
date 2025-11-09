@@ -2,7 +2,10 @@
   "name": "rbs-goose",
   "version": "1.0.0",
   "description": "Setup rbs type definitions for steep and automatically fix type errors",
-  "author": "kokuyouwind",
+  "author": {
+    "name": "kokuyouwind",
+    "url": "https://github.com/kokuyouwind"
+  },
   "license": "MIT",
   "repository": "https://github.com/kokuyouwind/claude_rbs_goose",
   "commands": {
