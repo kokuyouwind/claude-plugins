@@ -54,15 +54,13 @@ end
 update_git_ignore(<<~"IGNORE")
   .gem_rbs_collection/
   sig/generated/
-  .claude/commands/rbs_goose
-  .claude/commands/rbs_goose.md
 IGNORE
 puts('Initialize Complete!')
 
 case config.type_annotation_mode
 when :inline
-  follow_instruction(File('commands/rbs-goose/type_inline.md'))
+  follow_instruction(File('commands/type_inline.md'))
 when :file
-  follow_instruction(File('commands/rbs-goose/type_file.md'))
+  follow_instruction(File('commands/type_file.md'))
 end
 ```
