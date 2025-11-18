@@ -6,7 +6,7 @@ fetch('https://github.com/soutaro/rbs-inline/wiki/Syntax-guide')
 
 # Type check and fix
 def generate_fig_and_type_check
-  run("bundle exec rbs-inline --output #{signagure_directory} #{library_directory}")
+  run("bundle exec rbs-inline --output #{signature_directory} #{library_directory}")
   run(typecheck_command)
 end
 

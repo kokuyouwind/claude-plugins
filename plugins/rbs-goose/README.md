@@ -1,15 +1,26 @@
 # rbs-goose
 
+**Version: 1.1.0**
+
 A Claude Code plugin that sets up RBS type definitions for Steep and automatically fixes type errors in Ruby projects.
 
 ## Features
 
-When you invoke `/rbs-goose`, this command will:
+This plugin provides two commands:
 
-1. Generate `rbs_goose.yml` if it doesn't exist
-2. Set up necessary tools (steep, rbs_rails, etc.) if needed
-3. Run type checking
-4. Automatically fix type errors
+### `/rbs-goose:setup`
+Sets up RBS type checking environment:
+1. Generate `rbs_goose.yml` configuration file
+2. Install necessary tools (rbs, steep, rbs-inline, rbs_rails, etc.)
+3. Configure Steep for your project structure
+4. Update .gitignore for generated files
+
+### `/rbs-goose:run`
+Runs type checking and automatically fixes errors:
+1. If configuration doesn't exist, runs setup first
+2. Runs type checking using configured command
+3. Automatically fixes type errors
+4. Refines type signatures until well-typed
 
 ## Installation
 
@@ -32,22 +43,35 @@ If you haven't added the marketplace yet:
 
 ## Usage
 
-Simply run the command:
+### First-time setup
+
+Run the setup command to configure your project:
 
 ```bash
-/rbs-goose
+/rbs-goose:setup
 ```
 
-On first run, it will:
+This will:
 - Create a configuration file `rbs_goose.yml`
 - Install required gems (rbs, steep, rbs-inline, etc.)
 - Set up Steep configuration
 - For Rails apps, install rbs_rails
+- Update .gitignore for generated files
 
-On subsequent runs, it will:
-- Run type checking
+### Running type checking
+
+To run type checking and fix errors:
+
+```bash
+/rbs-goose:run
+```
+
+This will:
+- Run type checking using the configured command
 - Automatically fix type errors
 - Refine type signatures until the project is well-typed
+
+**Note**: If you haven't run setup yet, `/rbs-goose:run` will automatically run the setup process first.
 
 ## Configuration
 

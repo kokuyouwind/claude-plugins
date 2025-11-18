@@ -1,8 +1,12 @@
 Follow these instructions:
 
 ```
+# All file paths in this command are relative to the plugin installation directory
+# (e.g., ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/rbs-goose)
+plugin_base_path = File.dirname(__FILE__) # This is the plugin root directory
+
 # Setup configurations
-file = File.copy('templates/rbs_goose.template.yml', './rbs_goose.yml')
+file = File.copy(File.join(plugin_base_path, 'templates/rbs_goose.template.yml'), './rbs_goose.yml')
 
 puts(file.contents)
 until('If there are no problems with the above settings file, please answer yes. If you wish to update the file, please describe the changes.') do
@@ -28,7 +32,7 @@ unless gemfile.contain?('rbs')
         gemfile.update('rubocop', '1.74.0')
         retry
       else
-        say('Failed to install rbs-inline. Please resolve the dependencies of rbs-inline or switch the mode to file and try the `/rbs-goose` command again.')
+        say('Failed to install rbs-inline. Please resolve the dependencies of rbs-inline or switch the mode to file and try the `/rbs-goose:setup` command again.')
         exit(1)
       end
     end
@@ -55,12 +59,5 @@ update_git_ignore(<<~"IGNORE")
   .gem_rbs_collection/
   sig/generated/
 IGNORE
-puts('Initialize Complete!')
-
-case config.type_annotation_mode
-when :inline
-  follow_instruction(File('commands/type_inline.md'))
-when :file
-  follow_instruction(File('commands/type_file.md'))
-end
+puts('Initialize Complete! Run `/rbs-goose:run` to start type checking.')
 ```

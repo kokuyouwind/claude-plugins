@@ -14,7 +14,8 @@ This is a Claude Code plugin marketplace repository containing plugins that exte
 plugins/                 # Plugin implementations
   rbs-goose/            # Ruby type checking automation plugin
     plugin.json         # Plugin metadata and command definitions
-    commands/           # Command implementation files
+    commands/           # User-facing command implementation files
+    internal/           # Internal processing files (not exposed as commands)
     templates/          # Configuration templates
     README.md          # Plugin documentation
 ```
@@ -41,14 +42,40 @@ Commands use a pseudo-code format that Claude interprets:
 5. **Project Setup**: Functions like `setup_rbs()`, `setup_steep()`, `gemfile.contain?()`
 6. **Delegation**: `follow_instruction()` to chain command files
 
+### File Path Resolution in Commands
+
+**IMPORTANT**: When command files reference other files within the plugin (templates, internal files, etc.), they must use absolute paths based on the plugin installation directory.
+
+**Plugin Installation Path**: When installed from marketplace, plugins are located at:
+```
+~/.claude/plugins/marketplaces/<marketplace-name>/plugins/<plugin-name>/
+```
+
+**Best Practice**: Always declare `plugin_base_path` at the beginning of command files:
+```ruby
+# All file paths are relative to the plugin installation directory
+# (e.g., ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/rbs-goose)
+plugin_base_path = File.dirname(__FILE__) # This is the plugin root directory
+
+# Then use File.join() to reference plugin files
+file = File.copy(File.join(plugin_base_path, 'templates/config.yml'), './config.yml')
+follow_instruction(File.join(plugin_base_path, 'internal/some_process.md'))
+```
+
+**Why This Matters**: Claude interprets file paths in pseudo-code as relative to the plugin installation directory. Without explicit base path handling, files in `templates/`, `internal/`, or other subdirectories won't be found correctly.
+
 ### rbs-goose Plugin
 
 Automates RBS type definition setup and type error fixing for Ruby projects.
 
 **Command Flow**:
-1. `/rbs-goose` → `commands/rbs-goose.md` (entry point)
-2. First run → `initialize.md` (setup)
-3. Subsequent runs → `type_inline.md` or `type_file.md` (based on config)
+1. `/rbs-goose:run` → `commands/run.md` (entry point)
+2. First run → `commands/setup.md` (setup)
+3. Subsequent runs → `internal/type_inline.md` or `internal/type_file.md` (based on config)
+
+**Directory Structure**:
+- `commands/` - User-facing commands (`run.md`, `setup.md`)
+- `internal/` - Internal processing files not exposed as commands (`type_inline.md`, `type_file.md`)
 
 **Configuration** (`rbs_goose.yml`):
 - `typecheck_command`: Command to run type checking (default: "steep check")
@@ -62,13 +89,24 @@ Automates RBS type definition setup and type error fixing for Ruby projects.
 
 ## Development Workflow
 
+### Version Management
+
+**IMPORTANT**: When updating plugin versions, you must update version numbers in THREE places:
+
+1. **`.claude-plugin/marketplace.json`** - The `plugins[].version` field
+2. **`plugins/<plugin-name>/plugin.json`** - The `version` field
+3. **`plugins/<plugin-name>/README.md`** - The version badge/header
+
+All three must be kept in sync for consistency.
+
 ### Adding New Plugins
 
 1. Create plugin directory under `plugins/`
 2. Add `plugin.json` with metadata and command definitions
-3. Create `commands/` directory with implementation files
-4. Add `README.md` with usage documentation
-5. Update `.claude-plugin/marketplace.json` to register the plugin
+3. Create `commands/` directory with user-facing command implementation files
+4. Create `internal/` directory for internal processing files (optional)
+5. Add `README.md` with usage documentation
+6. Update `.claude-plugin/marketplace.json` to register the plugin with version
 
 ### Testing Plugins
 
