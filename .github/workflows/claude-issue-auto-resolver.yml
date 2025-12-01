@@ -14,35 +14,53 @@ jobs:
       contents: read
     steps:
       - name: Find and comment on unresolved issue
-        env:
-          # Use Personal Access Token as GitHub App tokens don't trigger claude-code-action
-          GH_TOKEN: ${{ secrets.GITHUB_PAT }}
-        run: |
-          # Search for issues in priority order: high -> medium -> low
-          for priority in "priority:high" "priority:medium" "priority:low"; do
-            echo "Searching for issues with label: $priority"
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          script: |
+            // Search for issues in priority order: high -> medium -> low
+            const priorities = ['priority:high', 'priority:medium', 'priority:low'];
 
-            # Find unresolved issues (without claude-code-requested label)
-            issue=$(gh issue list --repo ${{ github.repository }} \
-              --label "$priority" \
-              --state open \
-              --json number,labels,createdAt \
-              --jq '[.[] | select(.labels | map(.name) | contains(["claude-code-requested"]) | not)] | sort_by(.createdAt) | reverse | .[0].number')
+            for (const priority of priorities) {
+              console.log(`Searching for issues with label: ${priority}`);
 
-            if [ -n "$issue" ] && [ "$issue" != "null" ]; then
-              echo "Found issue #$issue with $priority"
+              // Get all open issues with the priority label
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: priority,
+                state: 'open',
+                sort: 'created',
+                direction: 'desc'
+              });
 
-              # Post a comment mentioning @claude
-              gh issue comment $issue --repo ${{ github.repository }} \
-                --body "@claude この問題を解決してください"
+              // Find unresolved issues (without claude-code-requested label)
+              const unresolvedIssue = issues.find(issue =>
+                !issue.labels.some(label => label.name === 'claude-code-requested')
+              );
 
-              # Add claude-code-requested label to prevent duplicate processing
-              gh issue edit $issue --repo ${{ github.repository }} \
-                --add-label "claude-code-requested"
+              if (unresolvedIssue) {
+                console.log(`Found issue #${unresolvedIssue.number} with ${priority}`);
 
-              echo "Successfully commented on issue #$issue and added label"
-              exit 0
-            fi
-          done
+                // Post a comment mentioning @claude
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: unresolvedIssue.number,
+                  body: '@claude この問題を解決してください'
+                });
 
-          echo "No unresolved issues found with priority labels"
+                // Add claude-code-requested label to prevent duplicate processing
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: unresolvedIssue.number,
+                  labels: ['claude-code-requested']
+                });
+
+                console.log(`Successfully commented on issue #${unresolvedIssue.number} and added label`);
+                return;
+              }
+            }
+
+            console.log('No unresolved issues found with priority labels');
