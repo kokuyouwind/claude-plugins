@@ -1,0 +1,8 @@
+{
+  "name": "dev-guidelines",
+  "version": "1.0.0",
+  "description": "Comprehensive development guidelines including code implementation workflow, code investigation, design decisions, error analysis, testing methodology, GitHub workflows, and web research",
+  "author": {
+    "name": "kokuyouwind"
+  }
+}
