@@ -1,67 +1,32 @@
 ---
 name: Design Alternatives
-description: Use this skill when making design decisions, choosing architecture patterns, selecting technologies, or evaluating implementation approaches. Provides methodology for proposing and evaluating alternatives.
+description: Use this skill when choosing architectures, selecting technologies, evaluating implementation approaches, or making design decisions. Propose 2-3 alternatives with advantages/disadvantages/reasoning/future scenarios for each.
 version: 1.0.0
 ---
 
 # Design and Architecture Decision Process
 
-## When to Use This Skill
+## Core Principle: Multiple Alternatives with Trade-offs
 
-This skill should be used when:
-- Making design decisions
-- Choosing architecture patterns
-- Selecting technologies or libraries
-- Evaluating implementation approaches
-- Planning system architecture
-- Deciding on technical solutions
+When facing design decisions, **always propose at least 2-3 alternatives** and analyze each comprehensively.
 
-## Design Decision Methodology
+## For Each Alternative, Clearly State
 
-When working on design decisions, follow this approach:
+### 1. Advantages
+What are the benefits? What problems does it solve well?
 
-### 1. Propose Multiple Alternatives
+### 2. Disadvantages
+What are the drawbacks, limitations, or complexities?
 
-Always propose **at least 2-3 design alternatives**:
-- Don't settle on the first solution that comes to mind
-- Explore different approaches and patterns
-- Consider various trade-offs
-- Think broadly about possibilities
+### 3. Reasoning
+Why would this be a good or poor choice? What factors support or oppose it?
 
-### 2. For Each Alternative, Clearly State
-
-#### Advantages
-- What are the benefits of this approach?
-- What problems does it solve well?
-- What are the positive aspects?
-
-#### Disadvantages
-- What are the drawbacks or limitations?
-- What challenges might arise?
-- What are the costs or complexities?
-
-#### Reasoning for Selection/Rejection
-- Why would this be a good choice?
-- Why might this not be suitable?
-- What factors support or oppose this option?
-
-#### Potential Future Scenarios
+### 4. Future Scenarios
 - When might this design break down?
 - What future requirements might challenge this approach?
-- What changes would necessitate a redesign?
-- How does this scale or adapt to growth?
-
-### 3. Benefits of This Approach
-
-- Expands thinking beyond obvious solutions
-- Identifies potential issues early
-- Facilitates informed decision-making
-- Documents reasoning for future reference
-- Helps stakeholders understand trade-offs
+- How does this scale or adapt to changes?
 
 ## Example Structure
-
-When presenting design alternatives:
 
 ```markdown
 ## Option 1: [Approach Name]
@@ -75,34 +40,44 @@ When presenting design alternatives:
 - [Drawback 2]
 
 **Reasoning:**
-[Why this option makes sense or doesn't]
+[Why this makes sense or doesn't]
 
 **Future Scenarios:**
-- This design might break down when [scenario]
-- Would need changes if [future requirement]
+- Breaks down when [scenario]
+- Needs changes if [future requirement]
 
 ## Option 2: [Alternative Approach]
-[Same structure as above]
+[Same structure]
 
 ## Option 3: [Another Alternative]
-[Same structure as above]
+[Same structure]
 
 ## Recommendation
 [Based on current requirements and future considerations]
 ```
 
+## Benefits of This Approach
+
+- Expands thinking beyond first obvious solution
+- Identifies potential issues early
+- Enables informed decision-making
+- Documents reasoning for future reference
+- Helps stakeholders understand trade-offs
+
 ## Best Practices
 
-1. **Be Thorough**: Don't rush to a solution
-2. **Consider Long-term**: Think beyond immediate needs
-3. **Document Trade-offs**: Make implicit costs explicit
-4. **Involve Stakeholders**: Present alternatives for discussion
-5. **Learn from Decisions**: Review past design choices
-
-## Important Notes
-
-- There is rarely a single "perfect" solution
-- Different contexts may favor different approaches
-- Future requirements can change the optimal choice
+### DO:
+- Think broadly before settling on a solution
+- Consider long-term implications, not just immediate needs
+- Make implicit costs and trade-offs explicit
 - Document the decision-making process
-- Revisit and learn from design decisions over time
+
+### DON'T:
+- Rush to the first solution
+- Present only one option as "the best"
+- Ignore future scalability or maintainability
+- Make decisions without exploring alternatives
+
+## Important Note
+
+There is rarely a single "perfect" solution. Different contexts favor different approaches, and future requirements can change the optimal choice.

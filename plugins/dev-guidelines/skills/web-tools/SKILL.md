@@ -1,74 +1,35 @@
 ---
 name: Web Research Tools
-description: Use this skill when performing web information retrieval, web scraping, browser automation, or documentation tasks. Provides guidelines for using Playwright MCP and Obsidian tools.
+description: Use this skill when performing web scraping, browser automation, or documentation tasks. Use Playwright MCP for web information retrieval and Obsidian MCP for note-taking.
 version: 1.0.0
 ---
 
 # Web Research and Documentation Tools
 
-## When to Use This Skill
+## Web Information Retrieval: Playwright MCP
 
-This skill should be used when:
-- Performing web information retrieval
-- Web scraping tasks
-- Browser automation needed
-- Creating or managing documentation
-- Note-taking and knowledge management
+For web scraping and browser automation:
+- **Tool**: https://github.com/microsoft/playwright-mcp
+- **Use for**: Navigating pages, interacting with elements, extracting data from dynamic websites, taking screenshots, handling authentication flows
 
-## Web Information Retrieval
+## Documentation and Notes: Obsidian MCP
 
-### Playwright MCP
-
-For all web scraping and browser automation needs:
-- Use https://github.com/microsoft/playwright-mcp
-- This is the preferred method for web information retrieval
-- Supports browser automation, page interaction, and data extraction
-
-### Usage Guidelines
-
-1. **Browser Automation**: Use Playwright MCP tools for:
-   - Navigating web pages
-   - Interacting with page elements
-   - Extracting data from dynamic websites
-   - Taking screenshots
-
-2. **Web Scraping**: Leverage Playwright capabilities for:
-   - Accessing JavaScript-rendered content
-   - Handling authentication flows
-   - Multi-step navigation scenarios
-
-## Documentation Tasks
-
-### Obsidian MCP
-
-For documentation and knowledge management:
-- Use https://github.com/jacksteamdev/obsidian-mcp-tools
-- Pre-configured and available in the environment
-- Leverage Obsidian's capabilities for note-taking
-
-### Usage Guidelines
-
-1. **Note-Taking**: Use Obsidian for:
-   - Organizing research findings
-   - Creating interconnected notes
-   - Building knowledge bases
-
-2. **Documentation**: Leverage Obsidian features:
-   - Markdown-based documentation
-   - Linking related concepts
-   - Organizing project documentation
+For knowledge management and documentation:
+- **Tool**: https://github.com/jacksteamdev/obsidian-mcp-tools
+- **Pre-configured** in the environment
+- **Use for**: Organizing research findings, creating interconnected notes, building knowledge bases, markdown-based documentation
 
 ## Best Practices
 
-1. **Choose the Right Tool**:
-   - Playwright MCP for web data retrieval
-   - Obsidian for documentation and notes
-   - Combine both for research workflows
+### Choose the Right Tool
+- **Playwright MCP** for web data retrieval
+- **Obsidian** for documentation and notes
+- **Combine both** for comprehensive research workflows (gather with Playwright → organize with Obsidian)
 
-2. **Efficient Workflows**:
-   - Use Playwright to gather information
-   - Use Obsidian to organize and document findings
-   - Create reproducible research processes
+### Efficient Workflows
+1. Use Playwright to gather information from web sources
+2. Use Obsidian to organize and document findings
+3. Create reproducible research processes
 
 ## Important Notes
 
