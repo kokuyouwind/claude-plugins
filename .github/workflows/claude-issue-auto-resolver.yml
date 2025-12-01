@@ -42,12 +42,12 @@ jobs:
               if (unresolvedIssue) {
                 console.log(`Found issue #${unresolvedIssue.number} with ${priority}`);
 
-                // Post a comment mentioning @claude
+                // Post a comment mentioning @claude with instruction to follow resolve-issue.md
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: unresolvedIssue.number,
-                  body: '@claude この問題を解決してください'
+                  body: '@claude .claude/resolve-issue.md に従ってこのIssueを解決してください'
                 });
 
                 // Add claude-code-requested label to prevent duplicate processing
@@ -58,7 +58,7 @@ jobs:
                   labels: ['claude-code-requested']
                 });
 
-                console.log(`Successfully commented on issue #${unresolvedIssue.number} and added label`);
+                console.log(`Successfully commented on issue #${unresolvedIssue.number} and added claude-code-requested label`);
                 return;
               }
             }
