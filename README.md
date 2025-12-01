@@ -1,6 +1,6 @@
 # Claude Code Plugin Marketplace
 
-This is a plugin marketplace for Claude Code maintained by kokuyouwind.
+This is a plugin marketplace for Claude Code maintained by kokuyouwind!
 
 ## Installation
 
