@@ -6,15 +6,15 @@
         "repo": "anthropics/claude-code"
       }
     },
-    "kokuyouwind-plugins-local": {
+    "kokuyouwind-plugins": {
       "source": {
-        "source": "local",
-        "path": "/Users/kokuyouwind/repos/claude-plugins"
+        "source": "github",
+        "repo": "kokuyouwind/claude-plugins"
       }
     }
   },
   "enabledPlugins": [
     "plugin-dev@claude-code-plugins",
-    "dev-guidelines@kokuyouwind-plugins-local"
+    "dev-guidelines@kokuyouwind-plugins"
   ]
 }
