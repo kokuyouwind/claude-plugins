@@ -1,55 +1,55 @@
 # Development Guidelines Plugin
 
-Comprehensive development guidelines for Claude Code, including best practices for code investigation, design decisions, error analysis, testing methodology, GitHub workflows, and web research.
+Comprehensive development guidelines for Claude Code, including best practices for code implementation, debugging, design decisions, testing methodology, GitHub workflows, and web research.
 
 ## Overview
 
 This plugin provides six skills that guide development practices:
 
-1. **Investigation Process** - Methodology for code investigation and bug analysis
-2. **Design Alternatives** - Approach for evaluating design decisions
-3. **Root Cause Analysis** - Guidelines for finding and fixing root causes
-4. **PR Description Format** - Format guidelines for GitHub PR descriptions
-5. **Test-Driven Approach** - TDD methodology and testing best practices
-6. **Web Research Tools** - Guidelines for web information retrieval
+1. **Implementation Workflow** - Git branch management and code implementation workflow
+2. **Debugging Process** - Methodology for code investigation, bug analysis, and root cause analysis
+3. **Design Alternatives** - Approach for evaluating design decisions and architecture choices
+4. **Test-Driven Approach** - TDD methodology and testing best practices
+5. **PR Description Format** - Format guidelines for GitHub PR descriptions in Japanese
+6. **Web Tools** - Guidelines for web information retrieval and documentation
 
 ## Skills
 
-### Investigation Process
+### Implementation Workflow
 
-**When activated:** When investigating code, analyzing bugs, understanding existing implementations, exploring codebases, or debugging issues.
+**When activated:** When implementing new features, making code changes, fixing bugs, or starting any code implementation work in a Git repository.
 
-**What it does:** Provides methodology for transparent, real-time code investigation that enables collaboration and catches mistakes early.
+**What it does:** Guides Git branch management workflow, determines whether to create new branch or work on existing PR branch, and ensures latest changes are pulled before starting work.
+
+### Debugging Process
+
+**When activated:** When investigating code, analyzing bugs, debugging issues, performing root cause analysis, or handling errors.
+
+**What it does:** Provides methodology for transparent real-time investigation with file:line references and enforces "investigate WHY before fixing" philosophy using 5 Whys technique.
 
 ### Design Alternatives
 
 **When activated:** When making design decisions, choosing architecture patterns, selecting technologies, or evaluating implementation approaches.
 
-**What it does:** Guides the process of proposing multiple alternatives with clear advantages, disadvantages, and future considerations.
-
-### Root Cause Analysis
-
-**When activated:** When handling errors, debugging unexpected behavior, investigating failures, fixing bugs, or analyzing system issues.
-
-**What it does:** Enforces "investigate WHY before fixing" philosophy to prevent recurring issues and reduce technical debt.
-
-### PR Description Format
-
-**When activated:** When creating GitHub pull requests or writing PR descriptions.
-
-**What it does:** Provides format guidelines for PR descriptions in Japanese with clear What, Why, and How sections.
+**What it does:** Guides the process of proposing multiple alternatives (2-3 minimum) with clear advantages, disadvantages, reasoning, and future scenarios.
 
 ### Test-Driven Approach
 
 **When activated:** When implementing tests, practicing TDD, creating test cases, or planning test strategy.
 
-**What it does:** References specific methodologies (t_wada's TDD, Kent Beck's TDD) and provides skeleton-first approach to test implementation.
+**What it does:** References specific methodologies (t_wada's TDD, Kent Beck's TDD) and provides test skeleton/structure first before implementation following Red-Green-Refactor cycle.
 
-### Web Research Tools
+### PR Description Format
+
+**When activated:** When creating GitHub pull requests or writing PR descriptions.
+
+**What it does:** Provides format guidelines for PR descriptions in Japanese (概要/変更の背景/変更詳細) with clear What, Why, and How structure using professional Japanese (です/ます).
+
+### Web Tools
 
 **When activated:** When performing web information retrieval, web scraping, browser automation, or documentation tasks.
 
-**What it does:** Provides guidelines for using Playwright MCP and Obsidian tools effectively.
+**What it does:** Provides guidelines for using Playwright MCP for web scraping/browser automation and Obsidian MCP for documentation and note-taking.
 
 ## Installation
 

@@ -1,45 +1,25 @@
 ---
 name: Test-Driven Approach
-description: Use this skill when implementing tests, practicing TDD (Test-Driven Development), creating test cases, writing unit tests, or planning test strategy. Provides methodology for effective testing.
+description: Use this skill when implementing tests, practicing TDD, creating test cases, or planning test strategy. Reference specific methodologies (t_wada's TDD, Kent Beck's TDD) and provide test skeleton before implementation.
 version: 1.0.0
 ---
 
-# Testing Methodology and Approach
+# Test-Driven Development Methodology
 
-## When to Use This Skill
+## Core Principles
 
-This skill should be used when:
-- Implementing tests for code
-- Practicing Test-Driven Development (TDD)
-- Creating test cases
-- Writing unit tests, integration tests, or E2E tests
-- Planning test strategy
-- Designing test suites
+### 1. Reference Specific Methodologies
 
-## Testing Approach
+When implementing tests, cite **concrete methodologies**:
+- **t_wada's TDD** - Test-Driven Development approach by t_wada
+- **Kent Beck's Test-Driven Development** - Classic TDD methodology
+- Framework-specific best practices (Jest, pytest, RSpec, etc.)
 
-### Reference Specific Methodologies
+Generic "best practices" are less effective than specific, established approaches.
 
-When implementing tests, reference **specific, concrete testing methodologies**:
+### 2. Test Skeleton First
 
-#### Recommended References:
-- **"t_wada's TDD"** - Test-Driven Development approach by t_wada
-- **"Kent Beck's Test-Driven Development"** - Classic TDD methodology
-- **Specific testing frameworks' best practices** (Jest, pytest, RSpec, etc.)
-
-#### Why Specific References Matter:
-- Generic terms like "best practices" are less effective
-- Concrete methodologies provide clear guidelines
-- Established approaches have proven track records
-- Specific references enable deeper learning
-
-### Test Implementation Process
-
-When implementing tests, follow this pattern:
-
-#### 1. Provide Test Skeleton First
-
-Start with the **structure** of test cases:
+Provide the **structure** of test cases before implementation:
 
 ```typescript
 describe('UserAuthentication', () => {
@@ -69,120 +49,57 @@ describe('UserAuthentication', () => {
 });
 ```
 
-#### 2. Framework Guides Implementation
+**Benefits**: Structure guides implementation, identifies edge cases early, ensures comprehensive coverage, facilitates scope discussion.
 
-Benefits of skeleton-first approach:
-- Provides structure for actual implementation
-- Helps identify edge cases early
-- Ensures comprehensive coverage
-- Makes it clear what needs to be tested
-- Facilitates discussion of test scope
+### 3. Red-Green-Refactor Cycle
 
-#### 3. Fill in Details After Confirmation
-
-Once the skeleton is confirmed:
-- Implement each test case
-- Add setup and teardown logic
-- Include assertions and expectations
-- Add test data and fixtures
-
-## Test-Driven Development (TDD) Cycle
-
-Follow the classic TDD cycle:
-
-### Red-Green-Refactor
-
-1. **Red**: Write a failing test
-   - Write test first, before implementation
-   - Test should fail because feature doesn't exist yet
-   - Verify that test actually fails
-
-2. **Green**: Make the test pass
-   - Write minimal code to make test pass
-   - Don't worry about perfection yet
-   - Focus on making it work
-
-3. **Refactor**: Improve the code
-   - Clean up implementation
-   - Remove duplication
-   - Improve design
-   - Ensure tests still pass
-
-### Benefits of TDD
-
-- Drives design from usage perspective
-- Ensures testable code
-- Provides immediate feedback
-- Creates regression test suite
-- Documents expected behavior
+1. **Red**: Write a failing test (feature doesn't exist yet)
+2. **Green**: Write minimal code to make test pass
+3. **Refactor**: Improve code while keeping tests green
 
 ## Test Case Design
 
 ### What to Test
-
-Focus on:
 - **Happy path**: Expected usage scenarios
 - **Edge cases**: Boundary conditions, empty inputs
 - **Error cases**: Invalid inputs, error handling
 - **Integration points**: Interaction with dependencies
 
 ### Test Naming
+Use descriptive names that explain the expected behavior:
 
-Use descriptive test names:
+✅ `should return 404 when user not found`
+✅ `should validate email format before saving`
+❌ `works correctly`
+❌ `test1`
 
-```typescript
-// Good
-it('should return 404 when user not found')
-it('should validate email format before saving')
+## Example Workflow
 
-// Less clear
-it('works correctly')
-it('test1')
+```markdown
+1. "マスター、t_wadaのTDDアプローチを使ってテストを実装するね"
+2. "まず、テストケースの構造を作るよ"
+   [Show test skeleton with describe/it blocks]
+3. "これでカバーすべきケースは揃っているかな？"
+4. "それじゃあ、各テストケースを実装していくね"
+   [Implement tests following Red-Green-Refactor]
 ```
 
 ## Best Practices
 
 ### DO:
-- Reference specific testing methodologies (t_wada's TDD, Kent Beck's TDD)
-- Provide test skeleton/structure first
-- Write tests before implementation (TDD)
-- Test behavior, not implementation details
-- Keep tests focused and independent
+- Reference specific methodologies (not generic "best practices")
+- Provide test skeleton before details
+- Write tests before implementation (in TDD)
 - Use descriptive test names
+- Test behavior, not implementation details
 
 ### DON'T:
-- Use generic "best practices" without specifics
-- Jump straight to implementation without structure
-- Write implementation before tests (in TDD)
+- Use vague "best practices" without specifics
+- Jump to implementation without structure
 - Test internal implementation details
 - Create dependent tests
-- Use vague test names
 
-## Example Workflow
+## Integration with Other Skills
 
-```markdown
-1. **Discuss test strategy**:
-   "マスター、t_wadaのTDDアプローチを使ってテストを実装するね"
-
-2. **Provide skeleton**:
-   "まず、テストケースの構造を作るよ"
-   [Show test skeleton with describe/it blocks]
-
-3. **Confirm scope**:
-   "これでカバーすべきケースは揃っているかな？"
-
-4. **Implement tests**:
-   "それじゃあ、各テストケースを実装していくね"
-   [Implement test cases one by one]
-
-5. **Follow TDD cycle**:
-   "テストが失敗することを確認してから、実装を書くよ"
-```
-
-## Important Notes
-
-- Concrete methodologies > Generic "best practices"
-- Structure before details
-- TDD is a design tool, not just a testing tool
-- Tests document expected behavior
-- Good tests enable confident refactoring
+- Works with **implementation-workflow** for proper branch setup before writing tests
+- Complements **debugging-process** (write failing test → investigate → fix → verify)

@@ -99,11 +99,16 @@ Automates RBS type definition setup and type error fixing for Ruby projects.
 
 **IMPORTANT**: When updating plugin versions, you must update version numbers in THREE places:
 
-1. **`.claude-plugin/marketplace.json`** - The `plugins[].version` field
-2. **`plugins/<plugin-name>/plugin.json`** - The `version` field
-3. **`plugins/<plugin-name>/README.md`** - The version badge/header
+1. **`plugins/<plugin-name>/.claude-plugin/plugin.json`** - The `version` field
+2. **`plugins/<plugin-name>/README.md`** - The version information and documentation
+3. **`.claude-plugin/marketplace.json`** - The `plugins[].version` field (at repository root)
 
-All three must be kept in sync for consistency.
+**CRITICAL**: All three must be kept in sync for consistency. The marketplace.json update is often forgotten but is REQUIRED for users to see and install the latest version.
+
+**Additional considerations when updating versions**:
+- If plugin functionality or skills have changed significantly, update `description` fields in both `plugin.json` and `marketplace.json` to reflect the changes
+- If skill names or count have changed, update README.md to reflect the current skills
+- Review and update README.md documentation to match current functionality
 
 ### Adding New Plugins
 
