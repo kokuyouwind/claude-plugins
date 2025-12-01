@@ -42,23 +42,51 @@ jobs:
               if (unresolvedIssue) {
                 console.log(`Found issue #${unresolvedIssue.number} with ${priority}`);
 
-                // Post a comment mentioning @claude
+                // Analyze issue content to determine type
+                const issueContent = `${unresolvedIssue.title} ${unresolvedIssue.body || ''}`.toLowerCase();
+
+                let issueType = 'type:feature'; // default
+                let requestMessage = '@claude この機能の実装方針をまとめて、実装PRを作ってください';
+
+                if (issueContent.match(/bug|バグ|エラー|error|不具合|修正|fix|問題/)) {
+                  issueType = 'type:bug';
+                  requestMessage = '@claude このバグを調査して、修正PRを作ってください';
+                } else if (issueContent.match(/調査|investigation|research|analyze|分析|確認/)) {
+                  issueType = 'type:investigation';
+                  requestMessage = '@claude この件について調査して、結果を簡潔にコメントしてください';
+                } else if (issueContent.match(/リファクタリング|refactor|cleanup|整理|クリーンアップ/)) {
+                  issueType = 'type:refactoring';
+                  requestMessage = '@claude このリファクタリングを実施して、PRを作ってください';
+                } else if (issueContent.match(/ドキュメント|document|readme|doc|docs|documentation/)) {
+                  issueType = 'type:documentation';
+                  requestMessage = '@claude ドキュメントを更新して、PRを作ってください';
+                } else if (issueContent.match(/改善|enhance|improve|improvement|最適化|optimize/)) {
+                  issueType = 'type:enhancement';
+                  requestMessage = '@claude この改善の実装方針をまとめて、実装PRを作ってください';
+                } else if (issueContent.match(/機能|feature|実装|implement|追加|add/)) {
+                  issueType = 'type:feature';
+                  requestMessage = '@claude この機能の実装方針をまとめて、実装PRを作ってください';
+                }
+
+                console.log(`Determined issue type: ${issueType}`);
+
+                // Post a comment mentioning @claude with specific request
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: unresolvedIssue.number,
-                  body: '@claude この問題を解決してください'
+                  body: requestMessage
                 });
 
-                // Add claude-code-requested label to prevent duplicate processing
+                // Add type label and claude-code-requested label
                 await github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: unresolvedIssue.number,
-                  labels: ['claude-code-requested']
+                  labels: [issueType, 'claude-code-requested']
                 });
 
-                console.log(`Successfully commented on issue #${unresolvedIssue.number} and added label`);
+                console.log(`Successfully commented on issue #${unresolvedIssue.number}, added ${issueType} and claude-code-requested labels`);
                 return;
               }
             }
