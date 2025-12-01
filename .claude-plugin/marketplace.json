@@ -22,6 +22,19 @@
       "license": "MIT",
       "keywords": ["ruby", "rbs", "steep", "type-checking"],
       "category": "development"
+    },
+    {
+      "name": "dev-guidelines",
+      "source": "./plugins/dev-guidelines",
+      "description": "Comprehensive development guidelines including code implementation workflow, code investigation, design decisions, error analysis, testing methodology, GitHub workflows, and web research",
+      "version": "1.0.0",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["development", "workflow", "guidelines", "best-practices"],
+      "category": "development"
     }
   ]
 }

@@ -13,10 +13,16 @@ This is a Claude Code plugin marketplace repository containing plugins that exte
   marketplace.json       # Defines the marketplace and available plugins
 plugins/                 # Plugin implementations
   rbs-goose/            # Ruby type checking automation plugin
-    plugin.json         # Plugin metadata and command definitions
+    .claude-plugin/     # Plugin metadata directory
+      plugin.json       # Plugin metadata and command definitions
     commands/           # User-facing command implementation files
     internal/           # Internal processing files (not exposed as commands)
     templates/          # Configuration templates
+    README.md          # Plugin documentation
+  dev-guidelines/       # Development workflow guidelines plugin
+    .claude-plugin/     # Plugin metadata directory
+      plugin.json       # Plugin metadata
+    skills/             # Auto-activating skills for development workflows
     README.md          # Plugin documentation
 ```
 
@@ -102,11 +108,21 @@ All three must be kept in sync for consistency.
 ### Adding New Plugins
 
 1. Create plugin directory under `plugins/`
-2. Add `plugin.json` with metadata and command definitions
-3. Create `commands/` directory with user-facing command implementation files
-4. Create `internal/` directory for internal processing files (optional)
+2. Create `.claude-plugin/` directory inside the plugin directory
+3. Add `.claude-plugin/plugin.json` with metadata (name, version, description, author)
+4. Create component directories as needed (`commands/`, `skills/`, `agents/`, etc.)
 5. Add `README.md` with usage documentation
-6. Update `.claude-plugin/marketplace.json` to register the plugin with version
+6. **REQUIRED**: Update `.claude-plugin/marketplace.json` to register the plugin
+
+**IMPORTANT**: Step 6 is mandatory. The plugin will not be discoverable or installable from the marketplace unless it's registered in `marketplace.json` with:
+- `name`: Plugin name (must match plugin.json)
+- `source`: Path to plugin directory (e.g., "./plugins/plugin-name")
+- `description`: Brief description
+- `version`: Plugin version (must match plugin.json)
+- `author`: Author information
+- `license`: License type (e.g., "MIT")
+- `keywords`: Array of relevant keywords
+- `category`: Plugin category (e.g., "development")
 
 ### Testing Plugins
 
