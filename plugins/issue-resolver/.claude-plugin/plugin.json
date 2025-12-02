@@ -1,0 +1,11 @@
+{
+  "name": "issue-resolver",
+  "version": "1.0.0",
+  "description": "Issue resolution workflow with automatic type detection and type-specific resolution procedures",
+  "author": {
+    "name": "kokuyouwind",
+    "url": "https://github.com/kokuyouwind"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/kokuyouwind/claude-plugins"
+}
