@@ -1,6 +1,6 @@
 ---
 name: Test-Driven Approach
-description: Use this skill when implementing tests, practicing TDD, creating test cases, or planning test strategy. Reference specific methodologies (t_wada's TDD, Kent Beck's TDD) and provide test skeleton before implementation.
+description: Provides TDD methodology guidance based on established practices (t_wada, Kent Beck). Use this skill when implementing tests, practicing TDD, creating test cases, or planning test strategy.
 version: 1.0.0
 ---
 
@@ -8,98 +8,35 @@ version: 1.0.0
 
 ## Core Principles
 
-### 1. Reference Specific Methodologies
+1. **Reference Specific Methodologies**: Cite t_wada's TDD, Kent Beck's TDD, or framework-specific practices (Jest, pytest, RSpec). Avoid generic "best practices".
+2. **Test Skeleton First**: Provide structure before implementation to identify edge cases early.
+3. **Red-Green-Refactor**: Write failing test → Minimal code to pass → Refactor
 
-When implementing tests, cite **concrete methodologies**:
-- **t_wada's TDD** - Test-Driven Development approach by t_wada
-- **Kent Beck's Test-Driven Development** - Classic TDD methodology
-- Framework-specific best practices (Jest, pytest, RSpec, etc.)
-
-Generic "best practices" are less effective than specific, established approaches.
-
-### 2. Test Skeleton First
-
-Provide the **structure** of test cases before implementation:
+## Test Skeleton Example
 
 ```typescript
 describe('UserAuthentication', () => {
   describe('login', () => {
-    it('should successfully login with valid credentials', () => {
-      // TODO: Implement
-    });
-
-    it('should reject invalid credentials', () => {
-      // TODO: Implement
-    });
-
-    it('should handle missing credentials', () => {
-      // TODO: Implement
-    });
-
-    it('should lock account after multiple failed attempts', () => {
-      // TODO: Implement
-    });
-  });
-
-  describe('logout', () => {
-    it('should clear session on logout', () => {
-      // TODO: Implement
-    });
+    it('should successfully login with valid credentials', () => {});
+    it('should reject invalid credentials', () => {});
+    it('should lock account after multiple failed attempts', () => {});
   });
 });
 ```
 
-**Benefits**: Structure guides implementation, identifies edge cases early, ensures comprehensive coverage, facilitates scope discussion.
+## What to Test
 
-### 3. Red-Green-Refactor Cycle
-
-1. **Red**: Write a failing test (feature doesn't exist yet)
-2. **Green**: Write minimal code to make test pass
-3. **Refactor**: Improve code while keeping tests green
-
-## Test Case Design
-
-### What to Test
 - **Happy path**: Expected usage scenarios
 - **Edge cases**: Boundary conditions, empty inputs
 - **Error cases**: Invalid inputs, error handling
-- **Integration points**: Interaction with dependencies
 
-### Test Naming
-Use descriptive names that explain the expected behavior:
+## Test Naming
 
 ✅ `should return 404 when user not found`
-✅ `should validate email format before saving`
-❌ `works correctly`
-❌ `test1`
+❌ `works correctly` / `test1`
 
-## Example Workflow
+## DO / DON'T
 
-```markdown
-1. "マスター、t_wadaのTDDアプローチを使ってテストを実装するね"
-2. "まず、テストケースの構造を作るよ"
-   [Show test skeleton with describe/it blocks]
-3. "これでカバーすべきケースは揃っているかな？"
-4. "それじゃあ、各テストケースを実装していくね"
-   [Implement tests following Red-Green-Refactor]
-```
+**DO**: Reference specific methodologies, provide skeleton first, use descriptive names, test behavior not implementation
 
-## Best Practices
-
-### DO:
-- Reference specific methodologies (not generic "best practices")
-- Provide test skeleton before details
-- Write tests before implementation (in TDD)
-- Use descriptive test names
-- Test behavior, not implementation details
-
-### DON'T:
-- Use vague "best practices" without specifics
-- Jump to implementation without structure
-- Test internal implementation details
-- Create dependent tests
-
-## Integration with Other Skills
-
-- Works with **implementation-workflow** for proper branch setup before writing tests
-- Complements **debugging-process** (write failing test → investigate → fix → verify)
+**DON'T**: Use vague best practices, skip structure, test implementation details, create dependent tests
