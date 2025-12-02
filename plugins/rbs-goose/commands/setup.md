@@ -5,6 +5,14 @@ Follow these instructions:
 # (e.g., ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/rbs-goose)
 plugin_base_path = File.dirname(__FILE__) # This is the plugin root directory
 
+# Note: Documentation for RBS, Steep, and related tools is available via skills:
+# - rbs-syntax: RBS syntax guide
+# - rbs-inline-syntax: RBS Inline syntax guide
+# - steep-reference: Steep type checker documentation
+# - rbs-collection-reference: RBS gem collection setup
+# - rbs-rails-reference: RBS Rails type generation
+# These skills will be auto-activated as needed during the setup process
+
 # Setup configurations
 file = File.copy(File.join(plugin_base_path, 'templates/rbs_goose.template.yml'), './rbs_goose.yml')
 
@@ -17,12 +25,9 @@ end
 config = Config.load('./rbs_goose.yml')
 unless gemfile.contain?('rbs')
   puts('setup rbs...')
-  fetch('https://github.com/soutaro/steep')
   setup_rbs
 
   if config.type_annotation_mode.inline?
-    fetch('https://github.com/soutaro/rbs-inline')
-
     begin
       setup_rbs_inline
     rescue => CompatibilityError(['rbs-inline', 'rubocop-ast'])
@@ -38,20 +43,17 @@ unless gemfile.contain?('rbs')
     end
   end
 
-  fetch('https://github.com/ruby/gem_rbs_collection')
   setup_rbs_collection
 end
 
 unless gemifle.contain?('steep')
   puts('setup steep...')
-  fetch('https://github.com/soutaro/steep')
   setup_steep
   update_steep_config(directory_structure)
 end
 
 if rails_app? && !gemfile.contain?('rbs')
   puts('setup rbs-rails...')
-  fetch('https://github.com/pocke/rbs_rails')
   setup_rails
 end
 

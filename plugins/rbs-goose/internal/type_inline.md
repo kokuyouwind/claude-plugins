@@ -1,8 +1,8 @@
 Follow these instructions:
 
 ```
-# Load Documentation
-fetch('https://github.com/soutaro/rbs-inline/wiki/Syntax-guide')
+# Note: RBS Inline syntax guide is available via the rbs-inline-syntax skill
+# The skill will be auto-activated when working with RBS Inline annotations
 
 # Type check and fix
 def generate_fig_and_type_check
