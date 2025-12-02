@@ -6,6 +6,20 @@ version: 1.0.0
 
 # Code Implementation Workflow
 
+## CRITICAL RULE: Never Push Directly to Default Branches
+
+**ABSOLUTELY PROHIBITED:**
+- ❌ `git push origin main`
+- ❌ `git push origin develop`
+- ❌ `git push origin master`
+
+**ALL changes must go through Pull Requests. NO EXCEPTIONS.**
+
+If you need to add files to default branch:
+1. Create a separate PR branch
+2. Submit a proper Pull Request
+3. Never bypass the PR process
+
 ## Core Rule: Branch Hygiene First
 
 **Before ANY code implementation**, follow proper branch workflow:

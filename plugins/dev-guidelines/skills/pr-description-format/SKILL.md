@@ -48,3 +48,26 @@ Specific implementation details
 - Write for code reviewers to understand changes quickly
 - Focus on clarity and completeness
 - Include relevant context and rationale
+
+## PR Workflow Requirements
+
+### 1. Always Start with Draft PR
+```bash
+gh pr create --draft
+```
+Only switch to open state when explicitly instructed to request review:
+```bash
+gh pr ready
+```
+
+### 2. Clarify "Why" Before Creating PR
+If the reason for changes is not clear or not provided by the user:
+- **ALWAYS ask the user for clarification** before creating the PR
+- Include business context, problem being solved, or improvement being made
+- Ensure reviewers can understand both implementation and motivation
+
+### 3. Update PR Description on New Commits
+When pushing new commits to an existing PR:
+- Always update the PR description to reflect current state: `gh pr edit --body`
+- Ensure description accurately represents ALL changes, not just initial implementation
+- Base the update on latest commit history and changes
