@@ -35,6 +35,19 @@
       "license": "MIT",
       "keywords": ["development", "workflow", "guidelines", "best-practices"],
       "category": "development"
+    },
+    {
+      "name": "issue-resolver",
+      "source": "./plugins/issue-resolver",
+      "description": "Automates GitHub Issue resolution workflows with type detection and type-specific procedures",
+      "version": "1.0.0",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["github", "issue", "workflow", "automation"],
+      "category": "development"
     }
   ]
 }
