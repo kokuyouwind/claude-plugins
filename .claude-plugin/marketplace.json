@@ -35,6 +35,19 @@
       "license": "MIT",
       "keywords": ["development", "workflow", "guidelines", "best-practices"],
       "category": "development"
+    },
+    {
+      "name": "issue-resolver",
+      "source": "./plugins/issue-resolver",
+      "description": "GitHub Issue解決プロセスを自動化するスキル。Issue種別を判定し、種別ごとに適切な解決手順を提供します",
+      "version": "1.0.0",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["github", "issue", "workflow", "automation"],
+      "category": "development"
     }
   ]
 }
