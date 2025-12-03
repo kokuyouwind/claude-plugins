@@ -1,0 +1,11 @@
+{
+  "name": "issue-resolver",
+  "version": "1.0.0",
+  "description": "Provides structured procedures for resolving GitHub issues, automatically activated when triggered from issue comments",
+  "author": {
+    "name": "kokuyouwind",
+    "url": "https://github.com/kokuyouwind"
+  },
+  "license": "MIT",
+  "skills": ["resolve-issue"]
+}
