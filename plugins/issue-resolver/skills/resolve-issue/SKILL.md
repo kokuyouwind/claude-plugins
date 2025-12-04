@@ -1,105 +1,86 @@
-# Issue解決スキル
+---
+name: resolve-issue
+description: Provides a systematic workflow for resolving GitHub Issues. Use this skill when assigned a GitHub Issue or when delegated by the Issue Auto-resolver.
+---
 
-このスキルは、GitHub Issueを体系的に解決するためのワークフローを提供します。
+# Resolve Issue
 
-## スキルの目的
+## Instructions
 
-GitHub Issueの種別を判定し、種別ごとに適切な解決プロセスを適用することで、一貫性のある高品質な問題解決を実現します。
+### Purpose
 
-## 使用タイミング
+Achieve consistent, high-quality problem resolution by determining the GitHub Issue type and applying the appropriate resolution process for each type.
 
-- GitHub Issueの解決を依頼されたとき
-- Issue Auto-resolverから処理を委譲されたとき
+### Usage Timing
 
-## 解決プロセス
+- When requested to resolve a GitHub Issue
+- When delegated processing by the Issue Auto-resolver
 
-### ステップ1: Issue種別の判定とラベル付与
+### Resolution Process
 
-まず、Issueに `type:*` ラベルが付与されているか確認してください。
+#### Step 1: Determine Issue Type and Apply Label
 
-**ラベルが付いていない場合:**
+First, check if the Issue has a `type:*` label.
 
-Issueのタイトルと本文を読んで、以下の6種類から適切な種別を判定し、対応するラベルを付与してください：
+**If no label is present:**
 
-- `type:bug` - バグ、エラー、不具合の修正
-- `type:feature` - 新機能の追加
-- `type:investigation` - 調査、分析タスク
-- `type:refactoring` - コードのリファクタリング
-- `type:documentation` - ドキュメントの更新
-- `type:enhancement` - 既存機能の改善
+Read the Issue title and body, determine the appropriate type from the following 6 categories, and apply the corresponding label:
 
-判定が難しい場合は、デフォルトで `type:feature` を付与してください。
+- `type:bug` - Fix bugs, errors, or defects
+- `type:feature` - Add new features
+- `type:investigation` - Investigation or analysis tasks
+- `type:refactoring` - Code refactoring
+- `type:documentation` - Update documentation
+- `type:enhancement` - Improve existing features
 
-### ステップ2: 種別ごとの詳細手順に従う
+If it is difficult to determine, apply `type:feature` by default.
 
-Issueの種別が判定できたら、以下のタイミングで対応する詳細手順ファイルを参照してください：
+#### Step 2: Follow Detailed Instructions for Each Type
 
-#### type:bug の場合
-**参照タイミング:** バグ修正の具体的な手順を確認する必要があるとき
+Once the Issue type is determined, refer to the corresponding detailed instruction file at the following times:
 
-詳細な手順は以下のファイルを参照してください：
-```
-{plugin_base_path}/issue-types/bug.md
-```
+**type:bug**
+- **When to refer:** When you need to check specific steps for bug fixing.
+- **Reference file:** `{plugin_base_path}/issue-types/bug.md`
 
-#### type:feature の場合
-**参照タイミング:** 新機能実装の具体的な手順を確認する必要があるとき
+**type:feature**
+- **When to refer:** When you need to check specific steps for implementing new features.
+- **Reference file:** `{plugin_base_path}/issue-types/feature.md`
 
-詳細な手順は以下のファイルを参照してください：
-```
-{plugin_base_path}/issue-types/feature.md
-```
+**type:investigation**
+- **When to refer:** When you need to check specific steps for investigation tasks.
+- **Reference file:** `{plugin_base_path}/issue-types/investigation.md`
 
-#### type:investigation の場合
-**参照タイミング:** 調査タスクの具体的な手順を確認する必要があるとき
+**type:refactoring**
+- **When to refer:** When you need to check specific steps for refactoring.
+- **Reference file:** `{plugin_base_path}/issue-types/refactoring.md`
 
-詳細な手順は以下のファイルを参照してください：
-```
-{plugin_base_path}/issue-types/investigation.md
-```
+**type:documentation**
+- **When to refer:** When you need to check specific steps for updating documentation.
+- **Reference file:** `{plugin_base_path}/issue-types/documentation.md`
 
-#### type:refactoring の場合
-**参照タイミング:** リファクタリングの具体的な手順を確認する必要があるとき
+**type:enhancement**
+- **When to refer:** When you need to check specific steps for improving existing features.
+- **Reference file:** `{plugin_base_path}/issue-types/enhancement.md`
 
-詳細な手順は以下のファイルを参照してください：
-```
-{plugin_base_path}/issue-types/refactoring.md
-```
+### Common Guidelines
 
-#### type:documentation の場合
-**参照タイミング:** ドキュメント更新の具体的な手順を確認する必要があるとき
+Important notes common to all Issue types:
 
-詳細な手順は以下のファイルを参照してください：
-```
-{plugin_base_path}/issue-types/documentation.md
-```
+**Code Quality**
+- Check existing code patterns before implementation and maintain consistency.
+- Avoid excessive feature additions or unnecessary refactoring.
 
-#### type:enhancement の場合
-**参照タイミング:** 既存機能改善の具体的な手順を確認する必要があるとき
+**Git Operations**
+- Manage branches according to the implementation workflow (implementation-workflow skill).
+- Keep commit messages clear and concise.
 
-詳細な手順は以下のファイルを参照してください：
-```
-{plugin_base_path}/issue-types/enhancement.md
-```
+**Creating PRs**
+- Use the `gh pr` command when creating PRs.
+- Write the PR title, comments, and description in Japanese (unless otherwise specified).
+- Include an appropriate summary of changes in the PR description.
 
-## 共通ガイドライン
+### Notes
 
-すべてのIssue種別に共通する重要な注意事項：
-
-### コード品質
-- 実装前に既存のコードパターンを確認し、一貫性を保つこと
-- 過度な機能追加や不要なリファクタリングは避けること
-
-### Git操作
-- 実装ワークフロー（implementation-workflow skill）に従ってブランチ管理を行うこと
-- コミットメッセージは明確で簡潔にすること
-
-### PR作成
-- PRを作成するときは `gh pr` コマンドを使うこと
-- PRのタイトル、コメント、descriptionは日本語で記載すること
-- PR説明には適切な変更内容の要約を含めること
-
-## 注意事項
-
-- `{plugin_base_path}` は、このスキルがインストールされているプラグインのベースパスを指します
-- 実際にファイルを参照する際は、適切なパスに置き換えて参照してください
+- `{plugin_base_path}` refers to the base path of the plugin where this skill is installed.
+- When actually referencing files, replace it with the appropriate path.

@@ -1,31 +1,34 @@
 ---
-name: PR Description Format
-description: Provides Japanese PR description format and workflow requirements for GitHub pull requests. Use this skill when creating PRs or using 'gh pr create'.
-version: 1.0.0
+name: pr-description-format
+description: Provides PR description format and workflow requirements for GitHub pull requests. Use this skill when creating PRs or using 'gh pr create'.
 ---
 
-# GitHub PR Description Format
+# PR Description Format
 
-## Format: What / Why / How
+## Instructions
 
-```markdown
-## 概要
-[Brief summary of what was changed]
+### Important Notes
 
-## 変更の背景
-[Why this change was needed]
+- Do not use roleplay; use normal professional tone.
+- If "Why" is unclear, ask user before creating PR.
 
-## 変更詳細
-- [Specific changes and implementation details]
-```
-
-## Important Notes
-
-- ロールプレイせず、通常のです/ます調で記述する
-- If "Why" is unclear, ask user before creating PR
-
-## Workflow Requirements
+### Workflow Requirements
 
 1. **Always start with Draft PR**: `gh pr create --draft`
 2. **Switch to open only when requested**: `gh pr ready`
 3. **Update description on new commits**: `gh pr edit --body` to reflect current state
+
+## Examples
+
+### Format: What / Why / How
+
+```markdown
+## Summary
+[Brief summary of what was changed]
+
+## Background
+[Why this change was needed]
+
+## Details
+- [Specific changes and implementation details]
+```
