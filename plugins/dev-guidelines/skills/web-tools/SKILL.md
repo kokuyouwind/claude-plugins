@@ -1,12 +1,13 @@
 ---
-name: Web Research Tools
+name: web-tools
 description: Specifies tool selection rules for web operations and documentation. Use this skill when performing web scraping, browser automation, GitHub information retrieval, or documentation tasks.
-version: 1.0.0
 ---
 
-# Web Research and Documentation Tools
+# Web Research Tools
 
-## Tool Selection Rules
+## Instructions
+
+### Tool Selection Rules
 
 | Task | Tool | Prohibited |
 |------|------|------------|
@@ -15,7 +16,13 @@ version: 1.0.0
 | App behavior verification | Playwright MCP (`mcp__playwright__browser_*`) | curl, WebFetch |
 | Documentation / Notes | Obsidian MCP | - |
 
-## GitHub Operations
+### Workflow
+
+1. Gather with Playwright → 2. Organize with Obsidian
+
+## Examples
+
+### GitHub Operations
 
 ```bash
 gh pr view/list    # PR information
@@ -24,12 +31,8 @@ gh repo view       # Repository information
 gh run list/view   # GitHub Actions
 ```
 
-## Playwright Operations
+### Playwright Operations
 
 - Navigation: `mcp__playwright__browser_navigate`
 - Interaction: `mcp__playwright__browser_click`, `mcp__playwright__browser_type`
 - Screenshots: `mcp__playwright__browser_take_screenshot`
-
-## Workflow
-
-1. Gather with Playwright → 2. Organize with Obsidian
