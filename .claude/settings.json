@@ -15,6 +15,7 @@
   },
   "enabledPlugins": {
     "plugin-dev@claude-code-plugins": true,
-    "dev-guidelines@kokuyouwind-plugins": true
+    "dev-guidelines@kokuyouwind-plugins": true,
+    "issue-resolver@kokuyouwind-plugins": true
   }
 }
