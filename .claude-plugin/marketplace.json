@@ -48,6 +48,19 @@
       "license": "MIT",
       "keywords": ["github", "issue", "workflow", "automation"],
       "category": "development"
+    },
+    {
+      "name": "code-like-prompt",
+      "source": "./plugins/code-like-prompt",
+      "description": "Collection of commands that execute code-like prompts demonstrating programming concepts through interactive scenarios",
+      "version": "0.1.0",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["education", "examples", "programming", "jokes"],
+      "category": "education"
     }
   ]
 }
