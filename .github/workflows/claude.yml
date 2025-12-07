@@ -46,5 +46,5 @@ jobs:
           # Optional: Add claude_args to customize behavior and configuration
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
-          claude_args: '--allowed-tools "Bash(gh issue:*),Bash(gh label:*),Bash(gh pr:*),Skill(*)"'
+          claude_args: '--allowed-tools "Bash(gh issue:*),Bash(gh label:*),Bash(gh pr:*),Bash(git add:*),Bash(git push:*),Bash(tree:*),Bash(mkdir:*),Bash(rm:*),Bash(curl:*),Bash(claude:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:code.claude.com),WebFetch(domain:docs.github.com),SlashCommand(/code-like-prompt:*),Skill(*)"'
 
