@@ -7,80 +7,44 @@ description: Provides a systematic workflow for resolving GitHub Issues. Use thi
 
 ## Instructions
 
-### Purpose
+### Step 1: Determine Issue Type
 
-Achieve consistent, high-quality problem resolution by determining the GitHub Issue type and applying the appropriate resolution process for each type.
+Check if the Issue has a `type:*` label. If not, determine the type from the title and body:
 
-### Usage Timing
+| Label | Description |
+|-------|-------------|
+| `type:bug` | Fix bugs, errors, or defects |
+| `type:feature` | Add new features |
+| `type:enhancement` | Improve existing features |
+| `type:refactoring` | Code refactoring |
+| `type:documentation` | Update documentation |
+| `type:investigation` | Investigation or analysis tasks |
 
-- When requested to resolve a GitHub Issue
-- When delegated processing by the Issue Auto-resolver
+Default to `type:feature` if unclear.
 
-### Resolution Process
+### Step 2: Follow Type-Specific Instructions
 
-#### Step 1: Determine Issue Type and Apply Label
+Refer to the corresponding file at `{plugin_base_path}/issue-types/<type>.md`:
 
-First, check if the Issue has a `type:*` label.
+- `bug.md` - Bug fixes
+- `feature.md` - New features
+- `enhancement.md` - Feature improvements
+- `refactoring.md` - Code refactoring
+- `documentation.md` - Documentation updates
+- `investigation.md` - Investigation tasks
 
-**If no label is present:**
+### Related Skills
 
-Read the Issue title and body, determine the appropriate type from the following 6 categories, and apply the corresponding label:
+This skill works with the following dev-guidelines skills:
 
-- `type:bug` - Fix bugs, errors, or defects
-- `type:feature` - Add new features
-- `type:investigation` - Investigation or analysis tasks
-- `type:refactoring` - Code refactoring
-- `type:documentation` - Update documentation
-- `type:enhancement` - Improve existing features
-
-If it is difficult to determine, apply `type:feature` by default.
-
-#### Step 2: Follow Detailed Instructions for Each Type
-
-Once the Issue type is determined, refer to the corresponding detailed instruction file at the following times:
-
-**type:bug**
-- **When to refer:** When you need to check specific steps for bug fixing.
-- **Reference file:** `{plugin_base_path}/issue-types/bug.md`
-
-**type:feature**
-- **When to refer:** When you need to check specific steps for implementing new features.
-- **Reference file:** `{plugin_base_path}/issue-types/feature.md`
-
-**type:investigation**
-- **When to refer:** When you need to check specific steps for investigation tasks.
-- **Reference file:** `{plugin_base_path}/issue-types/investigation.md`
-
-**type:refactoring**
-- **When to refer:** When you need to check specific steps for refactoring.
-- **Reference file:** `{plugin_base_path}/issue-types/refactoring.md`
-
-**type:documentation**
-- **When to refer:** When you need to check specific steps for updating documentation.
-- **Reference file:** `{plugin_base_path}/issue-types/documentation.md`
-
-**type:enhancement**
-- **When to refer:** When you need to check specific steps for improving existing features.
-- **Reference file:** `{plugin_base_path}/issue-types/enhancement.md`
-
-### Common Guidelines
-
-Important notes common to all Issue types:
-
-**Code Quality**
-- Check existing code patterns before implementation and maintain consistency.
-- Avoid excessive feature additions or unnecessary refactoring.
-
-**Git Operations**
-- Manage branches according to the implementation workflow (implementation-workflow skill).
-- Keep commit messages clear and concise.
-
-**Creating PRs**
-- Use the `gh pr` command when creating PRs.
-- Write the PR title, comments, and description in Japanese (unless otherwise specified).
-- Include an appropriate summary of changes in the PR description.
+| Skill | When to Use |
+|-------|-------------|
+| `dev-guidelines:implementation-workflow` | Git branch management and testing |
+| `dev-guidelines:pr-description-format` | Creating PRs with `gh pr create` |
+| `dev-guidelines:debugging-process` | Investigating bugs and tracing errors |
+| `dev-guidelines:design-alternatives` | Evaluating implementation approaches |
 
 ### Notes
 
-- `{plugin_base_path}` refers to the base path of the plugin where this skill is installed.
-- When actually referencing files, replace it with the appropriate path.
+- `{plugin_base_path}` refers to the plugin installation directory
+- PR titles and descriptions should be written in Japanese (日本語で記述)

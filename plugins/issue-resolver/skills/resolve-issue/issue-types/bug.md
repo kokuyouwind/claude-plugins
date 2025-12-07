@@ -1,41 +1,37 @@
-# type:bug - バグ修正手順
+# type:bug - Bug Fix
 
-## 概要
+## Process
 
-バグ、エラー、不具合の修正を行うための詳細手順です。
+### 1. Understand the Bug
 
-## 実装手順
+- Review symptoms described in the Issue
+- Understand reproduction steps (ask Issue author if unclear)
 
-### 1. バグの内容を確認し、再現手順を理解する
+### 2. Investigate Root Cause
 
-- Issueに記載されているバグの症状を確認する
-- 再現手順が記載されている場合は、その手順を理解する
-- 再現手順が不明確な場合は、コードから推測するか、Issue作成者に確認する
+Use **`dev-guidelines:debugging-process`** skill for systematic investigation:
+- Trace from error messages/stack traces
+- Analyze conditions that trigger the bug
+- Add debug logs if needed
 
-### 2. 関連するコードを調査して原因を特定する
+### 3. Implement Fix
 
-- エラーメッセージやスタックトレースから関連コードを特定する
-- バグが発生する条件や状況を分析する
-- 必要に応じてデバッグログを追加して原因を絞り込む
+- Fix the root cause, not symptoms
+- Verify existing tests still pass
+- Add regression tests as needed
 
-### 3. 修正方法を検討し、実装する
+### 4. Create PR
 
-- 根本原因に対する適切な修正方法を検討する
-- 副作用がないか確認する
-- 既存のテストが壊れないことを確認する
-- 必要に応じて新しいテストを追加する
+Use **`dev-guidelines:pr-description-format`** skill. Include:
+- Bug symptoms
+- Root cause explanation
+- Fix description
+- Test method (if applicable)
 
-### 4. 修正PRを作成する
+Commit message format: `fix: <brief description>`
 
-- コミットメッセージは `fix: <バグの簡潔な説明>` の形式で記載する
-- PRの説明には以下を含める：
-  - バグの症状
-  - 原因の説明
-  - 修正内容
-  - テスト方法（該当する場合）
+## Guidelines
 
-## 注意事項
-
-- バグ修正は最小限の変更に留める
-- 不要なリファクタリングは別のIssueとして分離する
-- セキュリティに関わるバグの場合は特に慎重に対応する
+- Keep changes minimal
+- Separate unrelated refactoring into separate Issues
+- Handle security-related bugs with extra care

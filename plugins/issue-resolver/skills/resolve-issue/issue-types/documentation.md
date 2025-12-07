@@ -1,51 +1,48 @@
-# type:documentation - ドキュメント更新手順
+# type:documentation - Documentation Update
 
-## 概要
+## Process
 
-ドキュメントを更新するための詳細手順です。
+### 1. Identify Target Documentation
 
-## 実装手順
+- Identify which documentation needs updating
+- Review current content and identify issues
+- Understand target audience (users, developers, operators, etc.)
 
-### 1. 更新が必要なドキュメントを確認する
+### 2. Gather Accurate Information
 
-- どのドキュメントを更新する必要があるか特定する
-- 現在のドキュメントの内容を確認し、問題点を把握する
-- ドキュメントの対象読者（ユーザー、開発者、運用担当者など）を理解する
+- Verify information from source code
+- Confirm actual behavior (when possible)
+- Collect background from related Issues/PRs
+- Check for inconsistencies with existing documentation
 
-### 2. 正確な情報を収集する
+### 3. Update Documentation
 
-- ソースコードを確認して正確な情報を取得する
-- 実際の動作を確認する（可能な場合）
-- 関連するIssueやPRから背景情報を収集する
-- 既存のドキュメントと矛盾がないか確認する
+- Use clear, concise language
+- Write at appropriate detail level for target audience
+- Include code examples and screenshots as needed
+- Use markdown formatting properly
+- Check for broken links
 
-### 3. ドキュメントを更新する
+### 4. Verify Quality
 
-- 明確で簡潔な表現を使用する
-- 対象読者に適したレベルの詳細さで記載する
-- コード例やスクリーンショットを適宜含める
-- マークダウンの書式を適切に使用する
-- リンク切れがないか確認する
+- Check for typos
+- Verify technical accuracy
+- Ensure natural flow
+- Add cross-references to related documentation as needed
 
-### 4. 読みやすさと正確性を確認する
+### 5. Create PR
 
-- 誤字脱字がないか確認する
-- 技術的な正確性を確認する
-- 文章の流れが自然か確認する
-- 必要に応じて、他のドキュメントへのリンクを追加する
+Use **`dev-guidelines:pr-description-format`** skill. Include:
+- Update purpose
+- Main changes
+- Before/After comparison (if applicable)
 
-### 5. ドキュメント更新PRを作成する
+Commit message format: `docs: <brief description>`
 
-- コミットメッセージは `docs: <更新内容の簡潔な説明>` の形式で記載する
-- PRの説明には以下を含める：
-  - 更新の目的
-  - 主な変更内容
-  - 更新前後の比較（該当する場合）
+## Guidelines
 
-## 注意事項
-
-- ドキュメントは常に最新の実装と一致させる
-- 専門用語は必要に応じて説明を加える
-- 国際化を考慮する場合は、英語と日本語の両方を更新する
-- READMEやチュートリアルなど、重要なドキュメントは特に丁寧に確認する
-- ドキュメントの更新中にコードの問題を見つけた場合は、別のIssueとして報告する
+- Keep documentation in sync with current implementation
+- Add explanations for technical terms as needed
+- Update both English and Japanese when internationalization applies
+- Take extra care with important docs (README, tutorials)
+- Report code issues found during documentation as separate Issues
