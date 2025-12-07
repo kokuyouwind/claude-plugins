@@ -79,3 +79,36 @@ Commands are numbered for organization:
 3. Include both "happy path" and edge case testing scenarios
 4. Document expected vs actual behavior for each experiment
 5. Consider adding variant commands that test different interpretations
+
+## Testing Guidelines
+
+### Command Testing Method
+
+**CRITICAL**: When testing code-like-prompt commands, always use `claude` command's non-interactive mode instead of SlashCommand tool.
+
+**Why**: Using SlashCommand tool directly in a session causes command expansion and returns control to the user, preventing continuous automated testing.
+
+**Correct method**:
+```bash
+claude -p "/code-like-prompt:02a-dangling-else-outer --condition-a=true --condition-b=true"
+```
+
+This allows continuous automated testing of multiple patterns without interruption.
+
+### Testing Workflow
+
+1. **Update plugin**: Ensure the plugin is updated and session is restarted
+2. **Run tests systematically**: Use `claude -p` to test all variants with different argument combinations
+3. **Verify output**: Compare actual output against expected behavior in specification docs
+4. **Document results**: Record any deviations or unexpected behaviors
+
+### Test Purpose and Interpretation
+
+**IMPORTANT**: The purpose of code-like-prompt tests is to verify whether Claude can correctly interpret code-like prompts, not to ensure all tests pass.
+
+**Key Points**:
+- These tests evaluate Claude's interpretation capabilities
+- If command specifications and implementations are correct but Claude interprets them incorrectly, this is an **expected and acceptable test outcome**
+- Failed test cases are valuable data points that reveal Claude's current limitations in understanding certain code patterns
+- Examples of challenging patterns: indentation-based scope determination, dangling else problem, complex nested structures
+- All test results (both passes and failures) should be documented to track Claude's interpretation behavior across versions

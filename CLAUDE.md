@@ -123,6 +123,22 @@ Provides example commands demonstrating code-like prompt patterns for Claude.
 
 This workflow is necessary because Claude Code loads plugin commands at session start and doesn't reload them dynamically.
 
+**Testing Commands**:
+- **CRITICAL**: When testing code-like-prompt commands, use `claude` command's non-interactive mode instead of SlashCommand tool
+- Using SlashCommand tool directly in the session causes command expansion and returns control to the user, preventing continuous testing
+- Use `claude -p "command"` for non-interactive testing:
+  ```bash
+  claude -p "/code-like-prompt:02a-dangling-else-outer --condition-a=true --condition-b=true"
+  ```
+- This allows continuous automated testing of multiple patterns without interruption
+
+**Test Purpose and Expectations**:
+- **IMPORTANT**: code-like-prompt tests verify whether Claude can correctly interpret code-like prompts
+- The goal is to test Claude's interpretation capabilities, not to ensure all tests pass
+- If command specifications and implementations are correct but Claude interprets them incorrectly, this is an expected test outcome
+- Failed test cases reveal Claude's current limitations in understanding certain code patterns (e.g., indentation-based scope, dangling else problem)
+- Document all test results (both passes and failures) to track Claude's interpretation behavior across versions
+
 ## Development Workflow
 
 ### Version Management

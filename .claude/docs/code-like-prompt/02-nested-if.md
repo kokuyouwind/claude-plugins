@@ -143,3 +143,69 @@ Structure breakdown:
 1. `02c-deep-nesting` - Most interesting test with mixed patterns
 2. `02a-dangling-else-outer` - Tests indentation-based else binding
 3. `02b-dangling-else-inner` - Contrast to 02a
+
+## Test Results
+
+### 2025-12-07 (Claude Sonnet 4.5)
+
+#### 02a-dangling-else-outer
+Tests whether Claude correctly interprets else at outer indentation level.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | (none) | bar | ✗ |
+| F | T | bar | bar | ✓ |
+| F | F | bar | bar | ✓ |
+
+**Pass Rate: 3/4 (75%)**
+
+**Analysis**: Claude incorrectly binds else to the inner if when A=T, B=F. Expected no output, but produced "bar", indicating Claude interprets the else as belonging to `if condition_b` instead of `if condition_a`.
+
+#### 02b-dangling-else-inner
+Tests whether Claude correctly interprets else at inner indentation level.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | bar | bar | ✓ |
+| F | T | (none) | (none) | ✓ |
+| F | F | (none) | (none) | ✓ |
+
+**Pass Rate: 4/4 (100%)**
+
+**Analysis**: Claude correctly interprets all cases where else belongs to the inner if. This pattern aligns with Claude's natural interpretation tendency.
+
+#### 02c-deep-nesting
+Tests complex 5-level nesting with mixed patterns.
+
+| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
+|----|----|----|-------|----------|--------|------|
+| T  | T  | T  | -  | foo | foo | ✓ |
+| T  | T  | F  | T  | bar | bar | ✓ |
+| T  | T  | F  | F  | baz | bar | ✗ |
+| T  | F  | T  | T  | qux | qux | ✓ |
+| T  | F  | T  | F  | (none) | qux | ✗ |
+| T  | F  | F  | -  | quux | quux | ✓ |
+| F  | T  | -  | -  | corge | corge | ✓ |
+| F  | F  | T  | -  | grault | grault | ✓ |
+| F  | F  | F  | -  | garply | garply | ✓ |
+
+**Pass Rate: 7/9 (78%)**
+
+**Analysis**:
+- Failed at L1=T,L2=T,L3=F,L4=F: Expected "baz", got "bar". Claude appears to skip the L4=F branch.
+- Failed at L1=T,L2=F,L3=T,L4=F: Expected no output (dangling else), got "qux". Claude incorrectly executes the L4=T branch.
+- Both failures involve interpreting nested structures with dangling else patterns.
+
+### Summary
+
+**Overall Pass Rate: 14/17 (82%)**
+
+**Key Findings**:
+1. Claude handles simple else-at-inner-level patterns perfectly (100%)
+2. Claude struggles with else-at-outer-level patterns (75% pass rate)
+3. Complex deep nesting reveals additional interpretation challenges (78% pass rate)
+4. Main limitation: Indentation-based scope determination, especially with dangling else patterns
+
+**Conclusion**: Claude's interpretation bias tends toward binding else to the nearest (inner) if statement, which causes failures when else should belong to outer scopes.
