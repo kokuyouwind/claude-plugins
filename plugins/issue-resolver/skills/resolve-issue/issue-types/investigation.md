@@ -1,45 +1,52 @@
-# type:investigation - 調査タスク手順
+# type:investigation - Investigation Task
 
-## 概要
+## Process
 
-コードベースやシステムの調査・分析を行うための詳細手順です。
+### 1. Clarify Investigation Scope
 
-## 実装手順
+- Review investigation purpose in the Issue
+- Clarify what to investigate and what information is needed
+- Identify scope (files, directories, system components, etc.)
 
-### 1. 調査対象を明確化する
+### 2. Investigate
 
-- Issueに記載されている調査目的を確認する
-- 何を調べるべきか、どのような情報が必要かを明確にする
-- 調査範囲を特定する（ファイル、ディレクトリ、システムコンポーネントなど）
+Use **`dev-guidelines:debugging-process`** skill for systematic investigation:
+- Read related source code
+- Understand background from commit/PR history
+- Check existing documentation and comments
+- Reference external resources (library docs, etc.) as needed
 
-### 2. 関連するコード、ドキュメント、履歴を調査する
+### 3. Organize Findings
 
-- 関連するソースコードを読む
-- コミット履歴やPR履歴から変更の背景を理解する
-- 既存のドキュメントやコメントを確認する
-- 必要に応じて外部リソース（ライブラリのドキュメントなど）を参照する
+- Structure discovered facts
+- Highlight important findings
+- Use diagrams/tables for visualization as needed
+- Summarize conclusions and recommendations
 
-### 3. 調査結果を整理する
+### 4. Post Results to Issue
 
-- 発見した事実を構造化して整理する
-- 重要な発見事項をハイライトする
-- 必要に応じて図や表を使って視覚化する
-- 結論や推奨事項をまとめる
+Post investigation results as Issue comment with clear, readable format:
 
-### 4. Issueのコメントに調査結果を簡潔にまとめて投稿する
+```
+## 調査概要
+[What was investigated]
 
-- 調査結果を明確で読みやすい形式で記載する
-- 以下の構成を推奨：
-  - **調査概要**: 何を調査したか
-  - **発見事項**: 主要な発見内容
-  - **詳細**: 具体的な調査結果
-  - **結論**: 結論や推奨事項
-- コードへの参照はファイルパスと行番号を含める
-- 長すぎる場合は要点を絞り、詳細は必要に応じて別ドキュメントにまとめる
+## 発見事項
+[Key findings]
 
-## 注意事項
+## 詳細
+[Specific investigation results]
 
-- 調査タスクでは通常、コード変更やPR作成は不要
-- 調査結果に基づいて新しいIssueを作成する必要がある場合は提案する
-- 事実と推測を明確に区別して記載する
-- 調査中に見つけた軽微な問題は、必要に応じて別のIssueとして報告する
+## 結論
+[Conclusions and recommendations]
+```
+
+- Include file path and line numbers for code references
+- Keep it concise; detail can go in separate documents if needed
+
+## Guidelines
+
+- Investigation tasks typically don't require code changes or PRs
+- Propose creating new Issues if findings warrant follow-up work
+- Clearly distinguish facts from speculation
+- Report minor issues found during investigation as separate Issues

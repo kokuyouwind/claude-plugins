@@ -1,44 +1,43 @@
-# type:refactoring - リファクタリング手順
+# type:refactoring - Code Refactoring
 
-## 概要
+## Process
 
-既存の機能を維持しながらコードの構造や品質を改善するための詳細手順です。
+### 1. Understand Target Code
 
-## 実装手順
+- Read and understand the refactoring target
+- Identify problems and improvement opportunities
+- Verify existing tests can guarantee behavior after refactoring
 
-### 1. リファクタリング対象のコードを確認する
+### 2. Plan Approach
 
-- リファクタリング対象のコードを読んで理解する
-- 現在のコードの問題点や改善点を特定する
-- 既存のテストを確認し、リファクタリング後も同じ動作を保証できることを確認する
+Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exist:
+- Clarify refactoring goal (readability, maintainability, performance, etc.)
+- Evaluate impact of each approach
+- Align with existing codebase patterns/style
+- Plan incremental steps for large refactoring
 
-### 2. 改善方針を検討する
+### 3. Implement
 
-- リファクタリングの目的を明確にする（可読性向上、保守性向上、パフォーマンス改善など）
-- 複数のアプローチがある場合は、それぞれの影響を検討する
-- 既存のコードベースのパターンやスタイルに合わせる
-- 大規模なリファクタリングの場合は、段階的に進める計画を立てる
+Follow **`dev-guidelines:implementation-workflow`** skill:
+- Don't change external behavior (API, interfaces)
+- Verify all existing tests pass
+- Add/improve tests as needed
+- Split commits into logical units for easier review
 
-### 3. 既存の機能を維持しながらコードを整理する
+### 4. Create PR
 
-- 外部から見た動作（API、インターフェース）を変更しない
-- 既存のテストがすべてパスすることを確認する
-- 必要に応じてテストを追加または改善する
-- コードレビューしやすいように、論理的な単位でコミットを分ける
+Use **`dev-guidelines:pr-description-format`** skill. Include:
+- Refactoring purpose
+- Change summary
+- Confirmation of no functional changes
+- Before/After comparison (if applicable)
 
-### 4. リファクタリングPRを作成する
+Commit message format: `refactor: <brief description>`
 
-- コミットメッセージは `refactor: <対象の簡潔な説明>` の形式で記載する
-- PRの説明には以下を含める：
-  - リファクタリングの目的
-  - 変更内容の概要
-  - 機能的な変更がないことの確認方法
-  - Before/Afterの比較（該当する場合）
+## Guidelines
 
-## 注意事項
-
-- リファクタリングと機能追加は分離する（同時に行わない）
-- 大規模なリファクタリングは小さな単位に分割して段階的に実施する
-- 既存の動作を変更しないことを最優先にする
-- リファクタリング中に見つけたバグは、別のIssueとして報告する
-- パフォーマンスに影響する変更の場合は、ベンチマークを取る
+- Separate refactoring from feature additions (don't do both at once)
+- Split large refactoring into smaller incremental steps
+- Prioritize preserving existing behavior
+- Report bugs found during refactoring as separate Issues
+- Take benchmarks for performance-impacting changes

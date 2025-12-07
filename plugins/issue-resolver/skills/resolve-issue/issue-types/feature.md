@@ -1,43 +1,42 @@
-# type:feature - 新機能追加手順
+# type:feature - New Feature
 
-## 概要
+## Process
 
-新機能を追加するための詳細手順です。
+### 1. Understand Requirements
 
-## 実装手順
+- Review feature requirements in the Issue
+- Clarify expected behavior and I/O
+- Ask Issue author if anything is unclear
 
-### 1. 要求される機能の仕様を理解する
+### 2. Plan Implementation
 
-- Issueに記載されている機能要件を確認する
-- 期待される動作や入出力を明確にする
-- 不明点がある場合はIssue作成者に確認する
+Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exist:
+- Check existing codebase architecture
+- Evaluate pros/cons of each approach
+- Present options to Issue author if needed
+- Leverage existing patterns and libraries
 
-### 2. 実装方針を検討する
+### 3. Implement
 
-- 既存のコードベースのアーキテクチャを確認する
-- 複数の実装方法がある場合は、それぞれの長所・短所を検討する
-- 必要に応じて、実装方針の選択肢をIssue作成者に提示する
-- 既存のパターンやライブラリを活用できないか確認する
+Follow **`dev-guidelines:implementation-workflow`** skill:
+- Follow coding conventions
+- Reuse existing components/utilities
+- Implement proper error handling
+- Add tests as needed
 
-### 3. 既存のコードベースのパターンに従って実装する
+### 4. Create PR
 
-- コーディング規約に従う
-- 既存のコンポーネントやユーティリティを再利用する
-- 適切なエラーハンドリングを実装する
-- 必要に応じてテストを追加する
+Use **`dev-guidelines:pr-description-format`** skill. Include:
+- Feature overview
+- Implementation approach
+- Usage/configuration (if applicable)
+- Test method (if applicable)
 
-### 4. 実装PRを作成する
+Commit message format: `feat: <brief description>`
 
-- コミットメッセージは `feat: <機能の簡潔な説明>` の形式で記載する
-- PRの説明には以下を含める：
-  - 機能の概要
-  - 実装方針の説明
-  - 使用方法や設定方法（該当する場合）
-  - テスト方法（該当する場合）
+## Guidelines
 
-## 注意事項
-
-- 過度に複雑な実装は避け、シンプルに保つ
-- 将来の拡張を想定しすぎた過剰な抽象化は避ける
-- スコープクリープ（機能の肥大化）に注意する
-- 依存関係の追加は必要最小限にする
+- Avoid over-complexity; keep it simple
+- Don't over-abstract for hypothetical future needs
+- Watch for scope creep
+- Minimize new dependencies
