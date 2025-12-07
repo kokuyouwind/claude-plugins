@@ -26,8 +26,8 @@
     {
       "name": "dev-guidelines",
       "source": "./plugins/dev-guidelines",
-      "description": "Development workflow guidelines with skills for Git branch management, debugging/investigation, architecture decisions, TDD methodology, PR descriptions, and web research tools",
-      "version": "1.1.0",
+      "description": "Development workflow guidelines with skills for Git branch management, testing practices, Docker environment handling, debugging/investigation, architecture decisions, and PR descriptions",
+      "version": "1.2.0",
       "author": {
         "name": "kokuyouwind",
         "url": "https://github.com/kokuyouwind"
