@@ -93,6 +93,36 @@ Automates RBS type definition setup and type error fixing for Ruby projects.
 - Configures .gitignore for generated files
 - Creates Steep configuration based on directory structure
 
+### code-like-prompt Plugin
+
+Provides example commands demonstrating code-like prompt patterns for Claude.
+
+**IMPORTANT**: When working on code-like-prompt plugin (implementation, testing, or debugging), ALWAYS read the relevant documentation in `.claude/docs/code-like-prompt/` first:
+- `.claude/docs/code-like-prompt/overview.md` - Overall concept and philosophy
+- `.claude/docs/code-like-prompt/02-nested-if.md` - Nested if/else pattern documentation
+- `.claude/docs/code-like-prompt/03-loop.md` - Loop pattern documentation
+- `.claude/docs/code-like-prompt/04-pattern-match.md` - Pattern matching documentation
+- Other topic-specific documentation as needed
+
+**Why This Matters**: The documentation contains detailed specifications, design rationale, and expected behavior for each command pattern. Reading it first ensures correct implementation and prevents misunderstandings about command behavior.
+
+**Workflow**:
+1. Read relevant `.claude/docs/code-like-prompt/*.md` documentation
+2. Understand the pattern and design intent
+3. Implement or test the command
+4. Verify behavior matches the specification
+
+**Testing and Deployment**:
+- **IMPORTANT**: Plugin command changes require PR merge and plugin update before testing
+- After merging command changes, Claude Code session restart is required to reload the plugin
+- When finding issues in commands during testing:
+  1. Fix the command files
+  2. Create and merge a PR with the fixes
+  3. Ask the user to restart Claude Code session and update the plugin
+  4. Then perform the actual testing
+
+This workflow is necessary because Claude Code loads plugin commands at session start and doesn't reload them dynamically.
+
 ## Development Workflow
 
 ### Version Management
