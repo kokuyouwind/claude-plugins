@@ -1,11 +1,11 @@
 {
   "name": "code-like-prompt",
-  "version": "0.1.0",
-  "description": "Collection of commands that execute code-like prompts demonstrating programming concepts",
+  "version": "0.2.0",
+  "description": "Collection of commands that execute code-like prompts demonstrating programming concepts including logic programming and backtracking",
   "author": {
     "name": "kokuyouwind",
     "email": "kokuyouwind@gmail.com"
   },
-  "keywords": ["education", "examples", "programming", "jokes"],
+  "keywords": ["education", "examples", "programming", "jokes", "prolog", "backtracking"],
   "license": "MIT"
 }
