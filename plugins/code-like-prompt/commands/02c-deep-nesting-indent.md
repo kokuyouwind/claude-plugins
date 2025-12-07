@@ -1,5 +1,5 @@
 ---
-description: コード風プロンプト例2c ネストされたif:複雑な5階層ネスト
+description: コード風プロンプト例2c ネストされたif:複雑な5階層ネスト (インデントベース)
 argument-hint: "[--level1=BOOL] [--level2=BOOL] [--level3=BOOL] [--level4=BOOL]"
 ---
 

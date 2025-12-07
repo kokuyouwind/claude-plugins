@@ -92,11 +92,31 @@ Structure breakdown:
 
 ### Variants
 
-| Command | Focus |
-|---------|-------|
-| `02a-dangling-else-outer` | Else at outer indentation level |
-| `02b-dangling-else-inner` | Else at inner indentation level |
-| `02c-deep-nesting` | Complex 5-level nesting with mixed patterns |
+Each test scenario has three syntax style variants:
+
+**Indentation-based (Python-style)**:
+- Uses indentation to define scope
+- No explicit block delimiters
+
+**Block-style (C/Java/JavaScript-style)**:
+- Uses braces `{}` to define scope
+- Explicit block boundaries
+
+**Keyword-style (Ruby-style)**:
+- Uses `if`/`end` keywords to define scope
+- Explicit keyword boundaries
+
+| Command | Focus | Syntax Style |
+|---------|-------|--------------|
+| `02a-dangling-else-outer-indent` | Else at outer indentation level | Indentation |
+| `02a-dangling-else-outer-block` | Else at outer indentation level | Block braces |
+| `02a-dangling-else-outer-keyword` | Else at outer indentation level | Keywords |
+| `02b-dangling-else-inner-indent` | Else at inner indentation level | Indentation |
+| `02b-dangling-else-inner-block` | Else at inner indentation level | Block braces |
+| `02b-dangling-else-inner-keyword` | Else at inner indentation level | Keywords |
+| `02c-deep-nesting-indent` | Complex 5-level nesting with mixed patterns | Indentation |
+| `02c-deep-nesting-block` | Complex 5-level nesting with mixed patterns | Block braces |
+| `02c-deep-nesting-keyword` | Complex 5-level nesting with mixed patterns | Keywords |
 
 ## Expected Behaviors
 
@@ -146,10 +166,12 @@ Structure breakdown:
 
 ## Test Results
 
-### 2025-12-07 (Claude Sonnet 4.5)
+### 2025-12-07 (Claude Sonnet 4.5) - Indentation-based variants
 
-#### 02a-dangling-else-outer
-Tests whether Claude correctly interprets else at outer indentation level.
+The following test results are for the indentation-based syntax variants. Block-style and keyword-style variants have not yet been tested.
+
+#### 02a-dangling-else-outer-indent
+Tests whether Claude correctly interprets else at outer indentation level using indentation-based syntax.
 
 | A | B | Expected | Actual | Pass |
 |---|---|----------|--------|------|
@@ -162,8 +184,8 @@ Tests whether Claude correctly interprets else at outer indentation level.
 
 **Analysis**: Claude incorrectly binds else to the inner if when A=T, B=F. Expected no output, but produced "bar", indicating Claude interprets the else as belonging to `if condition_b` instead of `if condition_a`.
 
-#### 02b-dangling-else-inner
-Tests whether Claude correctly interprets else at inner indentation level.
+#### 02b-dangling-else-inner-indent
+Tests whether Claude correctly interprets else at inner indentation level using indentation-based syntax.
 
 | A | B | Expected | Actual | Pass |
 |---|---|----------|--------|------|
@@ -176,8 +198,8 @@ Tests whether Claude correctly interprets else at inner indentation level.
 
 **Analysis**: Claude correctly interprets all cases where else belongs to the inner if. This pattern aligns with Claude's natural interpretation tendency.
 
-#### 02c-deep-nesting
-Tests complex 5-level nesting with mixed patterns.
+#### 02c-deep-nesting-indent
+Tests complex 5-level nesting with mixed patterns using indentation-based syntax.
 
 | L1 | L2 | L3 | L4 | Expected | Actual | Pass |
 |----|----|----|-------|----------|--------|------|
@@ -209,3 +231,34 @@ Tests complex 5-level nesting with mixed patterns.
 4. Main limitation: Indentation-based scope determination, especially with dangling else patterns
 
 **Conclusion**: Claude's interpretation bias tends toward binding else to the nearest (inner) if statement, which causes failures when else should belong to outer scopes.
+
+## Testing Different Syntax Styles
+
+The addition of block-style and keyword-style variants allows for comparative testing to determine whether Claude's difficulties are specific to indentation-based syntax or reflect fundamental scope interpretation challenges.
+
+### Testing Methodology
+
+For each syntax style (indent, block, keyword), run the same test matrices:
+- 02a variants: 4 test cases (A×B combinations)
+- 02b variants: 4 test cases (A×B combinations)
+- 02c variants: 9 test cases (L1-L4 combinations)
+
+Use non-interactive testing mode:
+```bash
+claude -p "/code-like-prompt:02a-dangling-else-outer-block --condition-a=true --condition-b=true"
+```
+
+### Expected Research Outcomes
+
+1. **If block-style and keyword-style both show 100% pass rates**: The issue is specific to indentation parsing, not scope understanding
+2. **If all three styles show similar failure patterns**: The issue is fundamental scope interpretation, not syntax-specific
+3. **If keyword-style performs better than block-style**: Claude may have better understanding of explicit keyword boundaries
+4. **If block-style performs better than keyword-style**: Brace-based delimiters may be clearer for scope determination
+
+### Next Steps
+
+After testing all variants:
+1. Document pass rates for each syntax style
+2. Compare failure patterns across styles
+3. Update this specification with comparative analysis
+4. Use findings to guide future code-like prompt design decisions

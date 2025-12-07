@@ -1,5 +1,5 @@
 ---
-description: コード風プロンプト例2a ネストされたif:elseが外側に属する
+description: コード風プロンプト例2a ネストされたif:elseが外側に属する (キーワードスタイル)
 argument-hint: "[--condition-a=BOOL] [--condition-b=BOOL]"
 ---
 
@@ -15,9 +15,11 @@ if condition_b.nil?
   condition_b = gets
 end
 
-if condition_a:
-    if condition_b:
-        print("foo")
-else:
-    print("bar")
+if condition_a
+  if condition_b
+    print "foo"
+  end
+else
+  print "bar"
+end
 ```
