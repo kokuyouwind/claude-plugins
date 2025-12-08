@@ -1,6 +1,6 @@
 {
   "name": "code-like-prompt",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Collection of commands that execute code-like prompts demonstrating programming concepts",
   "author": {
     "name": "kokuyouwind",
