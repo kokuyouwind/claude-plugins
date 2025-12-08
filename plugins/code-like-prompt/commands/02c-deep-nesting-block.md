@@ -6,51 +6,51 @@ argument-hint: "[--level1=BOOL] [--level2=BOOL] [--level3=BOOL] [--level4=BOOL]"
 Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
 ```
-if level1.nil?
-  print("Input: level1 (true/false)")
-  level1 = gets
-end
-if level2.nil?
-  print("Input: level2 (true/false)")
-  level2 = gets
-end
-if level3.nil?
-  print("Input: level3 (true/false)")
-  level3 = gets
-end
-if level4.nil?
-  print("Input: level4 (true/false)")
-  level4 = gets
-end
+if (level1 == NULL) {
+    printf("Input: level1 (true/false)");
+    scanf("%s", level1);
+}
+if (level2 == NULL) {
+    printf("Input: level2 (true/false)");
+    scanf("%s", level2);
+}
+if (level3 == NULL) {
+    printf("Input: level3 (true/false)");
+    scanf("%s", level3);
+}
+if (level4 == NULL) {
+    printf("Input: level4 (true/false)");
+    scanf("%s", level4);
+}
 
 if (level1) {
     if (level2) {
         if (level3) {
-            print("foo");
+            printf("foo");
         } else {
             if (level4) {
-                print("bar");
+                printf("bar");
             } else {
-                print("baz");
+                printf("baz");
             }
         }
     } else {
         if (level3) {
             if (level4) {
-                print("qux");
+                printf("qux");
             }
         } else {
-            print("quux");
+            printf("quux");
         }
     }
 } else {
     if (level2) {
-        print("corge");
+        printf("corge");
     } else {
         if (level3) {
-            print("grault");
+            printf("grault");
         } else {
-            print("garply");
+            printf("garply");
         }
     }
 }

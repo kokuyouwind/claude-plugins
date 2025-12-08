@@ -6,22 +6,18 @@ argument-hint: "[--level1=BOOL] [--level2=BOOL] [--level3=BOOL] [--level4=BOOL]"
 Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
 ```
-if level1.nil?
-  print("Input: level1 (true/false)")
-  level1 = gets
-end
-if level2.nil?
-  print("Input: level2 (true/false)")
-  level2 = gets
-end
-if level3.nil?
-  print("Input: level3 (true/false)")
-  level3 = gets
-end
-if level4.nil?
-  print("Input: level4 (true/false)")
-  level4 = gets
-end
+if level1 is None:
+    print("Input: level1 (true/false)")
+    level1 = input()
+if level2 is None:
+    print("Input: level2 (true/false)")
+    level2 = input()
+if level3 is None:
+    print("Input: level3 (true/false)")
+    level3 = input()
+if level4 is None:
+    print("Input: level4 (true/false)")
+    level4 = input()
 
 if level1:
     if level2:

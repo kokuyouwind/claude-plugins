@@ -7,11 +7,11 @@ Execute the following code. Output only what print() commands specify. Do not sh
 
 ```
 if condition_a.nil?
-  print("Input: condition_a (true/false)")
+  print "Input: condition_a (true/false)"
   condition_a = gets
 end
 if condition_b.nil?
-  print("Input: condition_b (true/false)")
+  print "Input: condition_b (true/false)"
   condition_b = gets
 end
 

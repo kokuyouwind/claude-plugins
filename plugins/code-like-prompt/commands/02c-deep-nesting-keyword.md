@@ -7,19 +7,19 @@ Execute the following code. Output only what print() commands specify. Do not sh
 
 ```
 if level1.nil?
-  print("Input: level1 (true/false)")
+  print "Input: level1 (true/false)"
   level1 = gets
 end
 if level2.nil?
-  print("Input: level2 (true/false)")
+  print "Input: level2 (true/false)"
   level2 = gets
 end
 if level3.nil?
-  print("Input: level3 (true/false)")
+  print "Input: level3 (true/false)"
   level3 = gets
 end
 if level4.nil?
-  print("Input: level4 (true/false)")
+  print "Input: level4 (true/false)"
   level4 = gets
 end
 
