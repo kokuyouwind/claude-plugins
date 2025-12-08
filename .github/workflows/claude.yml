@@ -58,4 +58,5 @@ jobs:
           plugins: |
             dev-guidelines@kokuyouwind-plugins
             issue-resolver@kokuyouwind-plugins
+            code-like-prompt@kokuyouwind-plugins
 
