@@ -48,3 +48,17 @@ jobs:
           # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
           claude_args: '--allowed-tools "Bash(gh issue:*),Bash(gh label:*),Bash(gh pr:*),Bash(git add:*),Bash(git push:*),Bash(tree:*),Bash(mkdir:*),Bash(rm:*),Bash(curl:*),Bash(claude:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:code.claude.com),WebFetch(domain:docs.github.com),SlashCommand(/code-like-prompt:*),Skill(*)"'
 
+          # Plugin marketplace configuration
+          # Note: .claude/settings.json is not automatically loaded in GitHub Actions
+          # Plugin marketplaces and plugins must be explicitly specified here
+          plugin_marketplaces: |
+            kokuyouwind-plugins:
+              source:
+                source: github
+                repo: kokuyouwind/claude-plugins
+
+          # Install required plugins for development workflow
+          plugins: |
+            - dev-guidelines@kokuyouwind-plugins
+            - issue-resolver@kokuyouwind-plugins
+
