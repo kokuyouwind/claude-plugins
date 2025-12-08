@@ -52,13 +52,10 @@ jobs:
           # Note: .claude/settings.json is not automatically loaded in GitHub Actions
           # Plugin marketplaces and plugins must be explicitly specified here
           plugin_marketplaces: |
-            kokuyouwind-plugins:
-              source:
-                source: github
-                repo: kokuyouwind/claude-plugins
+            https://github.com/kokuyouwind/claude-plugins.git
 
           # Install required plugins for development workflow
           plugins: |
-            - dev-guidelines@kokuyouwind-plugins
-            - issue-resolver@kokuyouwind-plugins
+            dev-guidelines@kokuyouwind-plugins
+            issue-resolver@kokuyouwind-plugins
 
