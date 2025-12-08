@@ -304,7 +304,7 @@ The joke illustrates how the same instruction can be interpreted differently:
 
 ## Version
 
-0.2.0
+0.1.0
 
 ### Changelog
 
