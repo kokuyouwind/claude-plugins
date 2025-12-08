@@ -47,4 +47,4 @@ This skill works with the following dev-guidelines skills:
 ### Notes
 
 - `{plugin_base_path}` refers to the plugin installation directory
-- PR titles and descriptions should be written in Japanese (日本語で記述)
+- **Language**: Unless otherwise specified, write all Issue comments, PR titles, PR descriptions, and commit messages in Japanese (日本語で記述)
