@@ -121,14 +121,9 @@ The joke illustrates how the same instruction can be interpreted differently:
 
 ## Version
 
-0.2.0
+0.1.0
 
 ### Changelog
-
-#### 0.2.0 (2025-12-07)
-- Added block-style and keyword-style syntax variants for 02-nested-if commands
-- Renamed existing commands to add `-indent` suffix for clarity
-- Updated documentation with comparative testing methodology
 
 #### 0.1.0
 - Initial release with milk joke and nested-if commands
