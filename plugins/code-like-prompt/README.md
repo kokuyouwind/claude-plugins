@@ -162,7 +162,7 @@ Tests whether Go-style concurrency syntax can influence Claude to use parallel p
 
 ## Version
 
-0.2.0
+0.1.0
 
 ## License
 
