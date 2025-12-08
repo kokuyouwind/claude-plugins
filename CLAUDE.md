@@ -143,6 +143,12 @@ This workflow is necessary because Claude Code loads plugin commands at session 
 
 ### Version Management
 
+**CRITICAL - DO NOT AUTO-BUMP VERSIONS**: Do NOT update plugin versions unless explicitly instructed by the user. Version updates should only happen when:
+- The user explicitly requests a version bump
+- There is a clear reason communicated by the user to release a new version (e.g., significant feature additions, breaking changes)
+
+When implementing features, bug fixes, or adding commands, keep the existing version number unchanged unless told otherwise.
+
 **IMPORTANT**: When updating plugin versions, you must update version numbers in THREE places:
 
 1. **`plugins/<plugin-name>/.claude-plugin/plugin.json`** - The `version` field
