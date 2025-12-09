@@ -1,0 +1,10 @@
+{
+  "name": "zenn-writer",
+  "version": "0.1.0",
+  "description": "Zenn記事執筆を支援するプラグイン。インタビュー形式で内容を深掘りし、完全な草稿を自動生成します。",
+  "author": {
+    "name": "kokuyouwind",
+    "email": "kokuyouwind@example.com"
+  },
+  "keywords": ["zenn", "article", "writing", "markdown", "japanese"]
+}
