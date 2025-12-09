@@ -131,6 +131,7 @@ This workflow is necessary because Claude Code loads plugin commands at session 
   claude -p "/code-like-prompt:02a-dangling-else-outer --condition-a=true --condition-b=true"
   ```
 - This allows continuous automated testing of multiple patterns without interruption
+- **IMPORTANT**: When testing in non-interactive mode, skip argument-less interactive input patterns (commands that require user input via AskUserQuestion). These patterns cannot be tested in non-interactive mode and should only be tested manually in interactive sessions.
 
 **Test Purpose and Expectations**:
 - **IMPORTANT**: code-like-prompt tests verify whether Claude can correctly interpret code-like prompts

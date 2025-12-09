@@ -262,3 +262,151 @@ After testing all variants:
 2. Compare failure patterns across styles
 3. Update this specification with comparative analysis
 4. Use findings to guide future code-like prompt design decisions
+
+## Test Results - Block and Keyword Syntax Styles
+
+### 2025-12-09 (Claude Sonnet 4.5) - Block-style variants
+
+#### 02a-dangling-else-outer-block
+Tests whether Claude correctly interprets else at outer indentation level using block braces.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | (none) | (no output) | ✓ |
+| F | T | bar | bar | ✓ |
+| F | F | bar | bar | ✓ |
+
+**Pass Rate: 4/4 (100%)**
+
+**Analysis**: Block braces completely eliminate the dangling else ambiguity. Claude correctly interprets scope boundaries and produces expected output in all cases.
+
+#### 02b-dangling-else-inner-block
+Tests whether Claude correctly interprets else at inner indentation level using block braces.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | bar | bar | ✓ |
+| F | T | (none) | (no output) | ✓ |
+| F | F | (none) | (no output) | ✓ |
+
+**Pass Rate: 4/4 (100%)**
+
+**Analysis**: Block braces provide clear scope boundaries. Claude correctly interprets all cases.
+
+#### 02c-deep-nesting-block
+Tests complex 5-level nesting with mixed patterns using block braces.
+
+| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
+|----|----|----|-------|----------|--------|------|
+| T  | T  | T  | -  | foo | foo | ✓ |
+| T  | T  | F  | T  | bar | bar | ✓ |
+| T  | T  | F  | F  | baz | baz | ✓ |
+| T  | F  | T  | T  | qux | qux | ✓ |
+| T  | F  | T  | F  | (none) | qux | ✗ |
+| T  | F  | F  | -  | quux | quux | ✓ |
+| F  | T  | -  | -  | corge | corge | ✓ |
+| F  | F  | T  | -  | grault | grault | ✓ |
+| F  | F  | F  | -  | garply | garply | ✓ |
+
+**Pass Rate: 8/9 (89%)**
+
+**Analysis**: Block braces improve performance significantly compared to indentation (89% vs 78%), but one dangling else case still fails. The failure at L1=T,L2=F,L3=T,L4=F suggests Claude may have difficulty with the specific nested structure regardless of syntax style.
+
+### 2025-12-09 (Claude Sonnet 4.5) - Keyword-style variants
+
+#### 02a-dangling-else-outer-keyword
+Tests whether Claude correctly interprets else at outer indentation level using if/end keywords.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | (none) | foo | ✗ |
+| F | T | bar | bar | ✓ |
+| F | F | bar | bar | ✓ |
+
+**Pass Rate: 3/4 (75%)**
+
+**Analysis**: Keyword boundaries don't eliminate the dangling else issue. Same failure pattern as indentation-based version (A=T, B=F case fails).
+
+#### 02b-dangling-else-inner-keyword
+Tests whether Claude correctly interprets else at inner indentation level using if/end keywords.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | bar | bar | ✓ |
+| F | T | (none) | (no output) | ✓ |
+| F | F | (none) | (no output) | ✓ |
+
+**Pass Rate: 4/4 (100%)**
+
+**Analysis**: Keyword boundaries work correctly for inner else patterns. Matches indentation-based version performance.
+
+#### 02c-deep-nesting-keyword
+Tests complex 5-level nesting with mixed patterns using if/end keywords.
+
+| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
+|----|----|----|-------|----------|--------|------|
+| T  | T  | T  | -  | foo | foo | ✓ |
+| T  | T  | F  | T  | bar | bar | ✓ |
+| T  | T  | F  | F  | baz | baz | ✓ |
+| T  | F  | T  | T  | qux | qux | ✓ |
+| T  | F  | T  | F  | (none) | qux | ✗ |
+| T  | F  | F  | -  | quux | quux | ✓ |
+| F  | T  | -  | -  | corge | corge | ✓ |
+| F  | F  | T  | -  | grault | grault | ✓ |
+| F  | F  | F  | -  | garply | garply | ✓ |
+
+**Pass Rate: 8/9 (89%)**
+
+**Analysis**: Keyword boundaries show same performance as block braces (89%). Same failure at L1=T,L2=F,L3=T,L4=F.
+
+## Comparative Analysis Across Syntax Styles
+
+### Overall Pass Rates by Syntax Style
+
+| Syntax Style | 02a-outer | 02b-inner | 02c-deep | Total | Overall |
+|--------------|-----------|-----------|----------|-------|---------|
+| Indentation  | 3/4 (75%) | 4/4 (100%) | 7/9 (78%) | 14/17 | 82% |
+| Block braces | 4/4 (100%) | 4/4 (100%) | 8/9 (89%) | 16/17 | 94% |
+| Keywords     | 3/4 (75%) | 4/4 (100%) | 8/9 (89%) | 15/17 | 88% |
+
+### Key Findings
+
+1. **Block braces are most effective** (94% overall pass rate)
+   - Completely eliminate dangling else ambiguity in simple cases (02a)
+   - Still struggle with complex nested dangling else patterns (02c)
+
+2. **Keywords show intermediate performance** (88% overall pass rate)
+   - Don't solve outer-else dangling else problem (02a still fails)
+   - Match block brace performance on complex nesting (02c)
+
+3. **Indentation has lowest performance** (82% overall pass rate)
+   - Struggles with outer-else patterns (02a: 75%)
+   - Worst performance on complex nesting (02c: 78%)
+
+4. **All styles handle inner-else perfectly** (100% across all styles)
+   - This aligns with Claude's natural interpretation bias toward binding else to the nearest inner if
+
+5. **Persistent failure pattern**
+   - L1=T,L2=F,L3=T,L4=F case fails in ALL syntax styles
+   - Suggests a fundamental limitation in handling specific nested dangling else structures, not just a syntax parsing issue
+
+### Conclusion
+
+**Syntax style significantly impacts interpretation accuracy**:
+- Block braces (`{}`) provide the clearest scope boundaries and should be preferred for complex conditional logic
+- Keywords (`if/end`) offer moderate improvement over indentation but don't fully eliminate ambiguity
+- Indentation-based syntax is most prone to misinterpretation
+
+**However, syntax alone doesn't solve all problems**:
+- Even with explicit block delimiters, Claude struggles with certain complex nested patterns
+- The persistent L1=T,L2=F,L3=T,L4=F failure suggests deeper limitations in tracking nested conditional state
+
+**Recommendations for code-like prompts**:
+1. Use block braces for critical conditional logic
+2. Avoid complex nested structures with dangling else patterns when possible
+3. When nested dangling else is unavoidable, use block braces and test thoroughly
+4. Consider restructuring complex conditions into simpler, sequential checks
