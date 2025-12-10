@@ -52,14 +52,14 @@
     {
       "name": "code-like-prompt",
       "source": "./plugins/code-like-prompt",
-      "description": "Collection of commands that execute code-like prompts demonstrating programming concepts through interactive scenarios",
+      "description": "Collection of commands that execute code-like prompts demonstrating programming concepts including logic programming and backtracking",
       "version": "0.1.0",
       "author": {
         "name": "kokuyouwind",
         "url": "https://github.com/kokuyouwind"
       },
       "license": "MIT",
-      "keywords": ["education", "examples", "programming", "jokes"],
+      "keywords": ["education", "examples", "programming", "jokes", "prolog", "backtracking"],
       "category": "education"
     },
     {

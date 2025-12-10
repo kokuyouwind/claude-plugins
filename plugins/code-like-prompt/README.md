@@ -240,6 +240,52 @@ Tests exhaustive pattern matching in Rust-style enum matching.
 
 **Arguments**: `--color`, `--r`, `--g`, `--b`
 
+### 04p-series: Prolog-style Backtracking
+
+Commands demonstrating logic programming concepts like unification, backtracking, and constraint propagation.
+
+#### `/code-like-prompt:04p-a-basic-facts`
+
+**Description**: コード風プロンプト例4p-a Prologバックトラック:基本的なファクトとクエリ
+
+Simple facts and queries with backtracking.
+
+#### `/code-like-prompt:04p-b-multi-clause`
+
+**Description**: コード風プロンプト例4p-b Prologバックトラック:複数節でのパス探索
+
+Path finding with backtracking through multiple clauses.
+
+#### `/code-like-prompt:04p-c-cut`
+
+**Description**: コード風プロンプト例4p-c Prologバックトラック:カット演算子
+
+Cut operator (!) preventing backtracking.
+
+#### `/code-like-prompt:04p-d-tree-traverse`
+
+**Description**: コード風プロンプト例4p-d Prologバックトラック:再帰的な木の走査
+
+Recursive tree traversal with DFS order.
+
+#### `/code-like-prompt:04p-e-findall`
+
+**Description**: コード風プロンプト例4p-e Prologバックトラック:全解の収集
+
+Collecting all solutions with findall.
+
+#### `/code-like-prompt:04p-f-negation`
+
+**Description**: コード風プロンプト例4p-f Prologバックトラック:失敗による否定
+
+Negation as failure (\+).
+
+#### `/code-like-prompt:04p-g-constraints`
+
+**Description**: コード風プロンプト例4p-g Prologバックトラック:制約伝播によるグラフ彩色
+
+Graph coloring with constraint propagation.
+
 ## The Milk Joke
 
 This plugin is based on a classic programmer joke:
