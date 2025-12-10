@@ -5,18 +5,17 @@ argument-hint: "[--text=STRING]"
 
 Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-```
-import re
+```haskell
+import Text.Regex.Posix
 
-if text.nil?
-  print("Input: text")
-  text = gets
-end
+text <- case text of
+  Nothing -> do
+    print "Input: text"
+    getLine
+  Just t -> return t
 
-if re.match(r"^foo.*bar$", text):
-    print("qux")
-elif re.match(r"^baz", text):
-    print("quux")
-else:
-    print("corge")
+case () of
+  _ | text =~ "^foo.*bar$" -> print "qux"
+    | text =~ "^baz"       -> print "quux"
+    | otherwise            -> print "corge"
 ```

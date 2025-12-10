@@ -5,25 +5,26 @@ argument-hint: "[--type=STRING] [--value=STRING]"
 
 Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-```
-if type.nil?
-  print("Input: type")
-  type = gets
-end
-if value.nil?
-  print("Input: value")
-  value = gets
-end
+```haskell
+data Data = Data { dataType :: String, dataValue :: String }
 
-data = {"type": type, "value": value}
+type' <- case type of
+  Nothing -> do
+    print "Input: type"
+    getLine
+  Just t -> return t
 
-match data:
-    case {"type": "foo", "value": v}:
-        print(f"bar{v}")
-    case {"type": "baz", "value": v} if int(v) > 10:
-        print(f"qux{v}")
-    case {"type": "baz", "value": v}:
-        print(f"quux{v}")
-    case _:
-        print("corge")
+value' <- case value of
+  Nothing -> do
+    print "Input: value"
+    getLine
+  Just v -> return v
+
+let data' = Data type' value'
+
+case data' of
+  Data "foo" v -> print $ "bar" ++ v
+  Data "baz" v | read v > 10 -> print $ "qux" ++ v
+  Data "baz" v               -> print $ "quux" ++ v
+  _                          -> print "corge"
 ```

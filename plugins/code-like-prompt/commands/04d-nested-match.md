@@ -5,35 +5,44 @@ argument-hint: "[--left=STRING] [--right-left=STRING] [--right-right=STRING]"
 
 Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-```
-if left.nil?
-  print("Input: left")
-  left = gets
-end
-if right_left.nil?
-  print("Input: right-left")
-  right_left = gets
-end
-if right_right.nil?
-  print("Input: right-right")
-  right_right = gets
-end
+```haskell
+data Node = Node { value :: String }
+data Tree = Tree { left :: Node, right :: Branch }
+data Branch = Branch { branchLeft :: Node, branchRight :: Node }
 
-tree = {
-    "left": {"value": left},
-    "right": {
-        "left": {"value": right_left},
-        "right": {"value": right_right}
-    }
-}
+left' <- case left of
+  Nothing -> do
+    print "Input: left"
+    getLine
+  Just l -> return l
 
-match tree:
-    case {"left": {"value": "foo"}, "right": {"left": {"value": "bar"}, "right": _}}:
-        print("qux")
-    case {"left": {"value": v1}, "right": {"left": {"value": v2}, "right": {"value": v2}}}:
-        print(f"quux{v1}")
-    case {"left": {"value": v}, "right": _}:
-        print(f"corge{v}")
-    case _:
-        print("grault")
+rightLeft' <- case right_left of
+  Nothing -> do
+    print "Input: right-left"
+    getLine
+  Just rl -> return rl
+
+rightRight' <- case right_right of
+  Nothing -> do
+    print "Input: right-right"
+    getLine
+  Just rr -> return rr
+
+let tree = Tree
+      { left = Node left'
+      , right = Branch
+          { branchLeft = Node rightLeft'
+          , branchRight = Node rightRight'
+          }
+      }
+
+case tree of
+  Tree (Node "foo") (Branch (Node "bar") _) ->
+    print "qux"
+  Tree (Node v1) (Branch (Node v2) (Node v2')) | v2 == v2' ->
+    print $ "quux" ++ v1
+  Tree (Node v) _ ->
+    print $ "corge" ++ v
+  _ ->
+    print "grault"
 ```

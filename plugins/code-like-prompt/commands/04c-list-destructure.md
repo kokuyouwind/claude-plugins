@@ -5,29 +5,30 @@ argument-hint: "[--item1=STRING] [--item2=STRING] [--item3=STRING]"
 
 Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-```
-if item1.nil?
-  print("Input: item1")
-  item1 = gets
-end
-if item2.nil?
-  print("Input: item2")
-  item2 = gets
-end
-if item3.nil?
-  print("Input: item3")
-  item3 = gets
-end
+```haskell
+item1' <- case item1 of
+  Nothing -> do
+    print "Input: item1"
+    getLine
+  Just i -> return i
 
-items = [item1, item2, item3]
+item2' <- case item2 of
+  Nothing -> do
+    print "Input: item2"
+    getLine
+  Just i -> return i
 
-match items:
-    case ["foo", second, "bar"]:
-        print(f"qux{second}")
-    case ["foo", *rest]:
-        print(f"quux{len(rest)}")
-    case [first, *_]:
-        print(f"corge{first}")
-    case []:
-        print("grault")
+item3' <- case item3 of
+  Nothing -> do
+    print "Input: item3"
+    getLine
+  Just i -> return i
+
+let items = [item1', item2', item3']
+
+case items of
+  ["foo", second, "bar"] -> print $ "qux" ++ second
+  "foo" : rest           -> print $ "quux" ++ show (length rest)
+  first : _              -> print $ "corge" ++ first
+  []                     -> print "grault"
 ```
