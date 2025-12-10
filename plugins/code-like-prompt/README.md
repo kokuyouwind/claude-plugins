@@ -190,6 +190,56 @@ Tests complex 5-level nesting with mixed patterns.
 /code-like-prompt:02a-dangling-else-outer-block --condition-a=true --condition-b=false
 ```
 
+### 04-series: Pattern Matching
+
+#### `/code-like-prompt:04a-regex-match`
+
+**Description**: コード風プロンプト例4a パターンマッチ:基本的な文字列パターンマッチング
+
+Tests basic string pattern matching with regex-like patterns.
+
+**Arguments**: `--text`
+
+#### `/code-like-prompt:04b-structural-match`
+
+**Description**: コード風プロンプト例4b パターンマッチ:構造的パターンマッチングとガード
+
+Tests structural pattern matching with dict destructuring and guards.
+
+**Arguments**: `--type`, `--value`
+
+#### `/code-like-prompt:04c-list-destructure`
+
+**Description**: コード風プロンプト例4c パターンマッチ:リスト/配列の分解
+
+Tests sequence pattern matching with list destructuring.
+
+**Arguments**: `--item1`, `--item2`, `--item3`
+
+#### `/code-like-prompt:04d-nested-match`
+
+**Description**: コード風プロンプト例4d パターンマッチ:ネストした構造のマッチング
+
+Tests deep pattern matching on nested tree-like structures.
+
+**Arguments**: `--left`, `--right-left`, `--right-right`
+
+#### `/code-like-prompt:04e-multi-guard`
+
+**Description**: コード風プロンプト例4e パターンマッチ:複数のガード条件
+
+Tests pattern matching with complex guard conditions.
+
+**Arguments**: `--x`, `--y`
+
+#### `/code-like-prompt:04f-exhaustive`
+
+**Description**: コード風プロンプト例4f パターンマッチ:網羅的パターンマッチング(Rust風)
+
+Tests exhaustive pattern matching in Rust-style enum matching.
+
+**Arguments**: `--color`, `--r`, `--g`, `--b`
+
 ## The Milk Joke
 
 This plugin is based on a classic programmer joke:
