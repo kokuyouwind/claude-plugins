@@ -61,6 +61,19 @@
       "license": "MIT",
       "keywords": ["education", "examples", "programming", "jokes"],
       "category": "education"
+    },
+    {
+      "name": "zenn-writer",
+      "source": "./plugins/zenn-writer",
+      "description": "Zenn記事執筆を支援するプラグイン。インタビュー形式で内容を深掘りし、完全な草稿を自動生成します。",
+      "version": "0.1.0",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["zenn", "article", "writing", "markdown", "japanese"],
+      "category": "content"
     }
   ]
 }
