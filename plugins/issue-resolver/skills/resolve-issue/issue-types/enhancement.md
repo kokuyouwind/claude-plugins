@@ -18,7 +18,7 @@ Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exis
 
 ### 3. Implement
 
-Follow **`dev-guidelines:implementation-workflow`** skill:
+Follow **`dev-guidelines:git-repository-workflow`** skill:
 - Follow existing code style and patterns
 - Maintain consistency with existing features
 - Provide migration path if backward compatibility needed
