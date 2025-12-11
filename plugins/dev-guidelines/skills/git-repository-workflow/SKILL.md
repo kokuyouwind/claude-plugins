@@ -1,9 +1,9 @@
 ---
-name: implementation-workflow
-description: Ensures proper Git branch management, testing practices, and PR workflow for code changes. Use this skill when implementing new features, bug fixes, or any code modifications in a Git repository.
+name: git-repository-workflow
+description: Provides Git repository workflow guidelines including branch management, testing practices (TDD), Docker environment handling, and PR workflow. Use this skill when implementing features, fixing bugs, or making any code changes in a Git repository.
 ---
 
-# Implementation Workflow
+# Git Repository Workflow
 
 ## Instructions
 
