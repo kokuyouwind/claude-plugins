@@ -6,25 +6,25 @@ Comprehensive development guidelines for Claude Code, including best practices f
 
 This plugin provides four skills that guide development practices:
 
-1. **Implementation Workflow** - Git branch management, testing practices (TDD), Docker environment handling, and code implementation workflow
+1. **Git Repository Workflow** - Git repository workflow guidelines including branch management, testing practices (TDD), Docker environment handling, and PR workflow
 2. **Debugging Process** - Methodology for code investigation, bug analysis, and root cause analysis
 3. **Design Alternatives** - Approach for evaluating design decisions and architecture choices
 4. **PR Description Format** - Format guidelines for GitHub PR descriptions in Japanese
 
 ## Skills
 
-### Implementation Workflow
+### Git Repository Workflow
 
-**When activated:** When implementing new features, making code changes, fixing bugs, or starting any code implementation work in a Git repository.
+**When activated:** When implementing features, fixing bugs, or making any code changes in a Git repository.
 
 **What it does:**
-- Guides Git branch management workflow
+- Provides Git branch management workflow guidelines
 - Determines whether to create new branch or work on existing PR branch
 - Ensures latest changes are pulled before starting work
 - Provides TDD methodology (Red-Green-Refactor cycle)
 - Checks test necessity before adding tests to projects without existing tests
 - Handles Docker environment command execution (docker exec when container is running)
-- References [web-app-testing.md](skills/implementation-workflow/web-app-testing.md) for E2E testing with Playwright MCP
+- References [web-app-testing.md](skills/git-repository-workflow/web-app-testing.md) for E2E testing with Playwright MCP
 
 ### Debugging Process
 
