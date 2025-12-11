@@ -18,7 +18,7 @@ Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exis
 
 ### 3. Implement
 
-Follow **`dev-guidelines:implementation-workflow`** skill:
+Follow **`dev-guidelines:git-repository-workflow`** skill:
 - Follow coding conventions
 - Reuse existing components/utilities
 - Implement proper error handling

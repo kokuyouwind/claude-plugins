@@ -68,7 +68,7 @@ plugins/issue-resolver/
 
 このプラグインは以下の機能と連携します：
 
-- **implementation-workflow skill**: ブランチ管理とワークフロー
+- **git-repository-workflow skill**: ブランチ管理とワークフロー
 - **gh CLIコマンド**: PR作成とラベル管理
 
 ## ライセンス
@@ -81,4 +81,4 @@ kokuyouwind (https://github.com/kokuyouwind)
 
 ## バージョン
 
-1.0.0
+1.1.0

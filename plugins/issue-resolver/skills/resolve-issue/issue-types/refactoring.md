@@ -18,7 +18,7 @@ Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exis
 
 ### 3. Implement
 
-Follow **`dev-guidelines:implementation-workflow`** skill:
+Follow **`dev-guidelines:git-repository-workflow`** skill:
 - Don't change external behavior (API, interfaces)
 - Verify all existing tests pass
 - Add/improve tests as needed
