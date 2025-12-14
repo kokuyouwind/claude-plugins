@@ -1,34 +1,31 @@
 ---
-description: コード風プロンプト例4c パターンマッチ:リスト/配列の分解
-argument-hint: "[--item1=STRING] [--item2=STRING] [--item3=STRING]"
+description: コード風プロンプト例4c リスト分解パターンマッチング
+argument-hint: '{"item1": string, "item2": string, "item3": string}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```haskell
-item1' <- case item1 of
-  Nothing -> do
-    print "Input: item1"
-    getLine
-  Just i -> return i
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-item2' <- case item2 of
-  Nothing -> do
-    print "Input: item2"
-    getLine
-  Just i -> return i
+```python
+# Validate required arguments
+if item1 is None:
+    raise ValueError("Required argument 'item1' is missing")
+if item2 is None:
+    raise ValueError("Required argument 'item2' is missing")
+if item3 is None:
+    raise ValueError("Required argument 'item3' is missing")
 
-item3' <- case item3 of
-  Nothing -> do
-    print "Input: item3"
-    getLine
-  Just i -> return i
+# List destructuring
+items = [item1, item2, item3]
 
-let items = [item1', item2', item3']
-
-case items of
-  ["foo", second, "bar"] -> print $ "qux" ++ second
-  "foo" : rest           -> print $ "quux" ++ show (length rest)
-  first : _              -> print $ "corge" ++ first
-  []                     -> print "grault"
+match items:
+    case ["foo", second, "bar"]:
+        print(f"qux{second}")
+    case ["foo", *rest]:
+        print(f"quux{len(rest)}")
+    case [first, *_]:
+        print(f"corge{first}")
+    case []:
+        print("grault")
 ```

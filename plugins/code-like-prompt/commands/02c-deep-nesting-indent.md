@@ -1,24 +1,24 @@
 ---
 description: コード風プロンプト例2c ネストされたif:複雑な5階層ネスト (インデントベース)
-argument-hint: "[--level1=BOOL] [--level2=BOOL] [--level3=BOOL] [--level4=BOOL]"
+argument-hint: '{"level1": boolean, "level2": boolean, "level3": boolean, "level4": boolean}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+
+```python
+# Validate required arguments
 if level1 is None:
-    print("Input: level1 (true/false)")
-    level1 = input()
+    raise ValueError("Required argument 'level1' is missing")
 if level2 is None:
-    print("Input: level2 (true/false)")
-    level2 = input()
+    raise ValueError("Required argument 'level2' is missing")
 if level3 is None:
-    print("Input: level3 (true/false)")
-    level3 = input()
+    raise ValueError("Required argument 'level3' is missing")
 if level4 is None:
-    print("Input: level4 (true/false)")
-    level4 = input()
+    raise ValueError("Required argument 'level4' is missing")
 
+# Logic
 if level1:
     if level2:
         if level3:

@@ -1,18 +1,20 @@
 ---
 description: コード風プロンプト例2a ネストされたif:elseが外側に属する (インデントベース)
-argument-hint: "[--condition-a=BOOL] [--condition-b=BOOL]"
+argument-hint: '{"condition_a": boolean, "condition_b": boolean}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+
+```python
+# Validate required arguments
 if condition_a is None:
-    print("Input: condition_a (true/false)")
-    condition_a = input()
+    raise ValueError("Required argument 'condition_a' is missing")
 if condition_b is None:
-    print("Input: condition_b (true/false)")
-    condition_b = input()
+    raise ValueError("Required argument 'condition_b' is missing")
 
+# Logic
 if condition_a:
     if condition_b:
         print("foo")
