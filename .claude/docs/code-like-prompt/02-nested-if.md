@@ -87,8 +87,9 @@ Structure breakdown:
 
 ### Arguments
 
-- `--condition-a`, `--condition-b`: Boolean values for dangling else tests
-- `--level1` through `--level4`: Boolean values for deep nesting test
+JSON environment arguments:
+- For dangling else tests: `{"condition_a": boolean, "condition_b": boolean}`
+- For deep nesting test: `{"level1": boolean, "level2": boolean, "level3": boolean, "level4": boolean}`
 
 ### Variants
 
@@ -144,6 +145,38 @@ Each test scenario has three syntax style variants:
 | F | T | (none) |
 | F | F | (none) |
 
+### Test Commands (Dangling Else)
+
+**02a variants** (A=T, B=T):
+```bash
+claude -p '/code-like-prompt:02a-dangling-else-outer-indent {"condition_a": true, "condition_b": true}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-block {"condition_a": true, "condition_b": true}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-keyword {"condition_a": true, "condition_b": true}'
+```
+
+**02a variants** (A=T, B=F):
+```bash
+claude -p '/code-like-prompt:02a-dangling-else-outer-indent {"condition_a": true, "condition_b": false}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-block {"condition_a": true, "condition_b": false}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-keyword {"condition_a": true, "condition_b": false}'
+```
+
+**02a variants** (A=F, B=T):
+```bash
+claude -p '/code-like-prompt:02a-dangling-else-outer-indent {"condition_a": false, "condition_b": true}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-block {"condition_a": false, "condition_b": true}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-keyword {"condition_a": false, "condition_b": true}'
+```
+
+**02a variants** (A=F, B=F):
+```bash
+claude -p '/code-like-prompt:02a-dangling-else-outer-indent {"condition_a": false, "condition_b": false}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-block {"condition_a": false, "condition_b": false}'
+claude -p '/code-like-prompt:02a-dangling-else-outer-keyword {"condition_a": false, "condition_b": false}'
+```
+
+**02b variants** - Replace `02a-dangling-else-outer` with `02b-dangling-else-inner` in the above commands.
+
 ### Complex Deep Nesting Test Matrix
 
 | L1 | L2 | L3 | L4 | Output |
@@ -157,6 +190,71 @@ Each test scenario has three syntax style variants:
 | F  | T  | -  | -  | corge |
 | F  | F  | T  | -  | grault |
 | F  | F  | F  | -  | garply |
+
+### Test Commands (Deep Nesting)
+
+**02c variants** (L1=T, L2=T, L3=T):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": true, "level2": true, "level3": true, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": true, "level2": true, "level3": true, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": true, "level2": true, "level3": true, "level4": false}'
+```
+
+**02c variants** (L1=T, L2=T, L3=F, L4=T):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": true, "level2": true, "level3": false, "level4": true}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": true, "level2": true, "level3": false, "level4": true}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": true, "level2": true, "level3": false, "level4": true}'
+```
+
+**02c variants** (L1=T, L2=T, L3=F, L4=F):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": true, "level2": true, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": true, "level2": true, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": true, "level2": true, "level3": false, "level4": false}'
+```
+
+**02c variants** (L1=T, L2=F, L3=T, L4=T):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": true, "level2": false, "level3": true, "level4": true}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": true, "level2": false, "level3": true, "level4": true}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": true, "level2": false, "level3": true, "level4": true}'
+```
+
+**02c variants** (L1=T, L2=F, L3=T, L4=F):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": true, "level2": false, "level3": true, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": true, "level2": false, "level3": true, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": true, "level2": false, "level3": true, "level4": false}'
+```
+
+**02c variants** (L1=T, L2=F, L3=F):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": true, "level2": false, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": true, "level2": false, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": true, "level2": false, "level3": false, "level4": false}'
+```
+
+**02c variants** (L1=F, L2=T):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": false, "level2": true, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": false, "level2": true, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": false, "level2": true, "level3": false, "level4": false}'
+```
+
+**02c variants** (L1=F, L2=F, L3=T):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": false, "level2": false, "level3": true, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": false, "level2": false, "level3": true, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": false, "level2": false, "level3": true, "level4": false}'
+```
+
+**02c variants** (L1=F, L2=F, L3=F):
+```bash
+claude -p '/code-like-prompt:02c-deep-nesting-indent {"level1": false, "level2": false, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-block {"level1": false, "level2": false, "level3": false, "level4": false}'
+claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": false, "level2": false, "level3": false, "level4": false}'
+```
 
 ## Implementation Priority
 
@@ -243,9 +341,9 @@ For each syntax style (indent, block, keyword), run the same test matrices:
 - 02b variants: 4 test cases (A×B combinations)
 - 02c variants: 9 test cases (L1-L4 combinations)
 
-Use non-interactive testing mode:
+Use non-interactive testing mode with JSON arguments:
 ```bash
-claude -p "/code-like-prompt:02a-dangling-else-outer-block --condition-a=true --condition-b=true"
+claude -p '/code-like-prompt:02a-dangling-else-outer-block {"condition_a": true, "condition_b": true}'
 ```
 
 ### Expected Research Outcomes
