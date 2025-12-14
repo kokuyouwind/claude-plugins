@@ -171,10 +171,13 @@ Test cases:
 
 ### Arguments
 
-- `--text`: Input string for regex matching
-- `--type`, `--value`: Dict fields for structural matching
-- `--items`: Comma-separated list for array matching
-- `--left`, `--right-left`, `--right-right`: Tree values
+JSON environment arguments (vary by command):
+- `text`: Input string for regex matching (e.g., `{"text": "foobar"}`)
+- `type`, `value`: Dict fields for structural matching (e.g., `{"type": "foo", "value": "123"}`)
+- `item1`, `item2`, `item3`: Items for array matching (e.g., `{"item1": "foo", "item2": "X", "item3": "bar"}`)
+- `left`, `right_left`, `right_right`: Tree values (e.g., `{"left": "foo", "right_left": "bar", "right_right": "X"}`)
+- `x`, `y`: Numbers for guard tests (e.g., `{"x": 1, "y": 1}`)
+- `color`, `r`, `g`, `b`: Enum and RGB values (e.g., `{"color": "Red"}` or `{"color": "Custom", "r": 255, "g": 100, "b": 50}`)
 
 ### Variants
 
@@ -214,3 +217,137 @@ When multiple cases match structurally, guards determine the actual match. Tests
 4. `04c-list-destructure` - Rest patterns
 5. `04a-regex-match` - Basic string patterns
 6. `04f-exhaustive` - Rust-style enum matching
+
+## Test Commands
+
+### 04a-regex-match
+
+**Case 1: "fooXXXbar" → qux**
+```bash
+claude -p '/code-like-prompt:04a-regex-match {"text": "fooXXXbar"}'
+```
+
+**Case 2: "foobar" → qux**
+```bash
+claude -p '/code-like-prompt:04a-regex-match {"text": "foobar"}'
+```
+
+**Case 3: "bazanything" → quux**
+```bash
+claude -p '/code-like-prompt:04a-regex-match {"text": "bazanything"}'
+```
+
+**Case 4: "hello" → corge**
+```bash
+claude -p '/code-like-prompt:04a-regex-match {"text": "hello"}'
+```
+
+### 04b-structural-match
+
+**Case 1: type="foo", value="123" → bar123**
+```bash
+claude -p '/code-like-prompt:04b-structural-match {"type": "foo", "value": "123"}'
+```
+
+**Case 2: type="baz", value="15" → qux15** (guard: 15 > 10)
+```bash
+claude -p '/code-like-prompt:04b-structural-match {"type": "baz", "value": "15"}'
+```
+
+**Case 3: type="baz", value="5" → quux5** (guard fails: 5 <= 10)
+```bash
+claude -p '/code-like-prompt:04b-structural-match {"type": "baz", "value": "5"}'
+```
+
+**Case 4: type="other", value="x" → corge**
+```bash
+claude -p '/code-like-prompt:04b-structural-match {"type": "other", "value": "x"}'
+```
+
+### 04c-list-destructure
+
+**Case 1: ["foo", "X", "bar"] → quxX**
+```bash
+claude -p '/code-like-prompt:04c-list-destructure {"item1": "foo", "item2": "X", "item3": "bar"}'
+```
+
+**Case 2: ["foo", "a", "b"] → quux2** (rest = ["a", "b"])
+```bash
+claude -p '/code-like-prompt:04c-list-destructure {"item1": "foo", "item2": "a", "item3": "b"}'
+```
+
+**Case 3: ["other", "x", "y"] → corgeother**
+```bash
+claude -p '/code-like-prompt:04c-list-destructure {"item1": "other", "item2": "x", "item3": "y"}'
+```
+
+### 04d-nested-match
+
+**Case 1: left="foo", right-left="bar", right-right="X" → qux**
+```bash
+claude -p '/code-like-prompt:04d-nested-match {"left": "foo", "right_left": "bar", "right_right": "X"}'
+```
+
+**Case 2: left="A", right-left="same", right-right="same" → quuxA** (values match)
+```bash
+claude -p '/code-like-prompt:04d-nested-match {"left": "A", "right_left": "same", "right_right": "same"}'
+```
+
+**Case 3: left="A", right-left="B", right-right="C" → corgeA**
+```bash
+claude -p '/code-like-prompt:04d-nested-match {"left": "A", "right_left": "B", "right_right": "C"}'
+```
+
+### 04e-multi-guard
+
+**Case 1: x=1, y=1 → foo** (both positive)
+```bash
+claude -p '/code-like-prompt:04e-multi-guard {"x": 1, "y": 1}'
+```
+
+**Case 2: x=1, y=-1 → bar** (at least one positive)
+```bash
+claude -p '/code-like-prompt:04e-multi-guard {"x": 1, "y": -1}'
+```
+
+**Case 3: x=-1, y=1 → bar** (at least one positive)
+```bash
+claude -p '/code-like-prompt:04e-multi-guard {"x": -1, "y": 1}'
+```
+
+**Case 4: x=0, y=0 → baz** (exact match)
+```bash
+claude -p '/code-like-prompt:04e-multi-guard {"x": 0, "y": 0}'
+```
+
+**Case 5: x=-1, y=-1 → qux** (default)
+```bash
+claude -p '/code-like-prompt:04e-multi-guard {"x": -1, "y": -1}'
+```
+
+### 04f-exhaustive
+
+**Case 1: Red → foo**
+```bash
+claude -p '/code-like-prompt:04f-exhaustive {"color": "Red"}'
+```
+
+**Case 2: Green → bar**
+```bash
+claude -p '/code-like-prompt:04f-exhaustive {"color": "Green"}'
+```
+
+**Case 3: Blue → baz**
+```bash
+claude -p '/code-like-prompt:04f-exhaustive {"color": "Blue"}'
+```
+
+**Case 4: Custom(255, 100, 50) → qux** (r > 200)
+```bash
+claude -p '/code-like-prompt:04f-exhaustive {"color": "Custom", "r": 255, "g": 100, "b": 50}'
+```
+
+**Case 5: Custom(100, 150, 200) → quux100150200**
+```bash
+claude -p '/code-like-prompt:04f-exhaustive {"color": "Custom", "r": 100, "g": 150, "b": 200}'
+```

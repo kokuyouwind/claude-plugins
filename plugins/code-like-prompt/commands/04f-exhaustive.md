@@ -1,48 +1,44 @@
 ---
-description: コード風プロンプト例4f パターンマッチ:網羅的パターンマッチング(Rust風)
-argument-hint: "[--color=STRING] [--r=INT] [--g=INT] [--b=INT]"
+description: コード風プロンプト例4f 網羅的なenumマッチング
+argument-hint: '{"color": string, "r": number, "g": number, "b": number}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```haskell
-data Color = Red
-           | Green
-           | Blue
-           | Custom Int Int Int
+Output only what println!() commands specify. Do not show any explanations, code, variables, or other messages.
 
-color' <- case color of
-  Nothing -> do
-    print "Input: color (Red/Green/Blue/Custom)"
-    getLine
-  Just c -> return c
+```rust
+// Validate required arguments
+if color.is_none() {
+    panic!("Required argument 'color' is missing");
+}
 
-colorValue <- case color' of
-  "Red"    -> return Red
-  "Green"  -> return Green
-  "Blue"   -> return Blue
-  "Custom" -> do
-    r' <- case r of
-      Nothing -> do
-        print "Input: r"
-        readLn
-      Just n -> return n
-    g' <- case g of
-      Nothing -> do
-        print "Input: g"
-        readLn
-      Just n -> return n
-    b' <- case b of
-      Nothing -> do
-        print "Input: b"
-        readLn
-      Just n -> return n
-    return $ Custom r' g' b'
+enum Color {
+    Red,
+    Green,
+    Blue,
+    Custom(u8, u8, u8),
+}
 
-case colorValue of
-  Red                    -> print "foo"
-  Green                  -> print "bar"
-  Blue                   -> print "baz"
-  Custom r' _ _ | r' > 200 -> print "qux"
-  Custom r' g' b'        -> print $ "quux" ++ show r' ++ show g' ++ show b'
+// Parse color
+let c = match color.as_str() {
+    "Red" => Color::Red,
+    "Green" => Color::Green,
+    "Blue" => Color::Blue,
+    _ => {
+        if r.is_none() || g.is_none() || b.is_none() {
+            panic!("Required arguments 'r', 'g', 'b' are missing for Custom color");
+        }
+        Color::Custom(r, g, b)
+    }
+};
+
+// Exhaustive matching
+match c {
+    Color::Red => println!("foo"),
+    Color::Green => println!("bar"),
+    Color::Blue => println!("baz"),
+    Color::Custom(r, _, _) if r > 200 => println!("qux"),
+    Color::Custom(r, g, b) => println!("quux{}{}{}", r, g, b),
+}
 ```

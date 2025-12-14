@@ -151,9 +151,17 @@ Expected: bar010, bar17, bar24, bar31
 
 ### Arguments
 
-- `--count`: Number of iterations for fixed count tests
-- `--items`: Comma-separated list for collection iteration
-- `--path`: Directory path for file system iteration
+JSON environment arguments (vary by command):
+- `count`: Number of iterations (e.g., `{"count": 5}`)
+- `max_count`: Maximum count for while loops (e.g., `{"max_count": 3}`)
+- `items`: Array of items for collection iteration (e.g., `{"items": ["qux", "quux", "corge"]}`)
+- `break_at`: Index to break at (e.g., `{"break_at": 3}`)
+- `skip_at`: Index to skip/continue at (e.g., `{"skip_at": 2}`)
+- `outer_count`, `inner_count`: Nested loop counts (e.g., `{"outer_count": 3, "inner_count": 2}`)
+- `inner_break_at`: Break index for inner loop (e.g., `{"outer_count": 3, "inner_break_at": 2}`)
+- `pattern`: Glob pattern for file iteration (e.g., `{"pattern": "*.txt"}`)
+- `start`, `end`: Range for accumulator (e.g., `{"start": 1, "end": 4}`)
+- `x_limit`, `y_start`, `y_decrement`: Complex while parameters (e.g., `{"x_limit": 5, "y_start": 10, "y_decrement": 3}`)
 
 ### Variants
 
@@ -217,3 +225,65 @@ i=2: j=0→bar20, j=1→bar21, j=2→break, baz2
 4. `03j-while-complex` - Tests multi-condition evaluation
 5. `03a-for-count` through `03e-loop-continue` - Basic tests
 6. `03h-filesystem-glob` - Interesting edge case with external state
+
+## Test Commands
+
+### 03a-for-count
+```bash
+claude -p '/code-like-prompt:03a-for-count {"count": 5}'
+```
+Expected output: foo0, foo1, foo2, foo3, foo4
+
+### 03b-while-counter
+```bash
+claude -p '/code-like-prompt:03b-while-counter {"max_count": 3}'
+```
+Expected output: bar, bar, bar, baz
+
+### 03c-each-collection
+```bash
+claude -p '/code-like-prompt:03c-each-collection {"items": ["qux", "quux", "corge"]}'
+```
+Expected output: qux, quux, corge
+
+### 03d-loop-break
+```bash
+claude -p '/code-like-prompt:03d-loop-break {"break_at": 3}'
+```
+Expected output: foo0, foo1, foo2, bar
+
+### 03e-loop-continue
+```bash
+claude -p '/code-like-prompt:03e-loop-continue {"skip_at": 2}'
+```
+Expected output: foo0, foo1, foo3, foo4
+
+### 03f-nested-loops
+```bash
+claude -p '/code-like-prompt:03f-nested-loops {"outer_count": 3, "inner_count": 2}'
+```
+Expected output: foo00, foo01, foo10, foo11, foo20, foo21
+
+### 03g-nested-break
+```bash
+claude -p '/code-like-prompt:03g-nested-break {"outer_count": 3, "inner_break_at": 2}'
+```
+Expected output: bar00, bar01, baz0, bar10, bar11, baz1, bar20, bar21, baz2
+
+### 03h-filesystem-glob
+```bash
+claude -p '/code-like-prompt:03h-filesystem-glob {"pattern": "*.txt"}'
+```
+Expected: Lists .txt files in current directory (or simulates based on context)
+
+### 03i-accumulator
+```bash
+claude -p '/code-like-prompt:03i-accumulator {"start": 1, "end": 4}'
+```
+Expected output: foo1, foo3, foo6, foo10
+
+### 03j-while-complex
+```bash
+claude -p '/code-like-prompt:03j-while-complex {"x_limit": 5, "y_start": 10, "y_decrement": 3}'
+```
+Expected output: bar010, bar17, bar24, bar31

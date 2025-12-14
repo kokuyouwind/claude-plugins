@@ -1,21 +1,24 @@
 ---
-description: コード風プロンプト例4a パターンマッチ:基本的な文字列パターンマッチング
-argument-hint: "[--text=STRING]"
+description: コード風プロンプト例4a 正規表現マッチング
+argument-hint: '{"text": string}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```haskell
-import Text.Regex.Posix
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-text <- case text of
-  Nothing -> do
-    print "Input: text"
-    getLine
-  Just t -> return t
+```python
+import re
 
-case () of
-  _ | text =~ "^foo.*bar$" -> print "qux"
-    | text =~ "^baz"       -> print "quux"
-    | otherwise            -> print "corge"
+# Validate required arguments
+if text is None:
+    raise ValueError("Required argument 'text' is missing")
+
+# Pattern matching
+if re.match(r"^foo.*bar$", text):
+    print("qux")
+elif re.match(r"^baz", text):
+    print("quux")
+else:
+    print("corge")
 ```

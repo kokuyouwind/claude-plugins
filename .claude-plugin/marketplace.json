@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Claude Code plugins maintained by kokuyouwind",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -53,7 +53,7 @@
       "name": "code-like-prompt",
       "source": "./plugins/code-like-prompt",
       "description": "Collection of commands that execute code-like prompts demonstrating programming concepts including logic programming and backtracking",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "kokuyouwind",
         "url": "https://github.com/kokuyouwind"

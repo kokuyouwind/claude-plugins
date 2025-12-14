@@ -1,20 +1,18 @@
 ---
 description: コード風プロンプト例2b ネストされたif:elseが内側に属する (キーワードスタイル)
-argument-hint: "[--condition-a=BOOL] [--condition-b=BOOL]"
+argument-hint: '{"condition_a": boolean, "condition_b": boolean}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```
-if condition_a.nil?
-  print "Input: condition_a (true/false)"
-  condition_a = gets
-end
-if condition_b.nil?
-  print "Input: condition_b (true/false)"
-  condition_b = gets
-end
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
+```ruby
+# Validate required arguments
+raise "Required argument 'condition_a' is missing" if condition_a.nil?
+raise "Required argument 'condition_b' is missing" if condition_b.nil?
+
+# Logic
 if condition_a
   if condition_b
     print "foo"

@@ -47,25 +47,19 @@ Expected behavior:
 
 ### Arguments
 
-Both commands accept:
-- `--milk-stock=N`: Sets Milk.stock to N (default: asks via gets)
-- `--egg-stock=N`: Sets Egg.stock to N (default: asks via gets)
+Both commands accept JSON environment arguments:
+- `Milk.stock`: Stock level for milk (number)
+- `Egg.stock`: Stock level for eggs (number)
+
+Example: `{"Milk.stock": 5, "Egg.stock": 3}`
 
 Note: `Egg.exists?` returns true if `Egg.stock > 0`, false otherwise.
 
-### Interactive vs Non-Interactive Mode
+### Test Execution
 
-**Interactive mode** (no arguments): Commands will prompt for input:
-```
-Input: Milk
-[user enters stock value]
-Input: Egg
-[user enters stock value]
-```
-
-**Non-interactive mode** (with arguments):
+Use `claude -p` with JSON arguments:
 ```bash
-claude -p "/code-like-prompt:01-shopping-request --milk-stock=5 --egg-stock=3"
+claude -p '/code-like-prompt:01-shopping-request {"Milk.stock": 5, "Egg.stock": 3}'
 ```
 
 ## Expected Behaviors
@@ -82,6 +76,28 @@ claude -p "/code-like-prompt:01-shopping-request --milk-stock=5 --egg-stock=3"
 |-----------|-------------------------|----------------------------------|
 | > 0       | Bought 1 milk.<br>Bought 6 eggs. | Bought 6 milks. |
 | 0         | Bought 1 milk. | Bought 1 milks. |
+
+### Test Commands
+
+**shopping-request** (Egg.stock > 0):
+```bash
+claude -p '/code-like-prompt:01-shopping-request {"Milk.stock": 5, "Egg.stock": 3}'
+```
+
+**shopping-request** (Egg.stock = 0):
+```bash
+claude -p '/code-like-prompt:01-shopping-request {"Milk.stock": 5, "Egg.stock": 0}'
+```
+
+**shopping-misunderstanding** (Egg.stock > 0):
+```bash
+claude -p '/code-like-prompt:01-shopping-misunderstanding {"Milk.stock": 5, "Egg.stock": 3}'
+```
+
+**shopping-misunderstanding** (Egg.stock = 0):
+```bash
+claude -p '/code-like-prompt:01-shopping-misunderstanding {"Milk.stock": 5, "Egg.stock": 0}'
+```
 
 ## Implementation Priority
 

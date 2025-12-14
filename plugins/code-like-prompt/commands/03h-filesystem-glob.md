@@ -1,17 +1,18 @@
 ---
-description: コード風プロンプト例3h ファイルシステムのglob反復処理
-argument-hint: "[--pattern=GLOB_PATTERN]"
+description: コード風プロンプト例3h ファイルシステムのglob検索
+argument-hint: '{"pattern": string}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
+
+Output only what puts() commands specify. Do not show any explanations, code, variables, or other messages.
 
 ```ruby
-if pattern.nil?
-  print("Input: pattern (glob pattern)")
-  pattern = gets
-end
+# Validate required arguments
+raise "Required argument 'pattern' is missing" if pattern.nil?
 
+# File system iteration
 Dir.glob(pattern).each do |file|
-  print(file)
+  puts file
 end
 ```

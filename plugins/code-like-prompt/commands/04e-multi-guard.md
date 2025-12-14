@@ -1,26 +1,27 @@
 ---
-description: コード風プロンプト例4e パターンマッチ:複数のガード条件
-argument-hint: "[--x=INT] [--y=INT]"
+description: コード風プロンプト例4e 複数ガード条件のパターンマッチング
+argument-hint: '{"x": number, "y": number}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```haskell
-x' <- case x of
-  Nothing -> do
-    print "Input: x"
-    readLn
-  Just n -> return n
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-y' <- case y of
-  Nothing -> do
-    print "Input: y"
-    readLn
-  Just n -> return n
+```python
+# Validate required arguments
+if x is None:
+    raise ValueError("Required argument 'x' is missing")
+if y is None:
+    raise ValueError("Required argument 'y' is missing")
 
-case (x', y') of
-  (a, b) | a > 0 && b > 0 -> print "foo"
-         | a > 0 || b > 0 -> print "bar"
-  (0, 0)                  -> print "baz"
-  _                       -> print "qux"
+# Pattern matching with guards
+match (x, y):
+    case (a, b) if a > 0 and b > 0:
+        print("foo")
+    case (a, b) if a > 0 or b > 0:
+        print("bar")
+    case (0, 0):
+        print("baz")
+    case _:
+        print("qux")
 ```

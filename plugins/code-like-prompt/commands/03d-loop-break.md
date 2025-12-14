@@ -1,16 +1,18 @@
 ---
 description: コード風プロンプト例3d break文で途中終了するループ
-argument-hint: "[--break-at=NUMBER]"
+argument-hint: '{"break_at": number}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
+
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
 ```python
-if break_at.nil?
-  print("Input: break_at (number)")
-  break_at = gets.to_i
-end
+# Validate required arguments
+if break_at is None:
+    raise ValueError("Required argument 'break_at' is missing")
 
+# Loop with break
 for i in range(10):
     if i == break_at:
         break

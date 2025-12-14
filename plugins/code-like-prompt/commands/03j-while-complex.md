@@ -1,24 +1,22 @@
 ---
-description: コード風プロンプト例3j 複雑な条件のwhile文
-argument-hint: "[--x-limit=NUMBER] [--y-start=NUMBER] [--y-decrement=NUMBER]"
+description: コード風プロンプト例3j 複雑な条件のwhileループ
+argument-hint: '{"x_limit": number, "y_start": number, "y_decrement": number}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
+
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
 ```python
-if x_limit.nil?
-  print("Input: x_limit (number)")
-  x_limit = gets.to_i
-end
-if y_start.nil?
-  print("Input: y_start (number)")
-  y_start = gets.to_i
-end
-if y_decrement.nil?
-  print("Input: y_decrement (number)")
-  y_decrement = gets.to_i
-end
+# Validate required arguments
+if x_limit is None:
+    raise ValueError("Required argument 'x_limit' is missing")
+if y_start is None:
+    raise ValueError("Required argument 'y_start' is missing")
+if y_decrement is None:
+    raise ValueError("Required argument 'y_decrement' is missing")
 
+# While loop with complex condition
 x = 0
 y = y_start
 while x < x_limit and y > 0:

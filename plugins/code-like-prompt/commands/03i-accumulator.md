@@ -1,20 +1,20 @@
 ---
 description: コード風プロンプト例3i アキュムレータパターン
-argument-hint: "[--start=NUMBER] [--end=NUMBER]"
+argument-hint: '{"start": number, "end": number}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
+
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
 ```python
-if start.nil?
-  print("Input: start (number)")
-  start = gets.to_i
-end
-if end.nil?
-  print("Input: end (number)")
-  end = gets.to_i
-end
+# Validate required arguments
+if start is None:
+    raise ValueError("Required argument 'start' is missing")
+if end is None:
+    raise ValueError("Required argument 'end' is missing")
 
+# Loop with accumulator
 total = 0
 for i in range(start, end):
     total += i

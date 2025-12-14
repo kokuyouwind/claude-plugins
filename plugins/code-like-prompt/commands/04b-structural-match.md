@@ -1,30 +1,29 @@
 ---
-description: コード風プロンプト例4b パターンマッチ:構造的パターンマッチングとガード
-argument-hint: "[--type=STRING] [--value=STRING]"
+description: コード風プロンプト例4b 構造的パターンマッチング
+argument-hint: '{"type": string, "value": string}'
 ---
 
-Execute the following code. Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Execute the following code with environment: $ARGUMENTS
 
-```haskell
-data Data = Data { dataType :: String, dataValue :: String }
+Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
 
-type' <- case type of
-  Nothing -> do
-    print "Input: type"
-    getLine
-  Just t -> return t
+```python
+# Validate required arguments
+if type is None:
+    raise ValueError("Required argument 'type' is missing")
+if value is None:
+    raise ValueError("Required argument 'value' is missing")
 
-value' <- case value of
-  Nothing -> do
-    print "Input: value"
-    getLine
-  Just v -> return v
+# Structural pattern matching
+data = {"type": type, "value": value}
 
-let data' = Data type' value'
-
-case data' of
-  Data "foo" v -> print $ "bar" ++ v
-  Data "baz" v | read v > 10 -> print $ "qux" ++ v
-  Data "baz" v               -> print $ "quux" ++ v
-  _                          -> print "corge"
+match data:
+    case {"type": "foo", "value": v}:
+        print(f"bar{v}")
+    case {"type": "baz", "value": v} if int(v) > 10:
+        print(f"qux{v}")
+    case {"type": "baz", "value": v}:
+        print(f"quux{v}")
+    case _:
+        print("corge")
 ```
