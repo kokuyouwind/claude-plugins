@@ -508,3 +508,123 @@ Tests complex 5-level nesting with mixed patterns using if/end keywords.
 2. Avoid complex nested structures with dangling else patterns when possible
 3. When nested dangling else is unavoidable, use block braces and test thoroughly
 4. Consider restructuring complex conditions into simpler, sequential checks
+
+## Test Results - 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
+
+After migrating to JSON environment format, all test variants were re-run.
+
+### Overall Pass Rates by Syntax Style
+
+| Syntax Style | 02a-outer | 02b-inner | 02c-deep | Total | Overall |
+|--------------|-----------|-----------|----------|-------|---------|
+| Indentation  | 3/4 (75%) | 2/4 (50%) | 8/9 (89%) | 13/17 | 76% |
+| Block braces | 3/4 (75%) | 2/4 (50%) | 8/9 (89%) | 13/17 | 76% |
+| Keywords     | 3/4 (75%) | 2/4 (50%) | 8/9 (89%) | 13/17 | 76% |
+
+**Overall: 39/51 (76%)**
+
+### 02a-dangling-else-outer (All Syntax Styles)
+
+All three syntax styles (indent, block, keyword) showed identical behavior.
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | (none) | foo | ✗ |
+| F | T | bar | bar | ✓ |
+| F | F | bar | bar | ✓ |
+
+**Pass Rate: 3/4 (75%) for each style, 9/12 total**
+
+**Analysis**: Unlike previous tests (2025-12-09) where block braces achieved 100% pass rate, all syntax styles now fail at A=T, B=F. The output is "foo" when it should be empty. This suggests Claude is now executing the inner `if (condition_b)` block even when condition_b is false, which is a fundamental condition evaluation issue, not a scope binding issue.
+
+### 02b-dangling-else-inner (All Syntax Styles)
+
+Indentation and keyword styles showed identical failures, while block style had different failures.
+
+**Indent/Keyword styles:**
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | bar | bar | ✓ |
+| F | T | (none) | bar | ✗ |
+| F | F | (none) | bar | ✗ |
+
+**Pass Rate: 2/4 (50%) each, 4/8 total for indent+keyword**
+
+**Block style:**
+
+| A | B | Expected | Actual | Pass |
+|---|---|----------|--------|------|
+| T | T | foo | foo | ✓ |
+| T | F | bar | bar | ✓ |
+| F | T | (none) | (empty code blocks + explanation) | ✗ |
+| F | F | (none) | (empty code blocks + explanation) | ✗ |
+
+**Pass Rate: 2/4 (50%)**
+
+**Analysis**:
+- Indent/keyword styles: When A=F, Claude outputs "bar" (the else branch) even though the outer if wasn't entered. This is a serious logic error.
+- Block style: Produces correct empty output but adds explanatory text, violating the "output only what printf() commands specify" instruction.
+
+### 02c-deep-nesting (All Syntax Styles)
+
+All three syntax styles showed identical behavior.
+
+| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
+|----|----|----|-------|----------|--------|------|
+| T  | T  | T  | -  | foo | foo | ✓ |
+| T  | T  | F  | T  | bar | bar | ✓ |
+| T  | T  | F  | F  | baz | baz | ✓ |
+| T  | F  | T  | T  | qux | qux | ✓ |
+| T  | F  | T  | F  | (none) | baz | ✗ |
+| T  | F  | F  | -  | quux | quux | ✓ |
+| F  | T  | -  | -  | corge | corge | ✓ |
+| F  | F  | T  | -  | grault | grault | ✓ |
+| F  | F  | F  | -  | garply | garply | ✓ |
+
+**Pass Rate: 8/9 (89%) for each style, 24/27 total**
+
+**Analysis**: Significantly improved from 2025-12-09 results (78% indent, 89% block/keyword). However, the same failure persists at L1=T,L2=F,L3=T,L4=F where "baz" is output instead of nothing. Interestingly, now ALL syntax styles fail identically on this case, whereas previously only indent failed differently.
+
+### Comparative Analysis: 2025-12-09 vs 2025-12-14
+
+#### Changes After JSON Environment Migration
+
+1. **02a-outer block braces regressed**: 100% → 75% (now fails A=T,B=F)
+2. **02b-inner performance degraded**: All styles dropped from 100% to 50%
+3. **02c-deep improved for indent**: 78% → 89%
+4. **Syntax styles now behave identically**: Previous differences between styles have largely disappeared
+
+#### Overall Comparison
+
+| Test | 2025-12-09 | 2025-12-14 | Change |
+|------|------------|------------|--------|
+| 02a-outer (indent) | 75% | 75% | ± 0% |
+| 02a-outer (block) | 100% | 75% | -25% |
+| 02a-outer (keyword) | 75% | 75% | ± 0% |
+| 02b-inner (all) | 100% | 50% | -50% |
+| 02c-deep (indent) | 78% | 89% | +11% |
+| 02c-deep (block) | 89% | 89% | ± 0% |
+| 02c-deep (keyword) | 89% | 89% | ± 0% |
+
+**Overall: 94% (2025-12-09) → 76% (2025-12-14)** - significant regression
+
+### Key Findings
+
+1. **JSON environment format introduced new issues**: The migration appears to have degraded Claude's ability to correctly evaluate nested conditionals
+2. **Fundamental condition evaluation problems**: Claude now outputs from branches that shouldn't execute (e.g., outputting "foo" when condition_b=false, outputting "bar" when condition_a=false)
+3. **Syntax style differences eliminated**: All three styles now behave nearly identically, suggesting the issues are not about parsing but about fundamental logic evaluation
+4. **Block braces no longer provide advantage**: Previously, block braces significantly improved interpretation accuracy, but this advantage has disappeared
+5. **Output format violations**: Block style adds explanatory text in some cases, violating the "output only" instruction
+
+### Conclusion
+
+The JSON environment format migration has had a **negative impact** on nested conditional interpretation. While it improved simple conditional evaluation (as seen in 01-shopping-request going from 50% to 100%), it has introduced serious regressions in nested conditional logic:
+
+- Claude now fails to correctly evaluate conditions in nested structures
+- Previously successful test cases (like 02a-outer-block with A=T,B=F) now fail
+- The advantage of explicit block delimiters has been lost
+
+This suggests that the JSON environment format may be interfering with Claude's ability to track and evaluate nested conditional state, or that the format change has triggered different interpretation behaviors. Further investigation is needed to understand why simpler conditionals improved while nested ones regressed.

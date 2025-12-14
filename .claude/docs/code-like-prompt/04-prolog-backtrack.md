@@ -210,3 +210,106 @@ Tests whether Claude understands that constraints eliminate invalid combinations
 5. `04p-e-findall` - Solution collection
 6. `04p-f-negation` - Negation as failure
 7. `04p-a-basic-facts` - Baseline verification
+
+## Test Results
+
+### 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
+
+Tests executed with JSON environment argument format (no arguments needed for these tests).
+
+#### Test Results Summary
+
+| Command | Expected Output | Actual Output | Pass |
+|---------|-----------------|---------------|------|
+| 04p-a-basic-facts | corge<br>grault | corge<br>grault | ✓ |
+| 04p-b-multi-clause | b c c d d | b c c d d | ✓ |
+| 04p-c-cut | bar<br>corge | bar<br>corge | ✓ |
+| 04p-d-tree-traverse | baz qux corge grault | baz qux corge grault | ✓ |
+| 04p-e-findall | [baz, quux] | [baz, quux] | ✓ |
+| 04p-f-negation | bar | bar | ✓ |
+| 04p-g-constraints | foo-bar-baz<br>foo-baz-bar<br>bar-foo-baz<br>bar-baz-foo<br>baz-foo-bar<br>baz-bar-foo | foo-bar-baz<br>foo-baz-bar<br>bar-foo-baz<br>bar-baz-foo<br>baz-foo-bar<br>baz-bar-foo | ✓ |
+
+**Pass Rate: 7/7 (100%)**
+
+#### Detailed Analysis
+
+**04p-a-basic-facts**: Perfect. Claude correctly:
+- Queries the fact database
+- Unifies variables across multiple predicates
+- Backtracks to find all solutions
+- Outputs only matching results (corge, grault)
+
+**04p-b-multi-clause**: Perfect. Claude correctly:
+- Uses multiple clauses for the same predicate
+- Implements recursive rules (`connected(X, Y) :- path(X, Z), connected(Z, Y)`)
+- Finds all reachable nodes through depth-first search
+- Outputs solutions in DFS order (b c c d d)
+
+**04p-c-cut**: Perfect. Claude correctly:
+- Understands cut (!) semantics
+- Commits to first matching clause when cut is executed
+- Prevents backtracking to alternative clauses after cut
+- Falls through to second clause when first clause fails entirely
+
+**04p-d-tree-traverse**: Perfect. Claude correctly:
+- Recursively traverses tree structures
+- Processes nodes in depth-first order (left subtree before right)
+- Collects leaf values through backtracking
+- Outputs: baz qux corge grault (DFS order)
+
+**04p-e-findall**: Perfect. Claude correctly:
+- Collects all solutions without manual backtracking
+- Filters by predicate conditions (foo(X, 2))
+- Returns list of matching values: [baz, quux]
+
+**04p-f-negation**: Perfect. Claude correctly:
+- Implements negation as failure (`\+`)
+- Only outputs values that satisfy foo(X) but not qux(X)
+- Correctly outputs: bar (satisfies foo(bar) and not qux(bar))
+
+**04p-g-constraints**: Perfect. Claude correctly:
+- Generates all possible combinations
+- Applies inequality constraints (R1 ≠ R2, R2 ≠ R3, R3 ≠ R1)
+- Eliminates invalid colorings during backtracking
+- Outputs all 6 valid 3-colorings of a triangle
+
+### Key Findings
+
+1. **Perfect Prolog interpretation**: Claude demonstrates flawless understanding of logic programming concepts
+2. **Correct backtracking behavior**: All backtracking patterns work exactly as expected
+3. **Cut semantics understood**: The cut operator (!) correctly prevents backtracking
+4. **Recursive rules work**: Complex recursive predicates are properly evaluated
+5. **Constraint satisfaction works**: Inequality constraints are correctly applied during search
+6. **DFS order preserved**: Solutions are found in depth-first search order
+7. **Negation as failure works**: `\+` correctly succeeds when goal cannot be proven
+8. **Output format perfect**: No explanatory text added - pure output only
+
+### Comparison with Other Test Series
+
+04p series achieved **100% pass rate**, significantly better than:
+- 01 series: 50% (condition evaluation issues)
+- 02 series: 76% (nested conditional issues)
+- 03 series: 67% (loop boundary and state issues)
+- 04 series: 83% (output format violations)
+
+### Why Prolog Tests Succeeded
+
+Several factors likely contribute to the perfect pass rate:
+
+1. **Declarative nature**: Prolog is declarative rather than imperative, which may align better with Claude's reasoning
+2. **Pattern matching focus**: Prolog heavily uses pattern matching, which Claude handles excellently (as shown in 04 series)
+3. **No mutable state**: Prolog avoids mutable state, eliminating state-tracking issues seen in loop tests
+4. **Clear semantics**: Backtracking and unification have well-defined semantics that Claude appears to model accurately
+5. **No complex nesting issues**: While recursive, Prolog rules don't have the scope ambiguity problems of nested conditionals
+
+### Conclusion
+
+Claude demonstrates **exceptional capability** in interpreting Prolog-style logic programming:
+- Perfect understanding of unification and backtracking
+- Accurate implementation of cut, negation, and constraint satisfaction
+- Correct depth-first search ordering
+- No output format violations
+
+This suggests that **declarative, pattern-matching-based paradigms** may be more naturally suited to Claude's interpretation capabilities than imperative, state-based programming with nested conditionals.
+
+**Recommendation**: For complex code-like prompts requiring multiple solutions or exhaustive search, consider using Prolog-style declarative patterns rather than imperative loops and nested conditionals.

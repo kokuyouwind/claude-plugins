@@ -351,3 +351,109 @@ claude -p '/code-like-prompt:04f-exhaustive {"color": "Custom", "r": 255, "g": 1
 ```bash
 claude -p '/code-like-prompt:04f-exhaustive {"color": "Custom", "r": 100, "g": 150, "b": 200}'
 ```
+
+## Test Results
+
+### 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
+
+Tests executed with JSON environment argument format.
+
+#### Test Results Summary
+
+| Command | Test Case | Expected | Actual | Pass |
+|---------|-----------|----------|--------|------|
+| 04a-regex-match | "fooXXXbar" | qux | qux | ✓ |
+| 04a-regex-match | "foobar" | qux | qux | ✓ |
+| 04a-regex-match | "bazanything" | quux | quux | ✓ |
+| 04a-regex-match | "hello" | corge | corge | ✓ |
+| 04b-structural-match | type="foo", value="123" | bar123 | bar123 | ✓ |
+| 04b-structural-match | type="baz", value="15" | qux15 | qux15 | ✓ |
+| 04b-structural-match | type="baz", value="5" | quux5 | quux5 | ✓ |
+| 04b-structural-match | type="other", value="x" | corge | corge | ✓ |
+| 04c-list-destructure | ["foo", "X", "bar"] | quxX | quxX | ✓ |
+| 04c-list-destructure | ["foo", "a", "b"] | quux2 | quux2 | ✓ |
+| 04c-list-destructure | ["other", "x", "y"] | corgeother | corgeother | ✓ |
+| 04d-nested-match | left="foo", right_left="bar", right_right="X" | qux | qux (+ explanation) | ✗ |
+| 04d-nested-match | left="A", right_left="same", right_right="same" | quuxA | quuxA | ✓ |
+| 04d-nested-match | left="A", right_left="B", right_right="C" | corgeA | corgeA (+ explanation) | ✗ |
+| 04e-multi-guard | x=1, y=1 | foo | foo | ✓ |
+| 04e-multi-guard | x=1, y=-1 | bar | bar | ✓ |
+| 04e-multi-guard | x=-1, y=1 | bar | bar | ✓ |
+| 04e-multi-guard | x=0, y=0 | baz | baz | ✓ |
+| 04e-multi-guard | x=-1, y=-1 | qux | qux | ✓ |
+| 04f-exhaustive | Red | foo | foo | ✓ |
+| 04f-exhaustive | Green | bar | bar | ✓ |
+| 04f-exhaustive | Blue | baz | baz | ✓ |
+| 04f-exhaustive | Custom(255, 100, 50) | qux | qux (+ explanation) | ✗ |
+| 04f-exhaustive | Custom(100, 150, 200) | quux100150200 | quux100150200 (+ explanation) | ✗ |
+
+**Pass Rate: 20/24 (83%)**
+
+#### Detailed Analysis
+
+**04a-regex-match (4/4 passed)**: All regex pattern matching tests passed. Claude correctly:
+- Matches patterns with wildcards (`^foo.*bar$`)
+- Matches exact strings ("foobar")
+- Matches prefixes (`^baz`)
+- Falls through to default case for non-matching strings
+
+**04b-structural-match (4/4 passed)**: All structural pattern matching with guards passed. Claude correctly:
+- Destructures dictionary patterns
+- Evaluates guard conditions (`int(v) > 10`)
+- Falls through when guards fail
+- Matches default case
+
+**04c-list-destructure (3/3 passed)**: All list/array destructuring tests passed. Claude correctly:
+- Matches exact patterns with wildcards (`["foo", second, "bar"]`)
+- Handles rest patterns (`["foo", *rest]`) and calculates length
+- Matches head pattern (`[first, *_]`)
+
+**04d-nested-match (2/3 passed)**: Deep structure matching mostly works, but 2 tests have output format violations:
+- Case 1 (left="foo", right_left="bar", right_right="X" → qux): Correct output but added explanation text
+- Case 2 (left="A", right_left="same", right_right="same" → quuxA): Perfect ✓
+- Case 3 (left="A", right_left="B", right_right="C" → corgeA): Correct output but added explanation text
+
+**Analysis**: Claude correctly matches nested structures and applies patterns, but violates "output only" instruction by adding explanatory text in some cases.
+
+**04e-multi-guard (5/5 passed)**: All complex guard condition tests passed. Claude correctly:
+- Evaluates multiple guard conditions (AND, OR)
+- Matches exact values
+- Falls through to default case
+
+**04f-exhaustive (3/5 passed)**: Rust-style exhaustive enum matching works, but 2 tests have output format violations:
+- Simple enum variants (Red, Green, Blue) pass perfectly
+- Custom variant with guard (r > 200) produces correct output but adds explanation text
+- Custom variant without guard produces correct output but adds explanation text
+
+**Analysis**: The logic is completely correct, but Claude adds explanatory Japanese text violating the "output only" instruction.
+
+### Key Findings
+
+1. **Pattern matching logic is excellent**: Claude correctly interprets all pattern matching constructs with 100% logical accuracy
+2. **Output format compliance issues**: 4/24 tests fail only due to added explanatory text, not logic errors
+3. **All pattern types work**: Regex, structural, list, nested, guards, and exhaustive matching all function correctly
+4. **Variable binding works**: Captured values are correctly available in result expressions
+5. **Guard evaluation is correct**: Complex boolean conditions in guards are properly evaluated
+6. **Pattern priority is respected**: First matching pattern wins, as expected
+
+### Failures Analysis
+
+All 4 failures are due to output format violations (added explanatory text), not pattern matching logic errors:
+
+1. **04d-nested-match** (2 failures): Added explanation about pattern matching process
+2. **04f-exhaustive** (2 failures): Added Japanese explanation about enum matching
+
+The actual pattern matching output in all cases is **100% correct**. The failures are purely format compliance issues.
+
+### Conclusion
+
+Claude demonstrates **excellent pattern matching interpretation** with:
+- 100% logical correctness across all pattern types
+- Correct handling of destructuring, guards, wildcards, and rest patterns
+- Proper evaluation of complex nested structures
+- Accurate variable binding and value extraction
+
+The only issue is **output format discipline** - Claude sometimes adds explanatory text despite "output only" instructions. This appears to be influenced by CLAUDE.md settings that encourage helpful Japanese communication.
+
+**True Pattern Matching Pass Rate: 24/24 (100%)** - All logic is correct
+**Format Compliance Pass Rate: 20/24 (83%)** - Some commands add explanatory text
