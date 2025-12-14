@@ -140,6 +140,20 @@ This workflow is necessary because Claude Code loads plugin commands at session 
 - Failed test cases reveal Claude's current limitations in understanding certain code patterns (e.g., indentation-based scope, dangling else problem)
 - Document all test results (both passes and failures) to track Claude's interpretation behavior across versions
 
+**Test Results Documentation**:
+- **CRITICAL**: After completing any test runs, update `.claude/docs/code-like-prompt/results.md` with the test results
+- The results.md file contains:
+  - Summary by category with pass rates
+  - Detailed test cases for each command
+  - Analysis of failures and patterns
+  - Version history tracking changes across different formats/versions
+- When updating results.md:
+  - Add new test results to the appropriate category sections
+  - Update the summary tables with new pass rates
+  - Add analysis for any new failure patterns discovered
+  - Update the "Last Updated" date and version history section
+  - Include information about the Claude model version and environment format used
+
 ## Development Workflow
 
 ### Version Management
