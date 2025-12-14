@@ -304,9 +304,16 @@ The joke illustrates how the same instruction can be interpreted differently:
 
 ## Version
 
-0.1.0
+0.2.0
 
 ### Changelog
+
+#### 0.2.0
+- **Breaking Change**: Migrated all commands from `--name=value` argument format to JSON environment variables
+- Added argument validation with error messages for missing required arguments
+- Removed interactive input prompts from all commands
+- Updated documentation with comprehensive test command examples
+- Added test commands for all scenarios in documentation files
 
 #### 0.1.0
 - Initial release with milk joke and nested-if commands
