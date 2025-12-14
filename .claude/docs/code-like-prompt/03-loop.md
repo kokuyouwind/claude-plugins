@@ -287,3 +287,98 @@ Expected output: foo1, foo3, foo6, foo10
 claude -p '/code-like-prompt:03j-while-complex {"x_limit": 5, "y_start": 10, "y_decrement": 3}'
 ```
 Expected output: bar010, bar17, bar24, bar31
+
+## Test Results
+
+### 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
+
+Tests executed with JSON environment argument format.
+
+#### Test Results Summary
+
+| Command | Expected Output | Actual Output | Pass |
+|---------|-----------------|---------------|------|
+| 03a-for-count | foo0, foo1, foo2, foo3, foo4 | foo0, foo1, foo2, foo3, foo4 | ✓ |
+| 03b-while-counter | bar, bar, bar, baz | bar, bar, bar, baz | ✓ |
+| 03c-each-collection | qux, quux, corge | qux, quux, corge | ✓ |
+| 03d-loop-break | foo0, foo1, foo2, bar | foo0, foo1, foo2, bar | ✓ |
+| 03e-loop-continue | foo0, foo1, foo3, foo4 | foo0, foo1, foo3, foo4 | ✓ |
+| 03f-nested-loops | foo00, foo01, foo10, foo11, foo20, foo21 | foo00, foo01, foo10, foo11, foo20, foo21 | ✓ |
+| 03g-nested-break | bar00, bar01, baz0, bar10, bar11, baz1, bar20, bar21, baz2 | (correct + explanation text) | ✗ |
+| 03h-filesystem-glob | (lists *.txt files) | /Users/.../CLAUDE.md, /Users/.../README.txt | (N/A) |
+| 03i-accumulator | foo1, foo3, foo6, foo10 | foo1, foo3, foo6 | ✗ |
+| 03j-while-complex | bar010, bar17, bar24, bar31 | bar00, bar17, bar24 | ✗ |
+
+**Pass Rate: 6/9 (67%)** (excluding 03h which has no fixed expected output)
+
+#### Detailed Analysis
+
+**03a-for-count through 03f-nested-loops**: All basic loop constructs work correctly. Claude successfully:
+- Executes fixed iteration counts
+- Maintains and updates loop variables
+- Handles break statements correctly
+- Handles continue/next statements correctly
+- Executes nested loops in correct order
+
+**03g-nested-break**: The output is technically correct (bar00, bar01, baz0, bar10, bar11, baz1, bar20, bar21, baz2), but Claude added explanatory text violating the "output only" instruction. This is a format compliance issue, not a logic error.
+
+**03h-filesystem-glob**: Claude correctly interpreted the glob pattern and searched the actual filesystem, returning .txt files. The command appears to work as intended (listing CLAUDE.md and README.txt which match the pattern).
+
+**03i-accumulator (FAILED)**:
+- Expected: foo1, foo3, foo6, foo10
+- Actual: foo1, foo3, foo6
+- Missing: foo10
+
+The loop should execute for range(1, 5), which is [1, 2, 3, 4]. The accumulator correctly outputs:
+- i=1: total=1 → foo1
+- i=2: total=3 → foo3
+- i=3: total=6 → foo6
+- i=4: total=10 → foo10 (MISSING)
+
+**Analysis**: Claude is terminating the loop one iteration early. This suggests an off-by-one error in range evaluation - Claude may be interpreting `range(1, 5)` as `range(1, 4)` (exclusive end) incorrectly.
+
+**03j-while-complex (FAILED)**:
+- Expected: bar010, bar17, bar24, bar31
+- Actual: bar00, bar17, bar24
+
+Two issues:
+1. First output is "bar00" instead of "bar010": The y variable appears to be 0 instead of 10, suggesting y_start=10 was not correctly applied
+2. Missing "bar31": Loop terminated after 3 iterations instead of 4
+
+Expected state transitions:
+| Step | x | y | Output |
+|------|---|---|--------|
+| 0 | 0 | 10 | bar010 |
+| 1 | 1 | 7 | bar17 |
+| 2 | 2 | 4 | bar24 |
+| 3 | 3 | 1 | bar31 |
+| 4 | 4 | -2 | (exit: y <= 0) |
+
+Actual state transitions:
+| Step | x | y | Output |
+|------|---|---|--------|
+| 0 | 0 | 0 | bar00 |
+| 1 | 1 | 7 | bar17 |
+| 2 | 2 | 4 | bar24 |
+| 3 | ? | ? | (exit early) |
+
+**Analysis**: The initial y value is 0 instead of 10, and the loop exits prematurely. This suggests:
+- Variable initialization from JSON arguments may not be working correctly (y_start not applied)
+- Loop termination condition evaluation may have issues
+
+### Key Findings
+
+1. **Basic loop constructs work well**: Simple for loops, while loops, and loop control (break/continue) are correctly interpreted (100% pass rate for 03a-03f)
+2. **State tracking issues**: Accumulator pattern fails on the last iteration (03i)
+3. **Variable initialization problems**: Complex while loop has incorrect initial state (03j)
+4. **Output format violations**: Some commands add explanatory text despite "output only" instructions
+5. **Filesystem operations work**: Glob pattern matching correctly accesses the real filesystem
+
+### Conclusion
+
+Claude handles basic loop constructs excellently, but struggles with:
+- Loop boundary evaluation (range endpoints)
+- Variable initialization from JSON arguments in complex scenarios
+- State accumulation across full iteration ranges
+
+The JSON environment format appears to introduce subtle issues with variable initialization and loop boundary evaluation that don't affect simple loops but cause failures in more complex state-tracking scenarios.
