@@ -213,49 +213,30 @@ Tests whether Claude understands that constraints eliminate invalid combinations
 
 ## Test Results
 
-### 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
+### 2025-12-15 (Claude Sonnet 4.5) - Clean Environment
 
-Tests executed with JSON environment argument format (no arguments needed for these tests).
+Tests run in `/tmp` to isolate from CLAUDE.md configuration interference.
 
-#### Test Results Summary
-
-| Command | Expected Output | Actual Output | Pass |
-|---------|-----------------|---------------|------|
-| 04p-a-basic-facts | corge<br>grault | corge<br>grault | ✓ |
+| Command | Expected | Result | Pass |
+|---------|----------|--------|------|
+| 04p-a-basic-facts | corge, grault | corge, grault | ✓ |
 | 04p-b-multi-clause | b c c d d | b c c d d | ✓ |
-| 04p-c-cut | bar<br>corge | bar<br>corge | ✓ |
+| 04p-c-cut | bar, corge | bar, corge | ✓ |
 | 04p-d-tree-traverse | baz qux corge grault | baz qux corge grault | ✓ |
 | 04p-e-findall | [baz, quux] | [baz, quux] | ✓ |
 | 04p-f-negation | bar | bar | ✓ |
-| 04p-g-constraints | foo-bar-baz<br>foo-baz-bar<br>bar-foo-baz<br>bar-baz-foo<br>baz-foo-bar<br>baz-bar-foo | foo-bar-baz<br>foo-baz-bar<br>bar-foo-baz<br>bar-baz-foo<br>baz-foo-bar<br>baz-bar-foo | ✓ |
+| 04p-g-constraints | (6 permutations) | foo-bar-baz, foo-baz-bar, bar-foo-baz, bar-baz-foo, baz-foo-bar, baz-bar-foo | ✓ |
 
-**Pass Rate: 7/7 (100%)**
+**Overall: 7/7 (100%)**
 
-#### Detailed Analysis
-
-**04p-a-basic-facts**: Perfect. Claude correctly:
-- Queries the fact database
-- Unifies variables across multiple predicates
-- Backtracks to find all solutions
-- Outputs only matching results (corge, grault)
-
-**04p-b-multi-clause**: Perfect. Claude correctly:
-- Uses multiple clauses for the same predicate
-- Implements recursive rules (`connected(X, Y) :- path(X, Z), connected(Z, Y)`)
-- Finds all reachable nodes through depth-first search
-- Outputs solutions in DFS order (b c c d d)
-
-**04p-c-cut**: Perfect. Claude correctly:
-- Understands cut (!) semantics
-- Commits to first matching clause when cut is executed
-- Prevents backtracking to alternative clauses after cut
-- Falls through to second clause when first clause fails entirely
-
-**04p-d-tree-traverse**: Perfect. Claude correctly:
-- Recursively traverses tree structures
-- Processes nodes in depth-first order (left subtree before right)
-- Collects leaf values through backtracking
-- Outputs: baz qux corge grault (DFS order)
+**Key Finding**: Claude demonstrates excellent understanding of Prolog-style logic programming:
+- Unification and pattern matching
+- Backtracking on failure
+- Cut operator (!) semantics
+- Recursive tree traversal in DFS order
+- Solution collection (findall)
+- Negation as failure
+- Constraint satisfaction with backtracking
 
 **04p-e-findall**: Perfect. Claude correctly:
 - Collects all solutions without manual backtracking
