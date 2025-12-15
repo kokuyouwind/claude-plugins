@@ -1,0 +1,17 @@
+{
+  "extraKnownMarketplaces": {
+    "kokuyouwind-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "{{REPO_PATH}}"
+      }
+    }
+  },
+  "installedPlugins": [
+    {
+      "name": "code-like-prompt",
+      "marketplace": "kokuyouwind-plugins",
+      "version": "0.2.0"
+    }
+  ]
+}
