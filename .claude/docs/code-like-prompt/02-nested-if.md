@@ -264,256 +264,11 @@ claude -p '/code-like-prompt:02c-deep-nesting-keyword {"level1": false, "level2"
 
 ## Test Results
 
-### 2025-12-07 (Claude Sonnet 4.5) - Indentation-based variants
+### 2025-12-15 (Claude Sonnet 4.5) - Clean Environment
 
-The following test results are for the indentation-based syntax variants. Block-style and keyword-style variants have not yet been tested.
+Tests run in `/tmp` to isolate from CLAUDE.md configuration interference.
 
-#### 02a-dangling-else-outer-indent
-Tests whether Claude correctly interprets else at outer indentation level using indentation-based syntax.
-
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | (none) | bar | ✗ |
-| F | T | bar | bar | ✓ |
-| F | F | bar | bar | ✓ |
-
-**Pass Rate: 3/4 (75%)**
-
-**Analysis**: Claude incorrectly binds else to the inner if when A=T, B=F. Expected no output, but produced "bar", indicating Claude interprets the else as belonging to `if condition_b` instead of `if condition_a`.
-
-#### 02b-dangling-else-inner-indent
-Tests whether Claude correctly interprets else at inner indentation level using indentation-based syntax.
-
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | bar | bar | ✓ |
-| F | T | (none) | (none) | ✓ |
-| F | F | (none) | (none) | ✓ |
-
-**Pass Rate: 4/4 (100%)**
-
-**Analysis**: Claude correctly interprets all cases where else belongs to the inner if. This pattern aligns with Claude's natural interpretation tendency.
-
-#### 02c-deep-nesting-indent
-Tests complex 5-level nesting with mixed patterns using indentation-based syntax.
-
-| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
-|----|----|----|-------|----------|--------|------|
-| T  | T  | T  | -  | foo | foo | ✓ |
-| T  | T  | F  | T  | bar | bar | ✓ |
-| T  | T  | F  | F  | baz | bar | ✗ |
-| T  | F  | T  | T  | qux | qux | ✓ |
-| T  | F  | T  | F  | (none) | qux | ✗ |
-| T  | F  | F  | -  | quux | quux | ✓ |
-| F  | T  | -  | -  | corge | corge | ✓ |
-| F  | F  | T  | -  | grault | grault | ✓ |
-| F  | F  | F  | -  | garply | garply | ✓ |
-
-**Pass Rate: 7/9 (78%)**
-
-**Analysis**:
-- Failed at L1=T,L2=T,L3=F,L4=F: Expected "baz", got "bar". Claude appears to skip the L4=F branch.
-- Failed at L1=T,L2=F,L3=T,L4=F: Expected no output (dangling else), got "qux". Claude incorrectly executes the L4=T branch.
-- Both failures involve interpreting nested structures with dangling else patterns.
-
-### Summary
-
-**Overall Pass Rate: 14/17 (82%)**
-
-**Key Findings**:
-1. Claude handles simple else-at-inner-level patterns perfectly (100%)
-2. Claude struggles with else-at-outer-level patterns (75% pass rate)
-3. Complex deep nesting reveals additional interpretation challenges (78% pass rate)
-4. Main limitation: Indentation-based scope determination, especially with dangling else patterns
-
-**Conclusion**: Claude's interpretation bias tends toward binding else to the nearest (inner) if statement, which causes failures when else should belong to outer scopes.
-
-## Testing Different Syntax Styles
-
-The addition of block-style and keyword-style variants allows for comparative testing to determine whether Claude's difficulties are specific to indentation-based syntax or reflect fundamental scope interpretation challenges.
-
-### Testing Methodology
-
-For each syntax style (indent, block, keyword), run the same test matrices:
-- 02a variants: 4 test cases (A×B combinations)
-- 02b variants: 4 test cases (A×B combinations)
-- 02c variants: 9 test cases (L1-L4 combinations)
-
-Use non-interactive testing mode with JSON arguments:
-```bash
-claude -p '/code-like-prompt:02a-dangling-else-outer-block {"condition_a": true, "condition_b": true}'
-```
-
-### Expected Research Outcomes
-
-1. **If block-style and keyword-style both show 100% pass rates**: The issue is specific to indentation parsing, not scope understanding
-2. **If all three styles show similar failure patterns**: The issue is fundamental scope interpretation, not syntax-specific
-3. **If keyword-style performs better than block-style**: Claude may have better understanding of explicit keyword boundaries
-4. **If block-style performs better than keyword-style**: Brace-based delimiters may be clearer for scope determination
-
-### Next Steps
-
-After testing all variants:
-1. Document pass rates for each syntax style
-2. Compare failure patterns across styles
-3. Update this specification with comparative analysis
-4. Use findings to guide future code-like prompt design decisions
-
-## Test Results - Block and Keyword Syntax Styles
-
-### 2025-12-09 (Claude Sonnet 4.5) - Block-style variants
-
-#### 02a-dangling-else-outer-block
-Tests whether Claude correctly interprets else at outer indentation level using block braces.
-
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | (none) | (no output) | ✓ |
-| F | T | bar | bar | ✓ |
-| F | F | bar | bar | ✓ |
-
-**Pass Rate: 4/4 (100%)**
-
-**Analysis**: Block braces completely eliminate the dangling else ambiguity. Claude correctly interprets scope boundaries and produces expected output in all cases.
-
-#### 02b-dangling-else-inner-block
-Tests whether Claude correctly interprets else at inner indentation level using block braces.
-
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | bar | bar | ✓ |
-| F | T | (none) | (no output) | ✓ |
-| F | F | (none) | (no output) | ✓ |
-
-**Pass Rate: 4/4 (100%)**
-
-**Analysis**: Block braces provide clear scope boundaries. Claude correctly interprets all cases.
-
-#### 02c-deep-nesting-block
-Tests complex 5-level nesting with mixed patterns using block braces.
-
-| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
-|----|----|----|-------|----------|--------|------|
-| T  | T  | T  | -  | foo | foo | ✓ |
-| T  | T  | F  | T  | bar | bar | ✓ |
-| T  | T  | F  | F  | baz | baz | ✓ |
-| T  | F  | T  | T  | qux | qux | ✓ |
-| T  | F  | T  | F  | (none) | qux | ✗ |
-| T  | F  | F  | -  | quux | quux | ✓ |
-| F  | T  | -  | -  | corge | corge | ✓ |
-| F  | F  | T  | -  | grault | grault | ✓ |
-| F  | F  | F  | -  | garply | garply | ✓ |
-
-**Pass Rate: 8/9 (89%)**
-
-**Analysis**: Block braces improve performance significantly compared to indentation (89% vs 78%), but one dangling else case still fails. The failure at L1=T,L2=F,L3=T,L4=F suggests Claude may have difficulty with the specific nested structure regardless of syntax style.
-
-### 2025-12-09 (Claude Sonnet 4.5) - Keyword-style variants
-
-#### 02a-dangling-else-outer-keyword
-Tests whether Claude correctly interprets else at outer indentation level using if/end keywords.
-
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | (none) | foo | ✗ |
-| F | T | bar | bar | ✓ |
-| F | F | bar | bar | ✓ |
-
-**Pass Rate: 3/4 (75%)**
-
-**Analysis**: Keyword boundaries don't eliminate the dangling else issue. Same failure pattern as indentation-based version (A=T, B=F case fails).
-
-#### 02b-dangling-else-inner-keyword
-Tests whether Claude correctly interprets else at inner indentation level using if/end keywords.
-
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | bar | bar | ✓ |
-| F | T | (none) | (no output) | ✓ |
-| F | F | (none) | (no output) | ✓ |
-
-**Pass Rate: 4/4 (100%)**
-
-**Analysis**: Keyword boundaries work correctly for inner else patterns. Matches indentation-based version performance.
-
-#### 02c-deep-nesting-keyword
-Tests complex 5-level nesting with mixed patterns using if/end keywords.
-
-| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
-|----|----|----|-------|----------|--------|------|
-| T  | T  | T  | -  | foo | foo | ✓ |
-| T  | T  | F  | T  | bar | bar | ✓ |
-| T  | T  | F  | F  | baz | baz | ✓ |
-| T  | F  | T  | T  | qux | qux | ✓ |
-| T  | F  | T  | F  | (none) | qux | ✗ |
-| T  | F  | F  | -  | quux | quux | ✓ |
-| F  | T  | -  | -  | corge | corge | ✓ |
-| F  | F  | T  | -  | grault | grault | ✓ |
-| F  | F  | F  | -  | garply | garply | ✓ |
-
-**Pass Rate: 8/9 (89%)**
-
-**Analysis**: Keyword boundaries show same performance as block braces (89%). Same failure at L1=T,L2=F,L3=T,L4=F.
-
-## Comparative Analysis Across Syntax Styles
-
-### Overall Pass Rates by Syntax Style
-
-| Syntax Style | 02a-outer | 02b-inner | 02c-deep | Total | Overall |
-|--------------|-----------|-----------|----------|-------|---------|
-| Indentation  | 3/4 (75%) | 4/4 (100%) | 7/9 (78%) | 14/17 | 82% |
-| Block braces | 4/4 (100%) | 4/4 (100%) | 8/9 (89%) | 16/17 | 94% |
-| Keywords     | 3/4 (75%) | 4/4 (100%) | 8/9 (89%) | 15/17 | 88% |
-
-### Key Findings
-
-1. **Block braces are most effective** (94% overall pass rate)
-   - Completely eliminate dangling else ambiguity in simple cases (02a)
-   - Still struggle with complex nested dangling else patterns (02c)
-
-2. **Keywords show intermediate performance** (88% overall pass rate)
-   - Don't solve outer-else dangling else problem (02a still fails)
-   - Match block brace performance on complex nesting (02c)
-
-3. **Indentation has lowest performance** (82% overall pass rate)
-   - Struggles with outer-else patterns (02a: 75%)
-   - Worst performance on complex nesting (02c: 78%)
-
-4. **All styles handle inner-else perfectly** (100% across all styles)
-   - This aligns with Claude's natural interpretation bias toward binding else to the nearest inner if
-
-5. **Persistent failure pattern**
-   - L1=T,L2=F,L3=T,L4=F case fails in ALL syntax styles
-   - Suggests a fundamental limitation in handling specific nested dangling else structures, not just a syntax parsing issue
-
-### Conclusion
-
-**Syntax style significantly impacts interpretation accuracy**:
-- Block braces (`{}`) provide the clearest scope boundaries and should be preferred for complex conditional logic
-- Keywords (`if/end`) offer moderate improvement over indentation but don't fully eliminate ambiguity
-- Indentation-based syntax is most prone to misinterpretation
-
-**However, syntax alone doesn't solve all problems**:
-- Even with explicit block delimiters, Claude struggles with certain complex nested patterns
-- The persistent L1=T,L2=F,L3=T,L4=F failure suggests deeper limitations in tracking nested conditional state
-
-**Recommendations for code-like prompts**:
-1. Use block braces for critical conditional logic
-2. Avoid complex nested structures with dangling else patterns when possible
-3. When nested dangling else is unavoidable, use block braces and test thoroughly
-4. Consider restructuring complex conditions into simpler, sequential checks
-
-## Test Results - 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
-
-After migrating to JSON environment format, all test variants were re-run.
-
-### Overall Pass Rates by Syntax Style
+#### Overall Pass Rates by Syntax Style
 
 | Syntax Style | 02a-outer | 02b-inner | 02c-deep | Total | Overall |
 |--------------|-----------|-----------|----------|-------|---------|
@@ -523,108 +278,37 @@ After migrating to JSON environment format, all test variants were re-run.
 
 **Overall: 39/51 (76%)**
 
-### 02a-dangling-else-outer (All Syntax Styles)
+#### 02a-dangling-else-outer
 
-All three syntax styles (indent, block, keyword) showed identical behavior.
+| Style | A=T,B=T | A=T,B=F | A=F,B=T | A=F,B=F | Pass Rate |
+|-------|---------|---------|---------|---------|-----------|
+| indent | foo ✓ | bar ✗ | bar ✓ | bar ✓ | 3/4 (75%) |
+| block | foo ✓ | foo ✗ | bar ✓ | bar ✓ | 3/4 (75%) |
+| keyword | foo ✓ | foo ✗ | bar ✓ | bar ✓ | 3/4 (75%) |
 
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | (none) | foo | ✗ |
-| F | T | bar | bar | ✓ |
-| F | F | bar | bar | ✓ |
+Expected: foo, (none), bar, bar
 
-**Pass Rate: 3/4 (75%) for each style, 9/12 total**
+**Failure Pattern**: All styles fail at A=T,B=F but with different outputs (indent:"bar", block/keyword:"foo")
 
-**Analysis**: Unlike previous tests (2025-12-09) where block braces achieved 100% pass rate, all syntax styles now fail at A=T, B=F. The output is "foo" when it should be empty. This suggests Claude is now executing the inner `if (condition_b)` block even when condition_b is false, which is a fundamental condition evaluation issue, not a scope binding issue.
+#### 02b-dangling-else-inner
 
-### 02b-dangling-else-inner (All Syntax Styles)
+| Style | A=T,B=T | A=T,B=F | A=F,B=T | A=F,B=F | Pass Rate |
+|-------|---------|---------|---------|---------|-----------|
+| indent | foo ✓ | bar ✓ | bar ✗ | bar ✗ | 2/4 (50%) |
+| block | foo ✓ | bar ✓ | (explanation) ✗ | bar ✗ | 2/4 (50%) |
+| keyword | foo ✓ | bar ✓ | bar ✗ | bar ✗ | 2/4 (50%) |
 
-Indentation and keyword styles showed identical failures, while block style had different failures.
+Expected: foo, bar, (none), (none)
 
-**Indent/Keyword styles:**
+**Failure Pattern**: When A=F, all styles incorrectly output "bar" or explanatory text
 
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | bar | bar | ✓ |
-| F | T | (none) | bar | ✗ |
-| F | F | (none) | bar | ✗ |
+#### 02c-deep-nesting
 
-**Pass Rate: 2/4 (50%) each, 4/8 total for indent+keyword**
+All three styles showed identical behavior (8/9 pass rate each).
 
-**Block style:**
+Only failure: L1=T, L2=F, L3=T, L4=F case
+- Expected: (none)
+- indent: "quux"
+- block/keyword: "baz"
 
-| A | B | Expected | Actual | Pass |
-|---|---|----------|--------|------|
-| T | T | foo | foo | ✓ |
-| T | F | bar | bar | ✓ |
-| F | T | (none) | (empty code blocks + explanation) | ✗ |
-| F | F | (none) | (empty code blocks + explanation) | ✗ |
-
-**Pass Rate: 2/4 (50%)**
-
-**Analysis**:
-- Indent/keyword styles: When A=F, Claude outputs "bar" (the else branch) even though the outer if wasn't entered. This is a serious logic error.
-- Block style: Produces correct empty output but adds explanatory text, violating the "output only what printf() commands specify" instruction.
-
-### 02c-deep-nesting (All Syntax Styles)
-
-All three syntax styles showed identical behavior.
-
-| L1 | L2 | L3 | L4 | Expected | Actual | Pass |
-|----|----|----|-------|----------|--------|------|
-| T  | T  | T  | -  | foo | foo | ✓ |
-| T  | T  | F  | T  | bar | bar | ✓ |
-| T  | T  | F  | F  | baz | baz | ✓ |
-| T  | F  | T  | T  | qux | qux | ✓ |
-| T  | F  | T  | F  | (none) | baz | ✗ |
-| T  | F  | F  | -  | quux | quux | ✓ |
-| F  | T  | -  | -  | corge | corge | ✓ |
-| F  | F  | T  | -  | grault | grault | ✓ |
-| F  | F  | F  | -  | garply | garply | ✓ |
-
-**Pass Rate: 8/9 (89%) for each style, 24/27 total**
-
-**Analysis**: Significantly improved from 2025-12-09 results (78% indent, 89% block/keyword). However, the same failure persists at L1=T,L2=F,L3=T,L4=F where "baz" is output instead of nothing. Interestingly, now ALL syntax styles fail identically on this case, whereas previously only indent failed differently.
-
-### Comparative Analysis: 2025-12-09 vs 2025-12-14
-
-#### Changes After JSON Environment Migration
-
-1. **02a-outer block braces regressed**: 100% → 75% (now fails A=T,B=F)
-2. **02b-inner performance degraded**: All styles dropped from 100% to 50%
-3. **02c-deep improved for indent**: 78% → 89%
-4. **Syntax styles now behave identically**: Previous differences between styles have largely disappeared
-
-#### Overall Comparison
-
-| Test | 2025-12-09 | 2025-12-14 | Change |
-|------|------------|------------|--------|
-| 02a-outer (indent) | 75% | 75% | ± 0% |
-| 02a-outer (block) | 100% | 75% | -25% |
-| 02a-outer (keyword) | 75% | 75% | ± 0% |
-| 02b-inner (all) | 100% | 50% | -50% |
-| 02c-deep (indent) | 78% | 89% | +11% |
-| 02c-deep (block) | 89% | 89% | ± 0% |
-| 02c-deep (keyword) | 89% | 89% | ± 0% |
-
-**Overall: 94% (2025-12-09) → 76% (2025-12-14)** - significant regression
-
-### Key Findings
-
-1. **JSON environment format introduced new issues**: The migration appears to have degraded Claude's ability to correctly evaluate nested conditionals
-2. **Fundamental condition evaluation problems**: Claude now outputs from branches that shouldn't execute (e.g., outputting "foo" when condition_b=false, outputting "bar" when condition_a=false)
-3. **Syntax style differences eliminated**: All three styles now behave nearly identically, suggesting the issues are not about parsing but about fundamental logic evaluation
-4. **Block braces no longer provide advantage**: Previously, block braces significantly improved interpretation accuracy, but this advantage has disappeared
-5. **Output format violations**: Block style adds explanatory text in some cases, violating the "output only" instruction
-
-### Conclusion
-
-The JSON environment format migration has had a **negative impact** on nested conditional interpretation. While it improved simple conditional evaluation (as seen in 01-shopping-request going from 50% to 100%), it has introduced serious regressions in nested conditional logic:
-
-- Claude now fails to correctly evaluate conditions in nested structures
-- Previously successful test cases (like 02a-outer-block with A=T,B=F) now fail
-- The advantage of explicit block delimiters has been lost
-
-This suggests that the JSON environment format may be interfering with Claude's ability to track and evaluate nested conditional state, or that the format change has triggered different interpretation behaviors. Further investigation is needed to understand why simpler conditionals improved while nested ones regressed.
+**Key Finding**: Testing in clean environment confirms these issues are Claude's interpretation limitations, not CLAUDE.md interference. Pass rate (76%) matches previous JSON format tests, indicating the behavior is consistent and reproducible.

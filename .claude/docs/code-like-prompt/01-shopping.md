@@ -105,82 +105,17 @@ Both commands are already implemented and ready for testing.
 
 ## Test Results
 
-### 2025-12-09 (Claude Sonnet 4.5)
+### 2025-12-15 (Claude Sonnet 4.5) - Clean Environment
 
-#### 01-shopping-request
-Tests the correct interpretation of the milk joke.
+Tests run in `/tmp` to isolate from CLAUDE.md configuration interference.
 
-| Egg Stock | Expected | Actual | Pass |
-|-----------|----------|--------|------|
-| > 0 (egg-stock=3) | Bought 1 milk.<br>Bought 6 eggs. | Bought 1 milk.<br>Bought 6 eggs. | ✓ |
-| 0 (egg-stock=0) | Bought 1 milk. | Bought 1 milk.<br>Bought 6 eggs. | ✗ |
+| Command | Egg Stock | Expected | Actual | Pass |
+|---------|-----------|----------|--------|------|
+| shopping-request | 3 | Bought 1 milk.<br>Bought 6 eggs. | Bought 1 milk.<br>Bought 6 eggs. | ✓ |
+| shopping-request | 0 | Bought 1 milk. | Bought 1 milk. | ✓ |
+| shopping-misunderstanding | 3 | Bought 6 milks. | Bought 6 milks. | ✓ |
+| shopping-misunderstanding | 0 | Bought 1 milks. | Bought 1 milks. | ✓ |
 
-**Pass Rate: 1/2 (50%)**
+**Pass Rate: 4/4 (100%)**
 
-**Analysis**: Claude correctly handles the case when eggs exist, but incorrectly executes the conditional block even when eggs don't exist (stock=0). This indicates Claude is not properly evaluating the `Egg.exists?` condition.
-
-#### 01-shopping-misunderstanding
-Tests the husband's misunderstanding of the milk joke.
-
-| Egg Stock | Expected | Actual | Pass |
-|-----------|----------|--------|------|
-| > 0 (egg-stock=3) | Bought 6 milks. | Bought 6 milks. | ✓ |
-| 0 (egg-stock=0) | Bought 1 milks. | Bought 6 milks. | ✗ |
-
-**Pass Rate: 1/2 (50%)**
-
-**Analysis**: Same pattern as shopping-request - Claude correctly handles the true condition but fails to properly evaluate the false condition. The if block is executed regardless of egg stock value.
-
-### Summary
-
-**Overall Pass Rate: 2/4 (50%)**
-
-**Key Findings**:
-1. Claude correctly interprets code structure and output formatting
-2. Claude fails to properly evaluate conditional expressions based on variable state
-3. Both commands show identical failure pattern - if blocks execute regardless of condition value
-4. The issue appears to be with condition evaluation, not with code structure interpretation
-
-**Conclusion**: Claude demonstrates good understanding of code syntax and structure, but has fundamental issues with evaluating conditional expressions based on runtime state. The `Egg.exists?` method (checking if stock > 0) is not being properly evaluated - Claude appears to execute if blocks unconditionally.
-
-### 2025-12-14 (Claude Sonnet 4.5) - JSON Environment Format
-
-After migrating to JSON environment format (removing interactive input), tests were re-run.
-
-#### 01-shopping-request
-Tests the correct interpretation of the milk joke with JSON arguments.
-
-| Egg Stock | Expected | Actual | Pass |
-|-----------|----------|--------|------|
-| > 0 (egg-stock=3) | Bought 1 milk.<br>Bought 6 eggs. | Bought 1 milk.<br>Bought 6 eggs. | ✓ |
-| 0 (egg-stock=0) | Bought 1 milk. | Bought 1 milk. | ✓ |
-
-**Pass Rate: 2/2 (100%)**
-
-**Analysis**: With JSON environment format, Claude now correctly evaluates the `Egg.exists?` condition! Both test cases pass, showing that the new argument format has resolved the previous condition evaluation issues.
-
-#### 01-shopping-misunderstanding
-Tests the husband's misunderstanding of the milk joke with JSON arguments.
-
-| Egg Stock | Expected | Actual | Pass |
-|-----------|----------|--------|------|
-| > 0 (egg-stock=3) | Bought 6 milks. | 6本の牛乳を買ったよ。 | ✗ |
-| 0 (egg-stock=0) | Bought 1 milks. | 6本の牛乳を買ったよ。 | ✗ |
-
-**Pass Rate: 0/2 (0%)**
-
-**Analysis**: While condition evaluation now works correctly (both cases output 6 milks), Claude is responding in Japanese instead of following the `puts()` command output format. Additionally, both test cases produce the same output when they should differ. This suggests:
-1. Claude is being influenced by the CLAUDE.md Japanese communication setting
-2. The condition is still not being properly evaluated (both cases produce 6 milks instead of 1 milk when egg-stock=0)
-
-### Summary (2025-12-14)
-
-**Overall Pass Rate: 2/4 (50%)**
-
-**Key Findings**:
-1. **Significant improvement for shopping-request**: JSON environment format fixed the condition evaluation issue - now 100% pass rate (up from 50%)
-2. **New issue with shopping-misunderstanding**: Claude outputs in Japanese and doesn't properly evaluate conditions
-3. **Impact of CLAUDE.md settings**: The Japanese communication setting in CLAUDE.md appears to override command-level output instructions
-4. **Condition evaluation partially fixed**: For shopping-request, Claude now correctly evaluates `Egg.exists?`, but shopping-misunderstanding still has issues
-
-**Conclusion**: The JSON environment format migration successfully resolved condition evaluation for the correct interpretation case (shopping-request), but language/format issues remain for the misunderstanding case.
+**Key Finding**: Testing in clean environment (isolated from user/project CLAUDE.md) eliminates all previous issues. Claude correctly evaluates conditions and outputs in proper format.
