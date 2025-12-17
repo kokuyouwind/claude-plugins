@@ -1,0 +1,8 @@
+# VCR cassettes - uncomment to exclude from git
+# If you want to commit cassettes as test fixtures, remove this file
+# cassettes/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
