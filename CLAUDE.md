@@ -154,6 +154,39 @@ This workflow is necessary because Claude Code loads plugin commands at session 
   - Update the "Last Updated" date and version history section
   - Include information about the Claude model version and environment format used
 
+**Test File Writing Guidelines**:
+- **CRITICAL**: All test files in `test/code-like-prompt/` must follow the TestCase array pattern
+- Group test functions by slash command (one test function per command)
+- Within each test function, define `tests := []TestCase` to list all test cases
+- Use `t.Run(tt.Name, ...)` to execute each test case
+- For special cases that require custom assertion logic (e.g., non-deterministic behavior, explanatory text output), define them as separate `t.Run()` blocks after the main test loop
+- Example structure:
+  ```go
+  func Test02aCommandName(t *testing.T) {
+      tests := []TestCase{
+          {
+              Name:    "TestCase1",
+              Command: "/code-like-prompt:02a-command-name",
+              Args:    map[string]interface{}{"arg1": value1},
+              ExpectedOutputs: []string{"expected1"},
+          },
+          // ... more test cases
+      }
+
+      for _, tt := range tests {
+          t.Run(tt.Name, func(t *testing.T) {
+              // Setup, Execute, Assert
+          })
+      }
+
+      // Special cases if needed
+      t.Run("SpecialCase", func(t *testing.T) {
+          // Custom logic
+      })
+  }
+  ```
+- This pattern keeps tests organized, reduces code duplication, and makes it easier to add new test cases
+
 ## Development Workflow
 
 ### Version Management
