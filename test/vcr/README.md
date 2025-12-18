@@ -407,6 +407,62 @@ claude_vcr.py (addon)
    - **Auto**: Check cache, forward to API if miss
 4. Response returned to client
 
+## Performance Analysis
+
+### Cache Hit Performance (code-like-prompt tests)
+
+Performance comparison for a single test case (`shopping_request_with_eggs`):
+
+| Execution | Time | Speedup |
+|-----------|------|---------|
+| Without VCR (direct API) | 8.66s | - |
+| With VCR (cache replay) | 6.43s | **25.7% faster** |
+| Cache savings | 2.23s | - |
+
+### API Request Breakdown
+
+For each test execution, Claude Code makes the following API requests:
+
+| Endpoint | Count | Cached? | Purpose | Estimated Time |
+|----------|-------|---------|---------|----------------|
+| `/v1/messages` | 4 | ✅ Yes | Main Claude API requests (warmup + actual) | ~2-3s (cached) |
+| `/v1/messages/count_tokens` | 1 | ❌ No | Token counting for cost estimation | ~0.5-1s |
+| `/api/event_logging/batch` | 2 | ❌ No | Telemetry/analytics logging | ~1-1.5s |
+
+**Total uncached time**: ~2.0-2.5s per test case
+
+### Why Cache Doesn't Eliminate All Delay
+
+Even with cache hits, tests still take several seconds due to:
+
+1. **Uncached Requests** (~2.2s)
+   - `count_tokens` and `event_logging` endpoints are not cached
+   - These still make actual API calls even in replay mode
+
+2. **Claude Code Processing** (~4-5s)
+   - Response parsing and deserialization
+   - Streaming response handling
+   - Output formatting and display
+   - Test framework overhead
+
+3. **Sequential Execution**
+   - Warmup request → actual request flow
+   - Each request processed one at a time
+
+### Improvement Opportunities
+
+To further reduce test execution time:
+
+1. **Cache additional endpoints**: Extend VCR to cache `count_tokens` and `event_logging`
+2. **Disable telemetry in tests**: Configure Claude Code to skip event logging
+3. **Optimize Claude Code**: Reduce response processing overhead
+
+### Current Limitations
+
+- Cache key based on: model, messages, system, tools, and generation parameters
+- Not cached: `count_tokens`, `event_logging`, and other non-message endpoints
+- Fixed test directory required for cache hits (see test/code-like-prompt/helpers.go)
+
 ## License
 
 This is part of the claude-plugins repository.

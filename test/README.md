@@ -71,16 +71,58 @@ cd test
 mise exec go@latest -- go test -v ./code-like-prompt
 ```
 
+### Using VCR for Faster Tests
+
+VCR (Video Cassette Recorder) mode is **enabled by default** and caches Claude API responses for faster test execution:
+
+```bash
+cd test/code-like-prompt
+
+# Default: VCR enabled (auto mode)
+go test -v -run Test01Shopping
+
+# Disable VCR to always call actual API
+DISABLE_BOOT_VCR=1 go test -v -run Test01Shopping
+```
+
+**Performance Impact**:
+- Without VCR: ~8.7s per test case
+- With VCR (cached): ~6.4s per test case
+- Speedup: ~25.7% (saves ~2.2s per test)
+
+**VCR Modes**:
+```bash
+# Auto mode (default) - use cache if available, otherwise record
+go test -v
+
+# Record mode - always call API and update cache
+BOOT_VCR_MODE=record go test -v
+
+# Replay mode - only use cache (fail on cache miss)
+BOOT_VCR_MODE=replay go test -v
+```
+
+**Important Notes**:
+- VCR proxy runs automatically on port 8001 by default
+- To disable VCR, set `DISABLE_BOOT_VCR=1`
+- Cache is stored in `test/vcr/cassettes/default/`
+- Proxy logs are written to `/tmp/vcr_proxy.log`
+- Tests use fixed directory `/tmp/code-like-prompt-test` for cache consistency
+- See `test/vcr/README.md` for detailed VCR documentation and performance analysis
+
 ## How Tests Work
 
 ### Test Environment Isolation
 
 Each test runs in an isolated environment to avoid interference from user configurations:
 
-1. **Temporary Directory**: Created under `/tmp` with unique timestamp-based names
+1. **Temporary Directory**:
+   - Without VCR: Created under `/tmp` with unique timestamp-based names
+   - With VCR (`BOOT_VCR=1`): Fixed path `/tmp/code-like-prompt-test` for cache consistency
 2. **Local Marketplace**: `.claude/settings.json` configured to use local plugin code instead of GitHub
 3. **Clean Environment**: No CLAUDE.md interference from user/project directories
 4. **Authentication**: Uses existing user authentication (not isolated)
+5. **VCR Proxy** (optional): Automatically started on port 8001 when `BOOT_VCR=1` is set
 
 ### Test Execution Flow
 
