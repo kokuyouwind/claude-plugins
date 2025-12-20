@@ -10,8 +10,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// TestCase defines a test case structure for code-like-prompt commands
+type TestCase struct {
+	Name            string
+	Command         string
+	Args            map[string]interface{}
+	ExpectedOutputs []string
+	CustomAssert    func(t *testing.T, output string) // Optional custom assertion function
+}
 
 // vcrProxy holds the VCR proxy process information
 type vcrProxy struct {
@@ -179,4 +189,31 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 	require.NoError(t, err, "Failed to execute claude command: %s\nOutput: %s", cmdStr, string(output))
 
 	return string(output)
+}
+
+// RunTestCases executes a list of test cases with the standard test pattern
+func RunTestCases(t *testing.T, tests []TestCase) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			// Setup
+			tmpDir := setupTestEnvironment(t)
+			defer cleanupTestEnvironment(t, tmpDir)
+
+			// Execute
+			output := runClaudeCommand(t, tmpDir, tt.Command, tt.Args)
+
+			// Assert
+			if tt.CustomAssert != nil {
+				// Use custom assertion if provided
+				tt.CustomAssert(t, output)
+			} else {
+				// Default assertion: check all expected outputs
+				for _, expected := range tt.ExpectedOutputs {
+					assert.Contains(t, output, expected, "Output should contain expected text")
+				}
+			}
+		})
+	}
 }
