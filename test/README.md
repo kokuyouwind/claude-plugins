@@ -24,10 +24,10 @@ test/
 
 ## Setup
 
-### Install Go (using mise)
+### Install Go
 
 ```bash
-mise install go@latest
+mise install
 ```
 
 ### Download Dependencies
