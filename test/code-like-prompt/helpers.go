@@ -173,7 +173,7 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 
 	// Execute claude command in the temporary directory
 	// This uses the project's .claude/settings.json without isolating user authentication
-	cmd := exec.Command("claude", "-p", cmdStr)
+	cmd := exec.Command("claude", "--model", "claude-haiku-4-5-20251001", "-p", cmdStr)
 	cmd.Dir = tmpDir
 	cmd.Env = os.Environ() // Use parent environment including authentication
 
