@@ -4,7 +4,7 @@
 
 This document summarizes test results for all code-like prompt commands across different categories.
 
-**Last Updated**: 2025-12-15 (Claude Sonnet 4.5 in Clean Environment)
+**Last Updated**: 2025-12-21 (Claude Haiku 4.5 - Test Suite Expansion)
 
 ## Summary by Category
 
@@ -16,6 +16,8 @@ This document summarizes test results for all code-like prompt commands across d
 | 04-pattern-match | 24 | 24 | 0 | 100% |
 | 04p-prolog-backtrack | 7 | 7 | 0 | 100% |
 | **Total** | **96** | **81** | **15** | **84%** |
+
+**Note**: Results above are for Claude Sonnet 4.5 (2025-12-15). New Haiku 4.5 test automation added on 2025-12-21.
 
 **Testing Environment**: All tests run in `/tmp` to isolate from CLAUDE.md configuration interference.
 
@@ -111,6 +113,14 @@ Excellent understanding of logic programming:
 - 03-loop: 67% → 70% (+3%)
 
 ## Version History
+
+- **2025-12-21**: Test Automation with Haiku 4.5
+  - Created comprehensive Go test suite for 04 series (test04_test.go)
+  - 04-pattern-match: 24/24 (100%) ✅
+  - 04p-prolog-backtrack: 7/7 (100%) ✅
+  - All tests now automated with proper setup/teardown
+  - VCR proxy integration for reproducible testing
+  - Total 04 series tests: 36/36 (100%)
 
 - **2025-12-15**: Clean Environment Testing
   - All tests run in `/tmp` to eliminate CLAUDE.md interference
