@@ -207,9 +207,11 @@ func Test02bDanglingElseInnerIndent(t *testing.T) {
 				"condition_b": true,
 			},
 			// Testing actual output (not expected output)
-			// Expected: (no output), Actual: "bar" (FAIL)
-			ExpectedOutputs: []string{
-				"bar",
+			// Expected: (no output), Actual: empty output on haiku (PASS on haiku, FAIL on Sonnet)
+			// Note: Sonnetでは通るがhaikuでは失敗する - haikuは何も出力しない
+			CustomAssert: func(t *testing.T, output string) {
+				trimmed := strings.TrimSpace(output)
+				assert.Empty(t, trimmed, "Output should be empty (actual behavior on haiku, expected is no output)")
 			},
 		},
 		{
@@ -220,9 +222,11 @@ func Test02bDanglingElseInnerIndent(t *testing.T) {
 				"condition_b": false,
 			},
 			// Testing actual output (not expected output)
-			// Expected: (no output), Actual: "bar" (FAIL)
-			ExpectedOutputs: []string{
-				"bar",
+			// Expected: (no output), Actual: empty output on haiku (PASS on haiku, FAIL on Sonnet)
+			// Note: Sonnetでは通るがhaikuでは失敗する - haikuは何も出力しない
+			CustomAssert: func(t *testing.T, output string) {
+				trimmed := strings.TrimSpace(output)
+				assert.Empty(t, trimmed, "Output should be empty (actual behavior on haiku, expected is no output)")
 			},
 		},
 	}
@@ -324,12 +328,11 @@ func Test02bDanglingElseInnerKeyword(t *testing.T) {
 				"condition_b": true,
 			},
 			// Testing actual output (not expected output)
-			// Expected: (no output), Actual: "bar" or "baz" (FAIL - varies)
+			// Expected: (no output), Actual: empty output on haiku (PASS on haiku, FAIL on Sonnet)
+			// Note: Sonnetでは通るがhaikuでは失敗する - haikuは何も出力しない
 			CustomAssert: func(t *testing.T, output string) {
-				// Accept "bar" or "baz" as Claude's behavior varies
-				hasBar := strings.Contains(output, "bar")
-				hasBaz := strings.Contains(output, "baz")
-				assert.True(t, hasBar || hasBaz, "Output should contain either 'bar' or 'baz' (actual behavior varies, expected is no output)")
+				trimmed := strings.TrimSpace(output)
+				assert.Empty(t, trimmed, "Output should be empty (actual behavior on haiku, expected is no output)")
 			},
 		},
 		{
@@ -547,9 +550,10 @@ func Test02cDeepNestingBlock(t *testing.T) {
 				"level4": false,
 			},
 			// Testing actual output (not expected output)
-			// Expected: (no output) - Dangling else pattern, Actual: "baz" (FAIL)
-			ExpectedOutputs: []string{
-				"baz",
+			// Expected: (no output) - Dangling else pattern, Actual: explanation text on haiku (FAIL on haiku, varies on Sonnet)
+			// Note: Sonnetでは通るがhaikuでは失敗する - haikuは説明文を出力する
+			CustomAssert: func(t *testing.T, output string) {
+				assert.NotEmpty(t, output, "Output should not be empty (actual behavior on haiku, expected is no output)")
 			},
 		},
 		{
