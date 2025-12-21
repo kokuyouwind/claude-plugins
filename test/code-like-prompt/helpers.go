@@ -30,6 +30,7 @@ type vcrProxy struct {
 }
 
 var globalProxy *vcrProxy
+var globalTmpDir string
 
 // startVCRProxy starts the VCR proxy unless DISABLE_BOOT_VCR environment variable is set
 func startVCRProxy(t *testing.T) *vcrProxy {
@@ -100,15 +101,11 @@ func stopVCRProxy(t *testing.T, proxy *vcrProxy) {
 	_, _ = proxy.cmd.Process.Wait()
 }
 
-// setupTestEnvironment creates a temporary directory with Claude configuration
+// setupTestEnvironmentOnce creates a temporary directory with Claude configuration
 // and returns the path to the temporary directory
-func setupTestEnvironment(t *testing.T) string {
+// This function should be called once in TestMain
+func setupTestEnvironmentOnce(t *testing.T) string {
 	t.Helper()
-
-	// Start VCR proxy if needed (only once for all tests)
-	if globalProxy == nil {
-		globalProxy = startVCRProxy(t)
-	}
 
 	// Use fixed directory path for consistent cache hits
 	tmpDir := "/tmp/code-like-prompt-test"
@@ -197,12 +194,8 @@ func RunTestCases(t *testing.T, tests []TestCase) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			// Setup
-			tmpDir := setupTestEnvironment(t)
-			defer cleanupTestEnvironment(t, tmpDir)
-
-			// Execute
-			output := runClaudeCommand(t, tmpDir, tt.Command, tt.Args)
+			// Execute using the global test directory
+			output := runClaudeCommand(t, globalTmpDir, tt.Command, tt.Args)
 
 			// Assert
 			if tt.CustomAssert != nil {
