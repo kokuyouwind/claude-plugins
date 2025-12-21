@@ -1,0 +1,275 @@
+=== RUN   Test01ShoppingRequest
+=== RUN   Test01ShoppingRequest/shopping_request_with_eggs
+=== RUN   Test01ShoppingRequest/shopping_request_without_eggs
+--- PASS: Test01ShoppingRequest (9.46s)
+    --- PASS: Test01ShoppingRequest/shopping_request_with_eggs (5.35s)
+    --- PASS: Test01ShoppingRequest/shopping_request_without_eggs (4.12s)
+=== RUN   Test01ShoppingMisunderstanding
+=== RUN   Test01ShoppingMisunderstanding/shopping_misunderstanding_with_eggs
+=== RUN   Test01ShoppingMisunderstanding/shopping_misunderstanding_without_eggs
+--- PASS: Test01ShoppingMisunderstanding (8.83s)
+    --- PASS: Test01ShoppingMisunderstanding/shopping_misunderstanding_with_eggs (4.22s)
+    --- PASS: Test01ShoppingMisunderstanding/shopping_misunderstanding_without_eggs (4.62s)
+=== RUN   Test02aDanglingElseOuterIndent
+=== RUN   Test02aDanglingElseOuterIndent/ATrueBTrue
+=== RUN   Test02aDanglingElseOuterIndent/ATrueBFalse
+=== RUN   Test02aDanglingElseOuterIndent/AFalseBTrue
+=== RUN   Test02aDanglingElseOuterIndent/AFalseBFalse
+--- PASS: Test02aDanglingElseOuterIndent (17.57s)
+    --- PASS: Test02aDanglingElseOuterIndent/ATrueBTrue (4.56s)
+    --- PASS: Test02aDanglingElseOuterIndent/ATrueBFalse (4.23s)
+    --- PASS: Test02aDanglingElseOuterIndent/AFalseBTrue (4.40s)
+    --- PASS: Test02aDanglingElseOuterIndent/AFalseBFalse (4.38s)
+=== RUN   Test02aDanglingElseOuterBlock
+=== RUN   Test02aDanglingElseOuterBlock/ATrueBTrue
+=== RUN   Test02aDanglingElseOuterBlock/ATrueBFalse
+=== RUN   Test02aDanglingElseOuterBlock/AFalseBTrue
+=== RUN   Test02aDanglingElseOuterBlock/AFalseBFalse
+--- PASS: Test02aDanglingElseOuterBlock (16.52s)
+    --- PASS: Test02aDanglingElseOuterBlock/ATrueBTrue (3.59s)
+    --- PASS: Test02aDanglingElseOuterBlock/ATrueBFalse (4.30s)
+    --- PASS: Test02aDanglingElseOuterBlock/AFalseBTrue (4.41s)
+    --- PASS: Test02aDanglingElseOuterBlock/AFalseBFalse (4.23s)
+=== RUN   Test02aDanglingElseOuterKeyword
+=== RUN   Test02aDanglingElseOuterKeyword/ATrueBTrue
+=== RUN   Test02aDanglingElseOuterKeyword/ATrueBFalse
+=== RUN   Test02aDanglingElseOuterKeyword/AFalseBTrue
+=== RUN   Test02aDanglingElseOuterKeyword/AFalseBFalse
+--- PASS: Test02aDanglingElseOuterKeyword (18.39s)
+    --- PASS: Test02aDanglingElseOuterKeyword/ATrueBTrue (5.19s)
+    --- PASS: Test02aDanglingElseOuterKeyword/ATrueBFalse (4.40s)
+    --- PASS: Test02aDanglingElseOuterKeyword/AFalseBTrue (4.40s)
+    --- PASS: Test02aDanglingElseOuterKeyword/AFalseBFalse (4.40s)
+=== RUN   Test02bDanglingElseInnerIndent
+=== RUN   Test02bDanglingElseInnerIndent/ATrueBTrue
+=== RUN   Test02bDanglingElseInnerIndent/ATrueBFalse
+=== RUN   Test02bDanglingElseInnerIndent/AFalseBTrue
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"\n" does not contain "bar"
+        	Test:       	Test02bDanglingElseInnerIndent/AFalseBTrue
+        	Messages:   	Output should contain expected text
+=== RUN   Test02bDanglingElseInnerIndent/AFalseBFalse
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"\n" does not contain "bar"
+        	Test:       	Test02bDanglingElseInnerIndent/AFalseBFalse
+        	Messages:   	Output should contain expected text
+--- FAIL: Test02bDanglingElseInnerIndent (17.21s)
+    --- PASS: Test02bDanglingElseInnerIndent/ATrueBTrue (4.41s)
+    --- PASS: Test02bDanglingElseInnerIndent/ATrueBFalse (4.50s)
+    --- FAIL: Test02bDanglingElseInnerIndent/AFalseBTrue (3.90s)
+    --- FAIL: Test02bDanglingElseInnerIndent/AFalseBFalse (4.40s)
+=== RUN   Test02bDanglingElseInnerBlock
+=== RUN   Test02bDanglingElseInnerBlock/ATrueBTrue
+=== RUN   Test02bDanglingElseInnerBlock/ATrueBFalse
+=== RUN   Test02bDanglingElseInnerBlock/AFalseBTrue
+=== RUN   Test02bDanglingElseInnerBlock/AFalseBFalse
+--- PASS: Test02bDanglingElseInnerBlock (18.49s)
+    --- PASS: Test02bDanglingElseInnerBlock/ATrueBTrue (4.25s)
+    --- PASS: Test02bDanglingElseInnerBlock/ATrueBFalse (4.35s)
+    --- PASS: Test02bDanglingElseInnerBlock/AFalseBTrue (4.40s)
+    --- PASS: Test02bDanglingElseInnerBlock/AFalseBFalse (5.49s)
+=== RUN   Test02bDanglingElseInnerKeyword
+=== RUN   Test02bDanglingElseInnerKeyword/ATrueBTrue
+=== RUN   Test02bDanglingElseInnerKeyword/ATrueBFalse
+=== RUN   Test02bDanglingElseInnerKeyword/AFalseBTrue
+    test02_test.go:332: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/test02_test.go:332
+        	            				/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:203
+        	Error:      	Should be true
+        	Test:       	Test02bDanglingElseInnerKeyword/AFalseBTrue
+        	Messages:   	Output should contain either 'bar' or 'baz' (actual behavior varies, expected is no output)
+=== RUN   Test02bDanglingElseInnerKeyword/AFalseBFalse
+--- FAIL: Test02bDanglingElseInnerKeyword (17.76s)
+    --- PASS: Test02bDanglingElseInnerKeyword/ATrueBTrue (4.35s)
+    --- PASS: Test02bDanglingElseInnerKeyword/ATrueBFalse (4.44s)
+    --- FAIL: Test02bDanglingElseInnerKeyword/AFalseBTrue (4.57s)
+    --- PASS: Test02bDanglingElseInnerKeyword/AFalseBFalse (4.41s)
+=== RUN   Test02cDeepNestingIndent
+=== RUN   Test02cDeepNestingIndent/L1TL2TL3T
+=== RUN   Test02cDeepNestingIndent/L1TL2TL3FL4T
+=== RUN   Test02cDeepNestingIndent/L1TL2TL3FL4F
+=== RUN   Test02cDeepNestingIndent/L1TL2FL3TL4T
+=== RUN   Test02cDeepNestingIndent/L1TL2FL3TL4F
+=== RUN   Test02cDeepNestingIndent/L1TL2FL3F
+=== RUN   Test02cDeepNestingIndent/L1FL2T
+=== RUN   Test02cDeepNestingIndent/L1FL2FL3T
+=== RUN   Test02cDeepNestingIndent/L1FL2FL3F
+--- PASS: Test02cDeepNestingIndent (39.83s)
+    --- PASS: Test02cDeepNestingIndent/L1TL2TL3T (4.60s)
+    --- PASS: Test02cDeepNestingIndent/L1TL2TL3FL4T (4.23s)
+    --- PASS: Test02cDeepNestingIndent/L1TL2TL3FL4F (4.78s)
+    --- PASS: Test02cDeepNestingIndent/L1TL2FL3TL4T (4.40s)
+    --- PASS: Test02cDeepNestingIndent/L1TL2FL3TL4F (4.41s)
+    --- PASS: Test02cDeepNestingIndent/L1TL2FL3F (4.51s)
+    --- PASS: Test02cDeepNestingIndent/L1FL2T (4.30s)
+    --- PASS: Test02cDeepNestingIndent/L1FL2FL3T (4.19s)
+    --- PASS: Test02cDeepNestingIndent/L1FL2FL3F (4.41s)
+=== RUN   Test02cDeepNestingBlock
+=== RUN   Test02cDeepNestingBlock/L1TL2TL3T
+=== RUN   Test02cDeepNestingBlock/L1TL2TL3FL4T
+=== RUN   Test02cDeepNestingBlock/L1TL2TL3FL4F
+=== RUN   Test02cDeepNestingBlock/L1TL2FL3TL4T
+=== RUN   Test02cDeepNestingBlock/L1TL2FL3TL4F
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"I'll trace through this code with the given arguments: level1=true, level2=false, level3=true, level4=false.\n\nFollowing the execution path:\n- level1 is true → enter first if\n- level2 is false → enter else block\n- level3 is true → enter if block\n- level4 is false → condition fails, skip the printf\n\nSince no printf statement is executed on this path, there is no output.\n" does not contain "baz"
+        	Test:       	Test02cDeepNestingBlock/L1TL2FL3TL4F
+        	Messages:   	Output should contain expected text
+=== RUN   Test02cDeepNestingBlock/L1TL2FL3F
+=== RUN   Test02cDeepNestingBlock/L1FL2T
+=== RUN   Test02cDeepNestingBlock/L1FL2FL3T
+=== RUN   Test02cDeepNestingBlock/L1FL2FL3F
+--- FAIL: Test02cDeepNestingBlock (37.62s)
+    --- PASS: Test02cDeepNestingBlock/L1TL2TL3T (4.71s)
+    --- PASS: Test02cDeepNestingBlock/L1TL2TL3FL4T (4.61s)
+    --- PASS: Test02cDeepNestingBlock/L1TL2TL3FL4F (4.61s)
+    --- PASS: Test02cDeepNestingBlock/L1TL2FL3TL4T (3.69s)
+    --- FAIL: Test02cDeepNestingBlock/L1TL2FL3TL4F (4.30s)
+    --- PASS: Test02cDeepNestingBlock/L1TL2FL3F (4.07s)
+    --- PASS: Test02cDeepNestingBlock/L1FL2T (3.61s)
+    --- PASS: Test02cDeepNestingBlock/L1FL2FL3T (4.48s)
+    --- PASS: Test02cDeepNestingBlock/L1FL2FL3F (3.54s)
+=== RUN   Test02cDeepNestingKeyword
+=== RUN   Test02cDeepNestingKeyword/L1TL2TL3T
+=== RUN   Test02cDeepNestingKeyword/L1TL2TL3FL4T
+=== RUN   Test02cDeepNestingKeyword/L1TL2TL3FL4F
+=== RUN   Test02cDeepNestingKeyword/L1TL2FL3TL4T
+=== RUN   Test02cDeepNestingKeyword/L1TL2FL3TL4F
+=== RUN   Test02cDeepNestingKeyword/L1TL2FL3F
+=== RUN   Test02cDeepNestingKeyword/L1FL2T
+=== RUN   Test02cDeepNestingKeyword/L1FL2FL3T
+=== RUN   Test02cDeepNestingKeyword/L1FL2FL3F
+--- PASS: Test02cDeepNestingKeyword (39.76s)
+    --- PASS: Test02cDeepNestingKeyword/L1TL2TL3T (4.23s)
+    --- PASS: Test02cDeepNestingKeyword/L1TL2TL3FL4T (4.09s)
+    --- PASS: Test02cDeepNestingKeyword/L1TL2TL3FL4F (5.05s)
+    --- PASS: Test02cDeepNestingKeyword/L1TL2FL3TL4T (4.55s)
+    --- PASS: Test02cDeepNestingKeyword/L1TL2FL3TL4F (4.49s)
+    --- PASS: Test02cDeepNestingKeyword/L1TL2FL3F (4.68s)
+    --- PASS: Test02cDeepNestingKeyword/L1FL2T (4.40s)
+    --- PASS: Test02cDeepNestingKeyword/L1FL2FL3T (4.36s)
+    --- PASS: Test02cDeepNestingKeyword/L1FL2FL3F (3.91s)
+=== RUN   Test03aForCount
+=== RUN   Test03aForCount/Count5
+=== RUN   Test03aForCount/Count3
+=== RUN   Test03aForCount/Count0
+--- PASS: Test03aForCount (13.46s)
+    --- PASS: Test03aForCount/Count5 (4.05s)
+    --- PASS: Test03aForCount/Count3 (4.39s)
+    --- PASS: Test03aForCount/Count0 (5.02s)
+=== RUN   Test03bWhileCounter
+=== RUN   Test03bWhileCounter/MaxCount3
+=== RUN   Test03bWhileCounter/MaxCount5
+=== RUN   Test03bWhileCounter/MaxCount1
+--- PASS: Test03bWhileCounter (16.07s)
+    --- PASS: Test03bWhileCounter/MaxCount3 (3.98s)
+    --- PASS: Test03bWhileCounter/MaxCount5 (6.96s)
+    --- PASS: Test03bWhileCounter/MaxCount1 (5.13s)
+=== RUN   Test03cEachCollection
+=== RUN   Test03cEachCollection/ThreeItems
+=== RUN   Test03cEachCollection/TwoItems
+=== RUN   Test03cEachCollection/EmptyCollection
+--- PASS: Test03cEachCollection (13.36s)
+    --- PASS: Test03cEachCollection/ThreeItems (5.22s)
+    --- PASS: Test03cEachCollection/TwoItems (4.30s)
+    --- PASS: Test03cEachCollection/EmptyCollection (3.84s)
+=== RUN   Test03dLoopBreak
+=== RUN   Test03dLoopBreak/BreakAt3
+=== RUN   Test03dLoopBreak/BreakAt5
+=== RUN   Test03dLoopBreak/BreakAt0
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo0"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo1"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo2"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo3"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo4"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo5"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo6"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo7"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo8"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+    helpers.go:207: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:207
+        	Error:      	"bar\n" does not contain "foo9"
+        	Test:       	Test03dLoopBreak/BreakAt0
+        	Messages:   	Output should contain expected text
+--- FAIL: Test03dLoopBreak (14.29s)
+    --- PASS: Test03dLoopBreak/BreakAt3 (5.01s)
+    --- PASS: Test03dLoopBreak/BreakAt5 (4.63s)
+    --- FAIL: Test03dLoopBreak/BreakAt0 (4.65s)
+=== RUN   Test03eLoopContinue
+=== RUN   Test03eLoopContinue/SkipAt2
+=== RUN   Test03eLoopContinue/SkipAt0
+--- PASS: Test03eLoopContinue (9.16s)
+    --- PASS: Test03eLoopContinue/SkipAt2 (4.58s)
+    --- PASS: Test03eLoopContinue/SkipAt0 (4.58s)
+=== RUN   Test03fNestedLoops
+=== RUN   Test03fNestedLoops/Outer3Inner2
+=== RUN   Test03fNestedLoops/Outer2Inner3
+--- PASS: Test03fNestedLoops (29.40s)
+    --- PASS: Test03fNestedLoops/Outer3Inner2 (19.20s)
+    --- PASS: Test03fNestedLoops/Outer2Inner3 (10.20s)
+=== RUN   Test03gNestedBreak
+=== RUN   Test03gNestedBreak/OuterCount3BreakAt2
+=== RUN   Test03gNestedBreak/OuterCount2BreakAt1
+--- PASS: Test03gNestedBreak (22.94s)
+    --- PASS: Test03gNestedBreak/OuterCount3BreakAt2 (15.42s)
+    --- PASS: Test03gNestedBreak/OuterCount2BreakAt1 (7.51s)
+=== RUN   Test03hFilesystemGlob
+=== RUN   Test03hFilesystemGlob/TxtPattern
+--- PASS: Test03hFilesystemGlob (8.05s)
+    --- PASS: Test03hFilesystemGlob/TxtPattern (8.05s)
+=== RUN   Test03iAccumulator
+=== RUN   Test03iAccumulator/Start1End4
+=== RUN   Test03iAccumulator/Start1End5
+--- PASS: Test03iAccumulator (20.57s)
+    --- PASS: Test03iAccumulator/Start1End4 (11.94s)
+    --- PASS: Test03iAccumulator/Start1End5 (8.63s)
+=== RUN   Test03jWhileComplex
+=== RUN   Test03jWhileComplex/XLimit5Y10Dec3
+    test03_test.go:459: 
+        	Error Trace:	/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/test03_test.go:459
+        	            				/Users/kokuyouwind/repos/claude-plugins/test/code-like-prompt/helpers.go:203
+        	Error:      	"I need permission to execute this script. Could you grant me approval to run the Python code? Once approved, I can execute it and show you the output.\n" does not contain "bar"
+        	Test:       	Test03jWhileComplex/XLimit5Y10Dec3
+--- FAIL: Test03jWhileComplex (14.81s)
+    --- FAIL: Test03jWhileComplex/XLimit5Y10Dec3 (14.81s)
+FAIL
+FAIL	github.com/kokuyouwind/claude-plugins/test/code-like-prompt	406.919s
+FAIL
