@@ -173,9 +173,23 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 
 	// Execute claude command in the temporary directory
 	// This uses the project's .claude/settings.json without isolating user authentication
-	cmd := exec.Command("claude", "--model", "claude-haiku-4-5-20251001", "-p", cmdStr)
+	cmdArgs := []string{"--model", "claude-haiku-4-5-20251001"}
+
+	// Add verbose flag if DEBUG environment variable is set
+	if os.Getenv("DEBUG") != "" {
+		cmdArgs = append(cmdArgs, "--verbose")
+	}
+
+	cmdArgs = append(cmdArgs, "-p", cmdStr)
+
+	cmd := exec.Command("claude", cmdArgs...)
 	cmd.Dir = tmpDir
 	cmd.Env = os.Environ() // Use parent environment including authentication
+
+	// Log the command being executed if DEBUG is set
+	if os.Getenv("DEBUG") != "" {
+		t.Logf("Executing command: claude %v", cmdArgs)
+	}
 
 	// If VCR proxy is running, set ANTHROPIC_BASE_URL
 	if globalProxy != nil {
@@ -184,6 +198,11 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 
 	output, err := cmd.CombinedOutput()
 	require.NoError(t, err, "Failed to execute claude command: %s\nOutput: %s", cmdStr, string(output))
+
+	// Log the output if DEBUG is set
+	if os.Getenv("DEBUG") != "" {
+		t.Logf("Command output:\n%s", string(output))
+	}
 
 	return string(output)
 }
