@@ -1,6 +1,7 @@
 package code_like_prompt
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -156,6 +157,12 @@ func cleanupTestEnvironment(t *testing.T, tmpDir string) {
 	require.NoError(t, err, "Failed to remove temporary directory")
 }
 
+// ClaudeResponse represents the JSON response from claude --output-format json
+type ClaudeResponse struct {
+	Result    string `json:"result"`
+	SessionID string `json:"session_id"`
+}
+
 // runClaudeCommand executes a claude command with the given arguments
 // and returns the standard output
 func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[string]interface{}) string {
@@ -171,9 +178,11 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 		cmdStr = command
 	}
 
+	// Always use JSON output format for session ID extraction
+	cmdArgs := []string{"--model", "claude-haiku-4-5-20251001", "-p", cmdStr, "--output-format", "json"}
+
 	// Execute claude command in the temporary directory
-	// This uses the project's .claude/settings.json without isolating user authentication
-	cmd := exec.Command("claude", "--model", "claude-haiku-4-5-20251001", "-p", cmdStr)
+	cmd := exec.Command("claude", cmdArgs...)
 	cmd.Dir = tmpDir
 	cmd.Env = os.Environ() // Use parent environment including authentication
 
@@ -185,7 +194,174 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 	output, err := cmd.CombinedOutput()
 	require.NoError(t, err, "Failed to execute claude command: %s\nOutput: %s", cmdStr, string(output))
 
-	return string(output)
+	// Parse JSON response to extract session ID and result
+	var response ClaudeResponse
+	var textOutput string
+	var sessionID string
+
+	if err := json.Unmarshal(output, &response); err == nil {
+		textOutput = response.Result
+		sessionID = response.SessionID
+	} else {
+		// Fallback to raw output if JSON parsing fails
+		textOutput = string(output)
+	}
+
+	// If DEBUG=1, print session ID and sidechain messages
+	if os.Getenv("DEBUG") == "1" && sessionID != "" {
+		fmt.Printf("session-id: %s\n", sessionID)
+
+		// Wait a bit for session file to be written
+		time.Sleep(500 * time.Millisecond)
+
+		// Load and print sidechain messages
+		messages := loadSidechainMessages(t, tmpDir, sessionID)
+		printSidechainMessages(messages)
+	}
+
+	return textOutput
+}
+
+// Message represents a message in the session history
+type Message struct {
+	IsSidechain bool   `json:"isSidechain"`
+	UserType    string `json:"userType"`
+	Type        string `json:"type"`
+	Message     struct {
+		Role    string        `json:"role"`
+		Content []ContentItem `json:"content"`
+	} `json:"message"`
+	Timestamp string `json:"timestamp"`
+	SessionID string `json:"sessionId"`
+}
+
+// ContentItem represents a content item in a message
+type ContentItem struct {
+	Type      string                 `json:"type"`
+	Text      string                 `json:"text"`
+	ID        string                 `json:"id"`
+	Name      string                 `json:"name"`
+	Input     map[string]interface{} `json:"input"`
+	Content   interface{}            `json:"content"`
+	IsError   bool                   `json:"is_error"`
+	ToolUseID string                 `json:"tool_use_id"`
+}
+
+// getProjectDirName converts a directory path to the project directory name used by Claude
+func getProjectDirName(dir string) string {
+	// Resolve to absolute path
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return ""
+	}
+
+	// Resolve symlinks (e.g., /tmp -> /private/tmp on macOS)
+	realDir, err := filepath.EvalSymlinks(absDir)
+	if err != nil {
+		return ""
+	}
+
+	// Remove leading / then replace remaining / with -
+	// Then add - prefix to match Claude's format
+	projectName := strings.TrimPrefix(realDir, "/")
+	projectName = strings.ReplaceAll(projectName, "/", "-")
+	projectName = "-" + projectName
+
+	return projectName
+}
+
+// loadSidechainMessages loads sidechain messages from session file
+func loadSidechainMessages(t *testing.T, tmpDir string, sessionID string) []Message {
+	t.Helper()
+
+	if sessionID == "" {
+		return nil
+	}
+
+	// Get project directory name
+	projectDirName := getProjectDirName(tmpDir)
+	if projectDirName == "" {
+		return nil
+	}
+
+	// Session file path
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+
+	sessionFile := filepath.Join(homeDir, ".claude", "projects", projectDirName, sessionID+".jsonl")
+
+	// Check if file exists
+	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
+		return nil
+	}
+
+	// Read JSONL file
+	file, err := os.Open(sessionFile)
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+
+	var messages []Message
+	scanner := bufio.NewScanner(file)
+
+	// Increase buffer size for large messages
+	buf := make([]byte, 0, 1024*1024)
+	scanner.Buffer(buf, 10*1024*1024)
+
+	for scanner.Scan() {
+		var msg Message
+		if err := json.Unmarshal(scanner.Bytes(), &msg); err != nil {
+			continue
+		}
+
+		// Filter: user input, internal thoughts (userType: "internal"), or assistant output
+		if msg.Type == "user" || msg.UserType == "internal" || msg.Type == "assistant" {
+			messages = append(messages, msg)
+		}
+	}
+
+	return messages
+}
+
+// printSidechainMessages prints messages in simple format
+func printSidechainMessages(messages []Message) {
+	if len(messages) == 0 {
+		return
+	}
+
+	for _, msg := range messages {
+		// Process each content item in the message
+		for _, item := range msg.Message.Content {
+			switch item.Type {
+			case "text":
+				// Regular text content
+				label := msg.Type
+				if msg.UserType == "internal" {
+					label = "internal"
+				}
+				fmt.Printf("==== %s\n%s\n\n", label, item.Text)
+
+			case "tool_use":
+				// Tool use (e.g., Bash command)
+				fmt.Printf("==== tool_use (%s)\n", item.Name)
+				if inputJSON, err := json.MarshalIndent(item.Input, "", "  "); err == nil {
+					fmt.Printf("%s\n\n", string(inputJSON))
+				}
+
+			case "tool_result":
+				// Tool result
+				fmt.Printf("==== tool_result\n")
+				if item.IsError {
+					fmt.Printf("Error: %v\n\n", item.Content)
+				} else {
+					fmt.Printf("%v\n\n", item.Content)
+				}
+			}
+		}
+	}
 }
 
 // RunTestCases executes a list of test cases with the standard test pattern
