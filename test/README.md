@@ -71,6 +71,69 @@ cd test
 mise exec go@latest -- go test -v ./code-like-prompt
 ```
 
+### Debug Mode with Sidechain Messages
+
+Enable debug mode to see detailed execution logs including user inputs, assistant responses, and tool calls:
+
+```bash
+cd test/code-like-prompt
+
+# Run tests with debug output
+DEBUG=1 go test -v -run Test01Shopping
+```
+
+**Debug Output Example**:
+```
+session-id: 82988a49-cf80-4c6b-aca7-0325a8587835
+==== user
+Execute the following code with environment: {"Egg.stock":3,"Milk.stock":5}
+...
+
+==== assistant
+I'll execute this Ruby code with the provided environment variables.
+
+==== tool_use (Skill)
+{
+  "args": "{\"Egg.stock\":3,\"Milk.stock\":5}",
+  "skill": "code-like-prompt:01-shopping-request"
+}
+
+==== tool_result
+Error: Execute skill: code-like-prompt:01-shopping-request
+
+==== assistant
+Bought 1 milk.
+Bought 6 eggs.
+```
+
+**What Debug Mode Shows**:
+- **session-id**: Unique identifier for the Claude Code session
+- **user**: Input prompts sent to Claude
+- **assistant**: Claude's responses and reasoning
+- **tool_use**: Tools Claude attempted to use (Bash, Write, etc.) with full parameters
+- **tool_result**: Results or errors from tool execution
+- **internal**: Internal thoughts (userType: "internal") if present
+
+**Finding Session Logs**:
+
+Session logs are stored in `~/.claude/projects/` with directory names based on the test working directory:
+
+```bash
+# For test directory /tmp/code-like-prompt-test, the project directory is:
+ls ~/.claude/projects/-private-tmp-code-like-prompt-test/
+
+# View a specific session log (use session-id from debug output):
+cat ~/.claude/projects/-private-tmp-code-like-prompt-test/82988a49-cf80-4c6b-aca7-0325a8587835.jsonl | jq '.'
+
+# Find recent session files:
+ls -lt ~/.claude/projects/-private-tmp-code-like-prompt-test/*.jsonl | head -5
+```
+
+**Session Log Format**:
+- Each line is a JSON object representing a message or event
+- Messages include `type` (user/assistant), `message.content`, `timestamp`, etc.
+- Tool calls are stored as content items with `type: "tool_use"` or `type: "tool_result"`
+
 ### Using VCR for Faster Tests
 
 VCR (Video Cassette Recorder) mode is **enabled by default** and caches Claude API responses for faster test execution:
@@ -83,6 +146,9 @@ go test -v -run Test01Shopping
 
 # Disable VCR to always call actual API
 DISABLE_BOOT_VCR=1 go test -v -run Test01Shopping
+
+# Combine with debug mode
+DEBUG=1 go test -v -run Test01Shopping
 ```
 
 **Performance Impact**:
@@ -116,24 +182,26 @@ BOOT_VCR_MODE=replay go test -v
 
 Each test runs in an isolated environment to avoid interference from user configurations:
 
-1. **Temporary Directory**:
-   - Without VCR: Created under `/tmp` with unique timestamp-based names
-   - With VCR (`BOOT_VCR=1`): Fixed path `/tmp/code-like-prompt-test` for cache consistency
+1. **Temporary Directory**: Fixed path `/tmp/code-like-prompt-test` for VCR cache consistency
 2. **Local Marketplace**: `.claude/settings.json` configured to use local plugin code instead of GitHub
 3. **Clean Environment**: No CLAUDE.md interference from user/project directories
 4. **Authentication**: Uses existing user authentication (not isolated)
-5. **VCR Proxy** (optional): Automatically started on port 8001 when `BOOT_VCR=1` is set
+5. **VCR Proxy** (optional): Automatically started on port 8001 by default
 
 ### Test Execution Flow
 
 ```
 Setup
   ↓
-Create tmpDir (/tmp/code-like-prompt-test-XXXXXX)
+Create tmpDir (/tmp/code-like-prompt-test)
   ↓
 Copy .claude/settings.json with local marketplace config
   ↓
-Execute: claude -p "command args" in tmpDir
+Execute: claude --output-format json -p "command args" in tmpDir
+  ↓
+Parse JSON response and extract result + session_id
+  ↓
+If DEBUG=1: Print session_id and sidechain messages
   ↓
 Verify output contains expected strings
   ↓
@@ -228,7 +296,7 @@ claude /login
 Verify the repository path in the generated settings.json:
 ```bash
 # The path should be absolute, not relative
-cat /tmp/code-like-prompt-test-*/\.claude/settings.json
+cat /tmp/code-like-prompt-test/.claude/settings.json
 ```
 
 ### Tests Are Slow
