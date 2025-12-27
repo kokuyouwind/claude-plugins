@@ -1,6 +1,7 @@
 package code_like_prompt
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -185,7 +186,228 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 	output, err := cmd.CombinedOutput()
 	require.NoError(t, err, "Failed to execute claude command: %s\nOutput: %s", cmdStr, string(output))
 
+	// If DEBUG=1, print sidechain messages
+	if os.Getenv("DEBUG") == "1" {
+		// Wait a bit for session file to be written
+		time.Sleep(500 * time.Millisecond)
+
+		// Extract session ID from the most recent session file
+		sessionID := extractSessionID(t, tmpDir, command)
+
+		// Load and print sidechain messages
+		messages := loadSidechainMessages(t, tmpDir, sessionID)
+		printSidechainMessages(messages)
+	}
+
 	return string(output)
+}
+
+// Message represents a message in the session history
+type Message struct {
+	IsSidechain bool   `json:"isSidechain"`
+	UserType    string `json:"userType"`
+	Type        string `json:"type"`
+	Message     struct {
+		Role    string        `json:"role"`
+		Content []ContentItem `json:"content"`
+	} `json:"message"`
+	Timestamp string `json:"timestamp"`
+	SessionID string `json:"sessionId"`
+}
+
+// ContentItem represents a content item in a message
+type ContentItem struct {
+	Type      string                 `json:"type"`
+	Text      string                 `json:"text"`
+	ID        string                 `json:"id"`
+	Name      string                 `json:"name"`
+	Input     map[string]interface{} `json:"input"`
+	Content   interface{}            `json:"content"`
+	IsError   bool                   `json:"is_error"`
+	ToolUseID string                 `json:"tool_use_id"`
+}
+
+// getProjectDirName converts a directory path to the project directory name used by Claude
+func getProjectDirName(dir string) string {
+	// Resolve to absolute path
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return ""
+	}
+
+	// Resolve symlinks (e.g., /tmp -> /private/tmp on macOS)
+	realDir, err := filepath.EvalSymlinks(absDir)
+	if err != nil {
+		return ""
+	}
+
+	// Remove leading / then replace remaining / with -
+	// Then add - prefix to match Claude's format
+	projectName := strings.TrimPrefix(realDir, "/")
+	projectName = strings.ReplaceAll(projectName, "/", "-")
+	projectName = "-" + projectName
+
+	return projectName
+}
+
+// loadSidechainMessages loads sidechain messages from session file
+func loadSidechainMessages(t *testing.T, tmpDir string, sessionID string) []Message {
+	t.Helper()
+
+	if sessionID == "" {
+		return nil
+	}
+
+	// Get project directory name
+	projectDirName := getProjectDirName(tmpDir)
+	if projectDirName == "" {
+		return nil
+	}
+
+	// Session file path
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+
+	sessionFile := filepath.Join(homeDir, ".claude", "projects", projectDirName, sessionID+".jsonl")
+
+	// Check if file exists
+	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
+		return nil
+	}
+
+	// Read JSONL file
+	file, err := os.Open(sessionFile)
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+
+	var messages []Message
+	scanner := bufio.NewScanner(file)
+
+	// Increase buffer size for large messages
+	buf := make([]byte, 0, 1024*1024)
+	scanner.Buffer(buf, 10*1024*1024)
+
+	for scanner.Scan() {
+		var msg Message
+		if err := json.Unmarshal(scanner.Bytes(), &msg); err != nil {
+			continue
+		}
+
+		// Filter: user input, internal thoughts (userType: "internal"), or assistant output
+		if msg.Type == "user" || msg.UserType == "internal" || msg.Type == "assistant" {
+			messages = append(messages, msg)
+		}
+	}
+
+	return messages
+}
+
+// printSidechainMessages prints messages in simple format
+func printSidechainMessages(messages []Message) {
+	if len(messages) == 0 {
+		return
+	}
+
+	for _, msg := range messages {
+		// Process each content item in the message
+		for _, item := range msg.Message.Content {
+			switch item.Type {
+			case "text":
+				// Regular text content
+				label := msg.Type
+				if msg.UserType == "internal" {
+					label = "internal"
+				}
+				fmt.Printf("==== %s\n%s\n\n", label, item.Text)
+
+			case "tool_use":
+				// Tool use (e.g., Bash command)
+				fmt.Printf("==== tool_use (%s)\n", item.Name)
+				if inputJSON, err := json.MarshalIndent(item.Input, "", "  "); err == nil {
+					fmt.Printf("%s\n\n", string(inputJSON))
+				}
+
+			case "tool_result":
+				// Tool result
+				fmt.Printf("==== tool_result\n")
+				if item.IsError {
+					fmt.Printf("Error: %v\n\n", item.Content)
+				} else {
+					fmt.Printf("%v\n\n", item.Content)
+				}
+			}
+		}
+	}
+}
+
+// extractSessionID extracts session ID from the most recent session file for the project
+// that contains the specified command
+func extractSessionID(t *testing.T, tmpDir string, command string) string {
+	t.Helper()
+
+	// Get project directory name
+	projectDirName := getProjectDirName(tmpDir)
+	if projectDirName == "" {
+		return ""
+	}
+
+	// Project directory path
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+
+	projectDir := filepath.Join(homeDir, ".claude", "projects", projectDirName)
+
+	// Check if project directory exists
+	if _, err := os.Stat(projectDir); os.IsNotExist(err) {
+		return ""
+	}
+
+	// Find all .jsonl files
+	files, err := filepath.Glob(filepath.Join(projectDir, "*.jsonl"))
+	if err != nil || len(files) == 0 {
+		return ""
+	}
+
+	// Search for the most recent file that contains the command
+	var mostRecent string
+	var mostRecentTime time.Time
+
+	for _, file := range files {
+		info, err := os.Stat(file)
+		if err != nil {
+			continue
+		}
+
+		// Read the file to check if it contains the command
+		content, err := os.ReadFile(file)
+		if err != nil {
+			continue
+		}
+
+		// Check if the file contains the command
+		if strings.Contains(string(content), command) {
+			if info.ModTime().After(mostRecentTime) {
+				mostRecentTime = info.ModTime()
+				mostRecent = file
+			}
+		}
+	}
+
+	if mostRecent == "" {
+		return ""
+	}
+
+	// Extract session ID from filename (remove .jsonl extension)
+	sessionID := filepath.Base(mostRecent)
+	sessionID = strings.TrimSuffix(sessionID, ".jsonl")
+
+	return sessionID
 }
 
 // RunTestCases executes a list of test cases with the standard test pattern
