@@ -33,8 +33,8 @@ type vcrProxy struct {
 var globalProxy *vcrProxy
 var globalTmpDir string
 
-// startVCRProxy starts the VCR proxy unless DISABLE_BOOT_VCR environment variable is set
-func startVCRProxy(t *testing.T) *vcrProxy {
+// startVCRProxyForTest starts the VCR proxy for a specific test case
+func startVCRProxyForTest(t *testing.T, cassetteName string) *vcrProxy {
 	t.Helper()
 
 	// Check if VCR should be disabled
@@ -65,8 +65,10 @@ func startVCRProxy(t *testing.T) *vcrProxy {
 		"--mode", "reverse:https://api.anthropic.com",
 		"--listen-port", port)
 
-	// Set VCR mode environment variable
-	cmd.Env = append(os.Environ(), fmt.Sprintf("VCR_MODE=%s", mode))
+	// Set VCR mode and cassette name environment variables
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("VCR_MODE=%s", mode),
+		fmt.Sprintf("VCR_CASSETTE=%s", cassetteName))
 
 	// Create log file for proxy output
 	logFile, err := os.Create("/tmp/vcr_proxy.log")
@@ -87,6 +89,12 @@ func startVCRProxy(t *testing.T) *vcrProxy {
 	}
 }
 
+// startVCRProxy starts the VCR proxy unless DISABLE_BOOT_VCR environment variable is set
+// This is kept for backward compatibility with TestMain
+func startVCRProxy(t *testing.T) *vcrProxy {
+	return startVCRProxyForTest(t, "default")
+}
+
 // stopVCRProxy stops the VCR proxy
 func stopVCRProxy(t *testing.T, proxy *vcrProxy) {
 	t.Helper()
@@ -95,11 +103,68 @@ func stopVCRProxy(t *testing.T, proxy *vcrProxy) {
 		return
 	}
 
+	// Wait for streaming responses to complete and be saved
+	// This is important for large streaming responses (e.g., Sonnet model)
+	// which may still be transmitting/saving when the test completes
+	time.Sleep(2 * time.Second)
+
 	err := proxy.cmd.Process.Kill()
 	require.NoError(t, err, "Failed to kill VCR proxy process")
 
 	// Wait for process to exit
 	_, _ = proxy.cmd.Process.Wait()
+
+	// Wait a bit for the port to be released
+	time.Sleep(1 * time.Second)
+}
+
+// setupTestEnvironmentForCase creates a temporary directory for a specific test case
+// with Claude configuration and returns the path to the temporary directory
+func setupTestEnvironmentForCase(t *testing.T, testName, caseName string) string {
+	t.Helper()
+
+	// Convert underscores to hyphens to match Claude's project directory naming
+	normalizedCaseName := strings.ReplaceAll(caseName, "_", "-")
+
+	// Create test-specific directory path
+	tmpDir := filepath.Join("/tmp/claude-plugin-test", testName, normalizedCaseName)
+
+	// Remove existing directory if it exists
+	if _, err := os.Stat(tmpDir); err == nil {
+		err = os.RemoveAll(tmpDir)
+		require.NoError(t, err, "Failed to remove existing test directory")
+	}
+
+	// Create the directory
+	err := os.MkdirAll(tmpDir, 0755)
+	require.NoError(t, err, "Failed to create test directory")
+
+	// Create .claude directory
+	claudeDir := filepath.Join(tmpDir, ".claude")
+	err = os.MkdirAll(claudeDir, 0755)
+	require.NoError(t, err, "Failed to create .claude directory")
+
+	// Get repository root path (assuming this test is in test/code-like-prompt)
+	testDir, err := os.Getwd()
+	require.NoError(t, err, "Failed to get working directory")
+	repoPath := filepath.Join(testDir, "..", "..")
+	absRepoPath, err := filepath.Abs(repoPath)
+	require.NoError(t, err, "Failed to get absolute repository path")
+
+	// Read settings template
+	templatePath := filepath.Join(testDir, "testdata", "settings.json.template")
+	templateContent, err := os.ReadFile(templatePath)
+	require.NoError(t, err, "Failed to read settings template")
+
+	// Replace {{REPO_PATH}} with actual repository path
+	settingsContent := strings.ReplaceAll(string(templateContent), "{{REPO_PATH}}", absRepoPath)
+
+	// Write settings.json
+	settingsPath := filepath.Join(claudeDir, "settings.json")
+	err = os.WriteFile(settingsPath, []byte(settingsContent), 0644)
+	require.NoError(t, err, "Failed to write settings.json")
+
+	return tmpDir
 }
 
 // setupTestEnvironmentOnce creates a temporary directory with Claude configuration
@@ -163,9 +228,9 @@ type ClaudeResponse struct {
 	SessionID string `json:"session_id"`
 }
 
-// runClaudeCommand executes a claude command with the given arguments
+// runClaudeCommandWithProxy executes a claude command with the given arguments and proxy
 // and returns the standard output
-func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[string]interface{}) string {
+func runClaudeCommandWithProxy(t *testing.T, tmpDir string, proxy *vcrProxy, command string, args map[string]interface{}) string {
 	t.Helper()
 
 	// Build command string with JSON arguments
@@ -187,8 +252,8 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 	cmd.Env = os.Environ() // Use parent environment including authentication
 
 	// If VCR proxy is running, set ANTHROPIC_BASE_URL
-	if globalProxy != nil {
-		cmd.Env = append(cmd.Env, fmt.Sprintf("ANTHROPIC_BASE_URL=http://localhost:%s", globalProxy.port))
+	if proxy != nil {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("ANTHROPIC_BASE_URL=http://localhost:%s", proxy.port))
 	}
 
 	output, err := cmd.CombinedOutput()
@@ -220,6 +285,12 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 	}
 
 	return textOutput
+}
+
+// runClaudeCommand executes a claude command with the given arguments
+// and returns the standard output
+func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[string]interface{}) string {
+	return runClaudeCommandWithProxy(t, tmpDir, globalProxy, command, args)
 }
 
 // Message represents a message in the session history
@@ -365,13 +436,34 @@ func printSidechainMessages(messages []Message) {
 }
 
 // RunTestCases executes a list of test cases with the standard test pattern
+// Each test case gets its own isolated environment with separate VCR proxy and temp directory
 func RunTestCases(t *testing.T, tests []TestCase) {
 	t.Helper()
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			// Execute using the global test directory
-			output := runClaudeCommand(t, globalTmpDir, tt.Command, tt.Args)
+			// Get test function name from parent test
+			testFuncName := t.Name()
+			// Remove the subtest name to get parent test name
+			// e.g., "Test01ShoppingRequest/shopping_request_with_eggs" -> "Test01ShoppingRequest"
+			parts := strings.Split(testFuncName, "/")
+			parentTestName := parts[0]
+
+			// Setup test environment for this specific test case
+			cassetteName := filepath.Join(parentTestName, tt.Name)
+			tmpDir := setupTestEnvironmentForCase(t, parentTestName, tt.Name)
+			proxy := startVCRProxyForTest(t, cassetteName)
+
+			// Cleanup after test
+			defer func() {
+				cleanupTestEnvironment(t, tmpDir)
+				if proxy != nil {
+					stopVCRProxy(t, proxy)
+				}
+			}()
+
+			// Execute using the test-specific directory and proxy
+			output := runClaudeCommandWithProxy(t, tmpDir, proxy, tt.Command, tt.Args)
 
 			// Assert
 			if tt.CustomAssert != nil {
