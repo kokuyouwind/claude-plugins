@@ -4,30 +4,8 @@
     "cache_key": "6fc374d4825ff21eb5e47b10fa18e4bbec673392accbca521f659702789614c5",
     "url": "https://api.anthropic.com/v1/messages?beta=true",
     "method": "POST",
-    "request_headers": {
-      "accept": "application/json",
-      "anthropic-beta": "oauth-2025-04-20,interleaved-thinking-2025-05-14,context-management-2025-06-27",
-      "anthropic-dangerous-direct-browser-access": "true",
-      "anthropic-version": "2023-06-01",
-      "authorization": "Bearer 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",
-      "content-type": "application/json",
-      "user-agent": "claude-cli/2.0.76 (external, cli)",
-      "x-app": "cli",
-      "x-stainless-arch": "arm64",
-      "x-stainless-lang": "js",
-      "x-stainless-os": "MacOS",
-      "x-stainless-package-version": "0.70.0",
-      "x-stainless-retry-count": "0",
-      "x-stainless-runtime": "node",
-      "x-stainless-runtime-version": "v24.3.0",
-      "x-stainless-timeout": "600",
-      "Connection": "keep-alive",
-      "Host": "api.anthropic.com",
-      "Accept-Encoding": "gzip, deflate, br, zstd",
-      "Content-Length": "284"
-    },
-    "recorded_at": "2025-12-27T11:28:02.522715",
-    "duration": 0.7511720657348633
+    "recorded_at": "2025-12-27T11:45:10.229820",
+    "duration": 0.7799420356750488
   },
   "request": {
     "model": "claude-haiku-4-5-20251001",
@@ -39,38 +17,38 @@
       }
     ],
     "metadata": {
-      "user_id": "user_cd2aa7f2285a144d2fea2724450384ab28628963d3e1151717b01b720f67f1f2_account_c34cbece-280e-483e-98ac-167887e91463_session_fc9fe765-21ab-4ddb-8c14-23cb7bd10bce"
+      "user_id": "user_cd2aa7f2285a144d2fea2724450384ab28628963d3e1151717b01b720f67f1f2_account_c34cbece-280e-483e-98ac-167887e91463_session_51cc4c48-c0d6-4219-bbbd-e9c9445076d0"
     }
   },
   "response": {
     "status_code": 200,
     "headers": {
-      "Date": "Sat, 27 Dec 2025 02:28:02 GMT",
+      "Date": "Sat, 27 Dec 2025 02:45:10 GMT",
       "Content-Type": "application/json",
       "Transfer-Encoding": "chunked",
       "Connection": "keep-alive",
       "anthropic-ratelimit-unified-status": "allowed",
       "anthropic-ratelimit-unified-5h-status": "allowed",
       "anthropic-ratelimit-unified-5h-reset": "1766811600",
-      "anthropic-ratelimit-unified-5h-utilization": "0.3393481818181818",
+      "anthropic-ratelimit-unified-5h-utilization": "0.4086172727272727",
       "anthropic-ratelimit-unified-7d-status": "allowed",
       "anthropic-ratelimit-unified-7d-reset": "1767265200",
-      "anthropic-ratelimit-unified-7d-utilization": "0.1064975",
+      "anthropic-ratelimit-unified-7d-utilization": "0.1141171",
       "anthropic-ratelimit-unified-representative-claim": "five_hour",
       "anthropic-ratelimit-unified-fallback-percentage": "0.5",
       "anthropic-ratelimit-unified-reset": "1766811600",
       "anthropic-ratelimit-unified-overage-disabled-reason": "org_level_disabled",
       "anthropic-ratelimit-unified-overage-status": "rejected",
-      "request-id": "req_011CWWQJHc2znvopXBhfTzfo",
+      "request-id": "req_011CWWRc3MALnBc2SDBx2GgB",
       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
       "anthropic-organization-id": "6ef5b37e-0b11-49ae-b54c-3edb5892e396",
       "Server": "cloudflare",
-      "x-envoy-upstream-service-time": "557",
+      "x-envoy-upstream-service-time": "584",
       "cf-cache-status": "DYNAMIC",
       "X-Robots-Tag": "none",
       "Content-Encoding": "gzip",
-      "CF-RAY": "9b4561d70a26d427-KIX"
+      "CF-RAY": "9b457aedf862b862-KIX"
     },
-    "content": "eyJtb2RlbCI6ImNsYXVkZS1oYWlrdS00LTUtMjAyNTEwMDEiLCJpZCI6Im1zZ18wMUNuc05jR2k0Y3d0eFFGQ2U2QnpGVFoiLCJ0eXBlIjoibWVzc2FnZSIsInJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50IjpbeyJ0eXBlIjoidGV4dCIsInRleHQiOiIjIn1dLCJzdG9wX3JlYXNvbiI6Im1heF90b2tlbnMiLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjgsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjoxLCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCJ9LCJjb250ZXh0X21hbmFnZW1lbnQiOnsiYXBwbGllZF9lZGl0cyI6W119fQ=="
+    "content": "eyJtb2RlbCI6ImNsYXVkZS1oYWlrdS00LTUtMjAyNTEwMDEiLCJpZCI6Im1zZ18wMUpCQ0Y4NFh3a3dEeEZDd3FXc2c3MjMiLCJ0eXBlIjoibWVzc2FnZSIsInJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50IjpbeyJ0eXBlIjoidGV4dCIsInRleHQiOiIjIn1dLCJzdG9wX3JlYXNvbiI6Im1heF90b2tlbnMiLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjgsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjoxLCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCJ9LCJjb250ZXh0X21hbmFnZW1lbnQiOnsiYXBwbGllZF9lZGl0cyI6W119fQ=="
   }
 }

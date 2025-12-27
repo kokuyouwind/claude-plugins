@@ -357,12 +357,11 @@ class ClaudeVCRProxy:
                     'content': flow.response.content,
                 }
 
-                # Prepare metadata
+                # Prepare metadata (excluding sensitive headers)
                 meta = {
                     'cache_key': cache_key,
                     'url': flow.request.url,
                     'method': flow.request.method,
-                    'request_headers': dict(flow.request.headers),
                     'recorded_at': datetime.now().isoformat(),
                     'duration': flow.response.timestamp_end - flow.request.timestamp_start if flow.response.timestamp_end else 0,
                 }
