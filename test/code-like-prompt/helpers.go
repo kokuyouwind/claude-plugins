@@ -103,6 +103,11 @@ func stopVCRProxy(t *testing.T, proxy *vcrProxy) {
 		return
 	}
 
+	// Wait for streaming responses to complete and be saved
+	// This is important for large streaming responses (e.g., Sonnet model)
+	// which may still be transmitting/saving when the test completes
+	time.Sleep(2 * time.Second)
+
 	err := proxy.cmd.Process.Kill()
 	require.NoError(t, err, "Failed to kill VCR proxy process")
 
