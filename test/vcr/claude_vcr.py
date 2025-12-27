@@ -34,6 +34,7 @@ import hashlib
 from pathlib import Path
 from datetime import datetime
 import os
+import re
 
 
 class VCRMode:
@@ -206,12 +207,34 @@ class ClaudeVCRProxy:
 
     def generate_cache_key(self, request_body):
         """Generate cache key from request body"""
+        # Normalize system field by removing <env> section
+        system = request_body.get('system')
+        if system:
+            normalized_system = []
+            for item in system:
+                if isinstance(item, dict) and 'text' in item:
+                    # Remove <env> section from text
+                    normalized_text = re.sub(
+                        r'<env>.*?</env>',
+                        '<env>NORMALIZED</env>',
+                        item['text'],
+                        flags=re.DOTALL
+                    )
+                    normalized_item = {**item, 'text': normalized_text}
+                    normalized_system.append(normalized_item)
+                else:
+                    normalized_system.append(item)
+        else:
+            normalized_system = system
+
         # Fields that should match for cache hit
+        # Note: metadata and tools are excluded
+        #   - metadata contains session-specific IDs
+        #   - tools contain dynamic date information and may change between runs
         cache_fields = {
             'model': request_body.get('model'),
             'messages': request_body.get('messages'),
-            'system': request_body.get('system'),
-            'tools': request_body.get('tools'),
+            'system': normalized_system,
             'max_tokens': request_body.get('max_tokens'),
             'temperature': request_body.get('temperature'),
             'top_p': request_body.get('top_p'),
