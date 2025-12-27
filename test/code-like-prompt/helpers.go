@@ -157,6 +157,12 @@ func cleanupTestEnvironment(t *testing.T, tmpDir string) {
 	require.NoError(t, err, "Failed to remove temporary directory")
 }
 
+// ClaudeResponse represents the JSON response from claude --output-format json
+type ClaudeResponse struct {
+	Result    string `json:"result"`
+	SessionID string `json:"session_id"`
+}
+
 // runClaudeCommand executes a claude command with the given arguments
 // and returns the standard output
 func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[string]interface{}) string {
@@ -172,9 +178,11 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 		cmdStr = command
 	}
 
+	// Always use JSON output format for session ID extraction
+	cmdArgs := []string{"--model", "claude-haiku-4-5-20251001", "-p", cmdStr, "--output-format", "json"}
+
 	// Execute claude command in the temporary directory
-	// This uses the project's .claude/settings.json without isolating user authentication
-	cmd := exec.Command("claude", "--model", "claude-haiku-4-5-20251001", "-p", cmdStr)
+	cmd := exec.Command("claude", cmdArgs...)
 	cmd.Dir = tmpDir
 	cmd.Env = os.Environ() // Use parent environment including authentication
 
@@ -186,20 +194,32 @@ func runClaudeCommand(t *testing.T, tmpDir string, command string, args map[stri
 	output, err := cmd.CombinedOutput()
 	require.NoError(t, err, "Failed to execute claude command: %s\nOutput: %s", cmdStr, string(output))
 
-	// If DEBUG=1, print sidechain messages
-	if os.Getenv("DEBUG") == "1" {
+	// Parse JSON response to extract session ID and result
+	var response ClaudeResponse
+	var textOutput string
+	var sessionID string
+
+	if err := json.Unmarshal(output, &response); err == nil {
+		textOutput = response.Result
+		sessionID = response.SessionID
+	} else {
+		// Fallback to raw output if JSON parsing fails
+		textOutput = string(output)
+	}
+
+	// If DEBUG=1, print session ID and sidechain messages
+	if os.Getenv("DEBUG") == "1" && sessionID != "" {
+		fmt.Printf("session-id: %s\n", sessionID)
+
 		// Wait a bit for session file to be written
 		time.Sleep(500 * time.Millisecond)
-
-		// Extract session ID from the most recent session file
-		sessionID := extractSessionID(t, tmpDir, command)
 
 		// Load and print sidechain messages
 		messages := loadSidechainMessages(t, tmpDir, sessionID)
 		printSidechainMessages(messages)
 	}
 
-	return string(output)
+	return textOutput
 }
 
 // Message represents a message in the session history
@@ -342,72 +362,6 @@ func printSidechainMessages(messages []Message) {
 			}
 		}
 	}
-}
-
-// extractSessionID extracts session ID from the most recent session file for the project
-// that contains the specified command
-func extractSessionID(t *testing.T, tmpDir string, command string) string {
-	t.Helper()
-
-	// Get project directory name
-	projectDirName := getProjectDirName(tmpDir)
-	if projectDirName == "" {
-		return ""
-	}
-
-	// Project directory path
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return ""
-	}
-
-	projectDir := filepath.Join(homeDir, ".claude", "projects", projectDirName)
-
-	// Check if project directory exists
-	if _, err := os.Stat(projectDir); os.IsNotExist(err) {
-		return ""
-	}
-
-	// Find all .jsonl files
-	files, err := filepath.Glob(filepath.Join(projectDir, "*.jsonl"))
-	if err != nil || len(files) == 0 {
-		return ""
-	}
-
-	// Search for the most recent file that contains the command
-	var mostRecent string
-	var mostRecentTime time.Time
-
-	for _, file := range files {
-		info, err := os.Stat(file)
-		if err != nil {
-			continue
-		}
-
-		// Read the file to check if it contains the command
-		content, err := os.ReadFile(file)
-		if err != nil {
-			continue
-		}
-
-		// Check if the file contains the command
-		if strings.Contains(string(content), command) {
-			if info.ModTime().After(mostRecentTime) {
-				mostRecentTime = info.ModTime()
-				mostRecent = file
-			}
-		}
-	}
-
-	if mostRecent == "" {
-		return ""
-	}
-
-	// Extract session ID from filename (remove .jsonl extension)
-	sessionID := filepath.Base(mostRecent)
-	sessionID = strings.TrimSuffix(sessionID, ".jsonl")
-
-	return sessionID
 }
 
 // RunTestCases executes a list of test cases with the standard test pattern
