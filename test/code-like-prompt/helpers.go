@@ -118,8 +118,11 @@ func stopVCRProxy(t *testing.T, proxy *vcrProxy) {
 func setupTestEnvironmentForCase(t *testing.T, testName, caseName string) string {
 	t.Helper()
 
+	// Convert underscores to hyphens to match Claude's project directory naming
+	normalizedCaseName := strings.ReplaceAll(caseName, "_", "-")
+
 	// Create test-specific directory path
-	tmpDir := filepath.Join("/tmp/claude-plugin-test", testName, caseName)
+	tmpDir := filepath.Join("/tmp/claude-plugin-test", testName, normalizedCaseName)
 
 	// Remove existing directory if it exists
 	if _, err := os.Stat(tmpDir); err == nil {
