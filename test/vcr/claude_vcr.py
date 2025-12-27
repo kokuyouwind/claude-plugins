@@ -89,30 +89,33 @@ class CacheManager:
     def save_recording(self, cache_key, request_data, response_data, meta):
         """Save recording to cassette"""
         try:
-            # Save request body
-            request_file = self.recordings_dir / f"{cache_key}.request.json"
-            with open(request_file, 'w') as f:
-                json.dump(request_data, f, indent=2, ensure_ascii=False)
+            import base64
 
-            # Save response (binary)
-            response_file = self.recordings_dir / f"{cache_key}.response.bin"
-            with open(response_file, 'wb') as f:
-                f.write(response_data['content'])
-
-            # Save metadata
-            meta_file = self.recordings_dir / f"{cache_key}.meta.json"
-            with open(meta_file, 'w') as f:
-                json.dump({
+            # Create single recording file with all data
+            recording = {
+                'cache_key': cache_key,
+                'meta': {
                     **meta,
-                    'response_headers': response_data['headers'],
+                    'recorded_at': datetime.now().isoformat(),
+                },
+                'request': request_data,
+                'response': {
                     'status_code': response_data['status_code'],
-                }, f, indent=2, ensure_ascii=False)
+                    'headers': response_data['headers'],
+                    'content': base64.b64encode(response_data['content']).decode('ascii'),
+                },
+            }
+
+            # Save to single JSON file
+            recording_file = self.recordings_dir / f"{cache_key}.json"
+            with open(recording_file, 'w') as f:
+                json.dump(recording, f, indent=2, ensure_ascii=False)
 
             # Update index
             self.index[cache_key] = {
                 'cache_key': cache_key,
                 'model': request_data.get('model'),
-                'recorded_at': datetime.now().isoformat(),
+                'recorded_at': recording['meta']['recorded_at'],
                 'request_size': len(json.dumps(request_data)),
                 'response_size': len(response_data['content']),
                 'stream': request_data.get('stream', False),
@@ -134,19 +137,19 @@ class CacheManager:
             return None
 
         try:
-            # Load metadata
-            meta_file = self.recordings_dir / f"{cache_key}.meta.json"
-            with open(meta_file) as f:
-                meta = json.load(f)
+            import base64
 
-            # Load response
-            response_file = self.recordings_dir / f"{cache_key}.response.bin"
-            with open(response_file, 'rb') as f:
-                content = f.read()
+            # Load recording from single JSON file
+            recording_file = self.recordings_dir / f"{cache_key}.json"
+            with open(recording_file) as f:
+                recording = json.load(f)
+
+            # Decode response content from base64
+            content = base64.b64decode(recording['response']['content'])
 
             return {
-                'status_code': meta['status_code'],
-                'headers': meta['response_headers'],
+                'status_code': recording['response']['status_code'],
+                'headers': recording['response']['headers'],
                 'content': content,
             }
 
