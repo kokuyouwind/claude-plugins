@@ -3,9 +3,9 @@ description: コード風プロンプト例1 牛乳ジョーク:妻の依頼
 argument-hint: '{"Milk.stock": number, "Egg.stock": number}'
 ---
 
-Execute the following code with environment: $ARGUMENTS
+Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what puts() commands specify. Do not show any explanations, code, variables, or other messages.
+Output only what puts() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```ruby
 # Validate required arguments
