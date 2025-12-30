@@ -3,9 +3,9 @@ description: コード風プロンプト例3c コレクション要素の反復�
 argument-hint: '{"items": array}'
 ---
 
-Execute the following code with environment: $ARGUMENTS
+Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Output only what puts() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```ruby
 # Validate required arguments

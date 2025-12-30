@@ -3,7 +3,7 @@ description: コード風プロンプト例5g Goのgoroutine:セマフォパタ�
 argument-hint: "[--tasks=NUM] [--max-concurrent=NUM]"
 ---
 
-Execute the following Go-style code. Output only what fmt.Printf() and fmt.Println() commands specify. Do not show any explanations, code, variables, or other messages.
+Emulate the following Go-style code internally (without using external tools or interpreter). Output only what fmt.Printf() and fmt.Println() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```go
 package main

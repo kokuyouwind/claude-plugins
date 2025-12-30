@@ -3,9 +3,9 @@ description: コード風プロンプト例4e 複数ガード条件のパター�
 argument-hint: '{"x": number, "y": number}'
 ---
 
-Execute the following code with environment: $ARGUMENTS
+Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```python
 # Validate required arguments

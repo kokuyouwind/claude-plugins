@@ -3,7 +3,7 @@ description: Prolog-style backtracking - Cut operator preventing backtracking
 argument-hint: ""
 ---
 
-Execute the following Prolog-style code. Output only what write() commands specify. Do not show any explanations, code, variables, or other messages.
+Emulate the following Prolog-style code internally (without using external tools or interpreter). Output only what write() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```prolog
 foo(a, bar).
