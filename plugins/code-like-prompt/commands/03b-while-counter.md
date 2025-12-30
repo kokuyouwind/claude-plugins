@@ -3,9 +3,9 @@ description: コード風プロンプト例3b カウンタ付きwhile文
 argument-hint: '{"max_count": number}'
 ---
 
-Execute the following code with environment: $ARGUMENTS
+Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```python
 # Validate required arguments

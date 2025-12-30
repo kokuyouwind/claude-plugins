@@ -3,9 +3,9 @@ description: コード風プロンプト例3g 内側のループのみbreakす�
 argument-hint: '{"outer_count": number, "inner_break_at": number}'
 ---
 
-Execute the following code with environment: $ARGUMENTS
+Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands specify. Do not show any explanations, code, variables, or other messages.
+Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```python
 # Validate required arguments

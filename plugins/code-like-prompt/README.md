@@ -392,9 +392,14 @@ Tests whether Go-style concurrency syntax can influence Claude to use parallel p
 
 ## Version
 
-0.2.1
+0.2.2
 
 ### Changelog
+
+#### 0.2.2
+- Extended internal emulation approach to 02-05 series commands (43 files total)
+- Updated instruction from "Execute" to "Emulate internally (without using external tools or interpreter)" across all remaining command series
+- Changed output instruction from "specify" to "would output" for consistency with 01 series
 
 #### 0.2.1
 - Changed 01 series commands to use internal emulation instead of external execution

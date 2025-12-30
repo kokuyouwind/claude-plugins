@@ -3,9 +3,9 @@ description: コード風プロンプト例4f 網羅的なenumマッチング
 argument-hint: '{"color": string, "r": number, "g": number, "b": number}'
 ---
 
-Execute the following code with environment: $ARGUMENTS
+Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what println!() commands specify. Do not show any explanations, code, variables, or other messages.
+Output only what println!() commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```rust
 // Validate required arguments
