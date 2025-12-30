@@ -5,45 +5,36 @@
     "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9": {
       "cache_key": "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9",
       "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:46:04.401506",
+      "recorded_at": "2025-12-30T19:33:19.488724",
       "request_size": 295,
       "response_size": 448,
       "stream": false,
       "status_code": 200
     },
-    "85eb0de21fd594d281b5c0759de8c5336792c50512f096219cde4114da6adc20": {
-      "cache_key": "85eb0de21fd594d281b5c0759de8c5336792c50512f096219cde4114da6adc20",
+    "0654f8064504c9e9553ebd8edfc1b5b89019f37b34439b795c7250f1e403d881": {
+      "cache_key": "0654f8064504c9e9553ebd8edfc1b5b89019f37b34439b795c7250f1e403d881",
       "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:46:04.932841",
-      "request_size": 89769,
-      "response_size": 3902,
+      "recorded_at": "2025-12-30T19:33:19.877403",
+      "request_size": 91819,
+      "response_size": 1318,
       "stream": true,
       "status_code": 200
     },
     "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283": {
       "cache_key": "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283",
       "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:46:05.538970",
+      "recorded_at": "2025-12-30T19:33:20.306293",
       "request_size": 3628,
-      "response_size": 6542,
-      "stream": true,
-      "status_code": 200
-    },
-    "5402e18e604ec6d1f348d5f786b95999b20c93f2d0f4a368ca0e4bf8a628c887": {
-      "cache_key": "5402e18e604ec6d1f348d5f786b95999b20c93f2d0f4a368ca0e4bf8a628c887",
-      "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:46:06.776745",
-      "request_size": 90237,
-      "response_size": 1368,
+      "response_size": 7190,
       "stream": true,
       "status_code": 200
     },
     "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1": {
       "cache_key": "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1",
       "model": "claude-sonnet-4-5-20250929",
-      "recorded_at": "2025-12-28T02:46:09.723800",
+      "recorded_at": "2025-12-30T19:33:22.772759",
       "request_size": 4058,
-      "response_size": 10285,
+      "response_size": 7468,
       "stream": true,
       "status_code": 200
     }

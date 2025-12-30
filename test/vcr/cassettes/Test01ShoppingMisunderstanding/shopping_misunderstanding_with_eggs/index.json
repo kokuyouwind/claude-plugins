@@ -2,40 +2,31 @@
   "version": "1.0",
   "cassette": "shopping_misunderstanding_with_eggs",
   "recordings": {
-    "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9": {
-      "cache_key": "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9",
+    "3cf025bdaf8f220b21cceae45725b99cc2875f50b016f4982f8b412ec9b65f2b": {
+      "cache_key": "3cf025bdaf8f220b21cceae45725b99cc2875f50b016f4982f8b412ec9b65f2b",
       "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:45:51.917229",
-      "request_size": 295,
-      "response_size": 448,
-      "stream": false,
-      "status_code": 200
-    },
-    "943f9840a969be146a62a7e88b4d60a39643599253d80742358d72cdffcf1cc7": {
-      "cache_key": "943f9840a969be146a62a7e88b4d60a39643599253d80742358d72cdffcf1cc7",
-      "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:45:52.332667",
-      "request_size": 89766,
-      "response_size": 3516,
+      "recorded_at": "2025-12-30T19:33:07.683630",
+      "request_size": 91816,
+      "response_size": 1419,
       "stream": true,
       "status_code": 200
     },
     "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283": {
       "cache_key": "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283",
       "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:45:52.536540",
+      "recorded_at": "2025-12-30T19:33:07.926814",
       "request_size": 3625,
-      "response_size": 5665,
+      "response_size": 5821,
       "stream": true,
       "status_code": 200
     },
-    "209b7b2b7e9051a8040e32e0a45aaa4670856597d9fdb2cabe78c5596ee54048": {
-      "cache_key": "209b7b2b7e9051a8040e32e0a45aaa4670856597d9fdb2cabe78c5596ee54048",
+    "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9": {
+      "cache_key": "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9",
       "model": "claude-haiku-4-5-20251001",
-      "recorded_at": "2025-12-28T02:45:53.466792",
-      "request_size": 90234,
-      "response_size": 1356,
-      "stream": true,
+      "recorded_at": "2025-12-30T19:33:08.223282",
+      "request_size": 295,
+      "response_size": 448,
+      "stream": false,
       "status_code": 200
     }
   }
