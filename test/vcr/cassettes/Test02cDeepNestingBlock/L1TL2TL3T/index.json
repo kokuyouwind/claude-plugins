@@ -28,6 +28,15 @@
       "response_size": 9641,
       "stream": true,
       "status_code": 200
+    },
+    "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1": {
+      "cache_key": "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1",
+      "model": "claude-sonnet-4-5-20250929",
+      "recorded_at": "2025-12-31T01:50:42.181912",
+      "request_size": 4022,
+      "response_size": 12128,
+      "stream": true,
+      "status_code": 200
     }
   }
 }
