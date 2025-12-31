@@ -1,0 +1,72 @@
+{
+  "cache_key": "b3830493e26ff524543cf5d14139bd700e1022c4d1ac1bfaaad7191ec5d1905c",
+  "meta": {
+    "cache_key": "b3830493e26ff524543cf5d14139bd700e1022c4d1ac1bfaaad7191ec5d1905c",
+    "url": "https://api.anthropic.com/v1/messages?beta=true",
+    "method": "POST",
+    "recorded_at": "2025-12-31T23:43:12.412432",
+    "duration": 1.1542770862579346
+  },
+  "request": {
+    "model": "claude-haiku-4-5-20251001",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Command: ls -la\nOutput: total 0\ndrwxr-xr-x  3 kokuyouwind  wheel  96 12 31 23:43 .\ndrwxr-xr-x  3 kokuyouwind  wheel  96 12 31 23:43 ..\ndrwxr-xr-x  3 kokuyouwind  wheel  96 12 31 23:43 .claude\n\n"
+          }
+        ]
+      }
+    ],
+    "system": [
+      {
+        "type": "text",
+        "text": "You are a Claude agent, built on Anthropic's Claude Agent SDK."
+      },
+      {
+        "type": "text",
+        "text": "Extract any file paths that this command reads or modifies. For commands like \"git diff\" and \"cat\", include the paths of files being shown. Use paths verbatim -- don't add any slashes or try to resolve them. Do not try to infer paths that were not explicitly listed in the command output.\n\nIMPORTANT: Commands that do not display the contents of the files should not return any filepaths. For eg. \"ls\", pwd\", \"find\". Even more complicated commands that don't display the contents should not be considered: eg \"find . -type f -exec ls -la {} + | sort -k5 -nr | head -5\"\n\nFirst, determine if the command displays the contents of the files. If it does, then <is_displaying_contents> tag should be true. If it does not, then <is_displaying_contents> tag should be false.\n\nFormat your response as:\n<is_displaying_contents>\ntrue\n</is_displaying_contents>\n\n<filepaths>\npath/to/file1\npath/to/file2\n</filepaths>\n\nIf no files are read or modified, return empty filepaths tags:\n<filepaths>\n</filepaths>\n\nDo not include any other text in your response."
+      }
+    ],
+    "tools": [],
+    "metadata": {
+      "user_id": "user_cd2aa7f2285a144d2fea2724450384ab28628963d3e1151717b01b720f67f1f2_account_c34cbece-280e-483e-98ac-167887e91463_session_07e2aa85-1675-4558-8dfd-22d3494682d8"
+    },
+    "max_tokens": 32000,
+    "stream": true
+  },
+  "response": {
+    "status_code": 200,
+    "headers": {
+      "Date": "Wed, 31 Dec 2025 14:43:11 GMT",
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+      "Connection": "keep-alive",
+      "Cache-Control": "no-cache",
+      "anthropic-ratelimit-unified-status": "allowed",
+      "anthropic-ratelimit-unified-5h-status": "allowed",
+      "anthropic-ratelimit-unified-5h-reset": "1767196800",
+      "anthropic-ratelimit-unified-5h-utilization": "0.5731090909090909",
+      "anthropic-ratelimit-unified-7d-status": "allowed",
+      "anthropic-ratelimit-unified-7d-reset": "1767265200",
+      "anthropic-ratelimit-unified-7d-utilization": "0.6344635",
+      "anthropic-ratelimit-unified-representative-claim": "five_hour",
+      "anthropic-ratelimit-unified-fallback-percentage": "0.5",
+      "anthropic-ratelimit-unified-fallback": "available",
+      "anthropic-ratelimit-unified-reset": "1767196800",
+      "anthropic-ratelimit-unified-overage-disabled-reason": "org_level_disabled",
+      "anthropic-ratelimit-unified-overage-status": "rejected",
+      "request-id": "req_011CWewbT9NxPTM6pS2owNQk",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "anthropic-organization-id": "6ef5b37e-0b11-49ae-b54c-3edb5892e396",
+      "Server": "cloudflare",
+      "x-envoy-upstream-service-time": "521",
+      "cf-cache-status": "DYNAMIC",
+      "X-Robots-Tag": "none",
+      "CF-RAY": "9b6a8c3b7fe948e5-NRT"
+    },
+    "content": "ZXZlbnQ6IG1lc3NhZ2Vfc3RhcnQKZGF0YTogeyJ0eXBlIjoibWVzc2FnZV9zdGFydCIsIm1lc3NhZ2UiOnsibW9kZWwiOiJjbGF1ZGUtaGFpa3UtNC01LTIwMjUxMDAxIiwiaWQiOiJtc2dfMDEzWnZvZVM0ckVEZE14ZkRvOHl0SzRBIiwidHlwZSI6Im1lc3NhZ2UiLCJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6W10sInN0b3BfcmVhc29uIjpudWxsLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjQwNywiY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zIjowLCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfY3JlYXRpb24iOnsiZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucyI6MCwiZXBoZW1lcmFsXzFoX2lucHV0X3Rva2VucyI6MH0sIm91dHB1dF90b2tlbnMiOjEsInNlcnZpY2VfdGllciI6InN0YW5kYXJkIn19IH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX3N0YXJ0CmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfc3RhcnQiLCJpbmRleCI6MCwiY29udGVudF9ibG9jayI6eyJ0eXBlIjoidGV4dCIsInRleHQiOiIifSAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjowLCJkZWx0YSI6eyJ0eXBlIjoidGV4dF9kZWx0YSIsInRleHQiOiI8aXNfZGlzcGxheWluZ19jb250ZW50cz5cbmZhbHNlIn0gfQoKZXZlbnQ6IHBpbmcKZGF0YTogeyJ0eXBlIjogInBpbmcifQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjowLCJkZWx0YSI6eyJ0eXBlIjoidGV4dF9kZWx0YSIsInRleHQiOiJcbjwvaXNfZGlzcGxheWluZ19jb250ZW50cz4ifSAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MCwiZGVsdGEiOnsidHlwZSI6InRleHRfZGVsdGEiLCJ0ZXh0IjoiXG5cbjxmaWxlcGF0aHM+In0gICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MCwiZGVsdGEiOnsidHlwZSI6InRleHRfZGVsdGEiLCJ0ZXh0IjoiXG48L2ZpbGVwYXRocz4ifSAgICAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19zdG9wCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfc3RvcCIsImluZGV4IjowICAgICAgICAgICB9CgpldmVudDogbWVzc2FnZV9kZWx0YQpkYXRhOiB7InR5cGUiOiJtZXNzYWdlX2RlbHRhIiwiZGVsdGEiOnsic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGx9LCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjQwNywiY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zIjowLCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6MCwib3V0cHV0X3Rva2VucyI6MzJ9LCJjb250ZXh0X21hbmFnZW1lbnQiOnsiYXBwbGllZF9lZGl0cyI6W119ICAgICAgICAgICAgICB9CgpldmVudDogbWVzc2FnZV9zdG9wCmRhdGE6IHsidHlwZSI6Im1lc3NhZ2Vfc3RvcCIgICAgICAgICAgICB9Cgo="
+  }
+}

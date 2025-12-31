@@ -1,0 +1,336 @@
+{
+  "cache_key": "65dea84868ded07c67fffd1e7b20037dfd6c2145a14ab37751b7d70a91b6a2c6",
+  "meta": {
+    "cache_key": "65dea84868ded07c67fffd1e7b20037dfd6c2145a14ab37751b7d70a91b6a2c6",
+    "url": "https://api.anthropic.com/v1/messages?beta=true",
+    "method": "POST",
+    "recorded_at": "2025-12-31T23:44:42.710649",
+    "duration": 1.7362799644470215
+  },
+  "request": {
+    "model": "claude-haiku-4-5-20251001",
+    "messages": [
+      {
+        "role": "user",
+        "content": "You are Worker 1 Agent in a plugin agent script-based messaging test.\n\nYour role:\n1. Wait to receive a message from main (blocking receive, timeout 30 seconds)\n2. Process the message by adding \"processed_\" prefix to the data\n3. Send the processed result to the coordinator\n4. Exit\n\nMessage passing via filesystem:\n- Check for messages in: erlang-messages/worker_1-main-*.msg\n- When found, read the JSON message and extract the \"data\" field\n- Process: prepend \"processed_\" to the data value\n- Send result to coordinator by creating: erlang-messages/coordinator-worker_1-*.msg\n- Message format for sending: {\"result\":\"<processed_data>\"}\n\nExpected flow:\n- Wait for message from main containing data: \"foo\"\n- Process to: \"processed_foo\"\n- Send to coordinator with that result\n\nBlock and wait for message for up to 30 seconds."
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "I'll start the Worker 1 Agent and wait for a message from main. Let me implement the blocking receive with a 30-second timeout."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_0136xMEf79arDZ6DscCy5ZZy",
+            "name": "Bash",
+            "input": {
+              "command": "mkdir -p /private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault/erlang-messages",
+              "description": "Create erlang-messages directory if not exists"
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_0136xMEf79arDZ6DscCy5ZZy",
+            "type": "tool_result",
+            "content": "",
+            "is_error": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now I'll implement the blocking receive with a 30-second timeout to wait for a message from main:"
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01GUBNLtzR4ue3NruuLJNy9i",
+            "name": "Bash",
+            "input": {
+              "command": "cat > /tmp/worker1_wait.sh << 'EOF'\n#!/bin/bash\n\nWORKER_ID=\"worker_1\"\nMSG_DIR=\"/private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault/erlang-messages\"\nTIMEOUT=30\nSTART_TIME=$(date +%s)\n\necho \"io:format(\\\"Worker ~p: Starting blocking receive (timeout ~p seconds)~n\\\", [$WORKER_ID, $TIMEOUT]).\"\n\n# Blocking receive with timeout\nwhile true; do\n    CURRENT_TIME=$(date +%s)\n    ELAPSED=$((CURRENT_TIME - START_TIME))\n    \n    if [ $ELAPSED -ge $TIMEOUT ]; then\n        echo \"io:format(\\\"Worker ~p: Receive timeout after ~p seconds~n\\\", [$WORKER_ID, $TIMEOUT]).\"\n        exit 1\n    fi\n    \n    # Check for incoming message from main\n    for msg_file in \"$MSG_DIR\"/worker_1-main-*.msg; do\n        if [ -f \"$msg_file\" ]; then\n            echo \"io:format(\\\"Worker ~p received message file: ~s~n\\\", [$WORKER_ID, \\\"$(basename $msg_file)\\\"]).\"\n            \n            # Read the JSON message\n            MESSAGE=$(cat \"$msg_file\")\n            echo \"io:format(\\\"Worker ~p received raw message: ~s~n\\\", [$WORKER_ID, '$MESSAGE']).\"\n            \n            # Extract data field from JSON\n            DATA=$(echo \"$MESSAGE\" | grep -o '\"data\":\"[^\"]*\"' | cut -d'\"' -f4)\n            echo \"io:format(\\\"Worker ~p extracted data: ~s~n\\\", [$WORKER_ID, '$DATA']).\"\n            \n            # Process: add \"processed_\" prefix\n            RESULT=\"processed_$DATA\"\n            echo \"io:format(\\\"Worker ~p processed result: ~s~n\\\", [$WORKER_ID, '$RESULT']).\"\n            \n            # Create response message for coordinator\n            RESPONSE_MSG=\"{\\\"result\\\":\\\"$RESULT\\\"}\"\n            TIMESTAMP=$(date +%s%N)\n            RESPONSE_FILE=\"$MSG_DIR/coordinator-worker_1-$TIMESTAMP.msg\"\n            \n            echo \"$RESPONSE_MSG\" > \"$RESPONSE_FILE\"\n            echo \"io:format(\\\"Worker ~p sent response to coordinator: ~s~n\\\", [$WORKER_ID, '$RESPONSE_MSG']).\"\n            \n            # Delete the incoming message\n            rm \"$msg_file\"\n            echo \"io:format(\\\"Worker ~p: Message processing complete, exiting~n\\\", [$WORKER_ID]).\"\n            exit 0\n        fi\n    done\n    \n    # Sleep for a short interval before checking again\n    sleep 0.5\ndone\nEOF\nchmod +x /tmp/worker1_wait.sh\n/tmp/worker1_wait.sh\n",
+              "description": "Implement Worker 1 blocking receive with 30-second timeout"
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Permission to use Bash has been auto-denied (prompts unavailable).",
+            "is_error": true,
+            "tool_use_id": "toolu_01GUBNLtzR4ue3NruuLJNy9i"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Let me try a different approach using the shell more directly:"
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_018yhLPbM2p4hHKS6n1DaZxN",
+            "name": "Bash",
+            "input": {
+              "command": "ls -la",
+              "description": "List current directory contents"
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_018yhLPbM2p4hHKS6n1DaZxN",
+            "type": "tool_result",
+            "content": "total 0\ndrwxr-xr-x  4 kokuyouwind  wheel  128 12 31 23:44 .\ndrwxr-xr-x  3 kokuyouwind  wheel   96 12 31 23:43 ..\ndrwxr-xr-x  3 kokuyouwind  wheel   96 12 31 23:43 .claude\ndrwxr-xr-x  2 kokuyouwind  wheel   64 12 31 23:44 erlang-messages",
+            "is_error": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Good, the directory exists. Now let me create a Python script to implement the blocking receive behavior:"
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01PUn19hWS6sJQnxNZCzT8A6",
+            "name": "Write",
+            "input": {
+              "file_path": "/private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault/worker_1.py",
+              "content": "#!/usr/bin/env python3\n\"\"\"\nWorker 1 Agent - Erlang-style actor in script-based messaging\nImplements blocking receive with 30-second timeout\n\"\"\"\n\nimport os\nimport json\nimport time\nimport glob\nimport sys\nfrom pathlib import Path\n\nWORKER_ID = \"worker_1\"\nMSG_DIR = \"/private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault/erlang-messages\"\nTIMEOUT = 30\n\ndef log(message):\n    \"\"\"Log in Erlang io:format style\"\"\"\n    print(f\"io:format(\\\"Worker {WORKER_ID}: {message}~n\\\").\")\n\ndef blocking_receive():\n    \"\"\"Blocking receive with timeout (30 seconds)\"\"\"\n    log(f\"Starting blocking receive (timeout {TIMEOUT} seconds)\")\n\n    start_time = time.time()\n\n    while True:\n        elapsed = time.time() - start_time\n\n        if elapsed >= TIMEOUT:\n            log(f\"Receive timeout after {TIMEOUT} seconds\")\n            sys.exit(1)\n\n        # Check for incoming message from main\n        msg_files = glob.glob(f\"{MSG_DIR}/worker_1-main-*.msg\")\n\n        if msg_files:\n            msg_file = msg_files[0]\n            log(f\"Received message file: {os.path.basename(msg_file)}\")\n\n            try:\n                # Read the JSON message\n                with open(msg_file, 'r') as f:\n                    message_raw = f.read()\n                log(f\"Received raw message: {message_raw}\")\n\n                # Parse JSON and extract data field\n                message = json.loads(message_raw)\n                data = message.get(\"data\", \"\")\n                log(f\"Extracted data: {data}\")\n\n                # Process: add \"processed_\" prefix\n                result = f\"processed_{data}\"\n                log(f\"Processed result: {result}\")\n\n                # Create response message for coordinator\n                response_msg = {\"result\": result}\n                response_json = json.dumps(response_msg)\n                timestamp = int(time.time() * 1000000000)  # nanoseconds\n                response_file = f\"{MSG_DIR}/coordinator-worker_1-{timestamp}.msg\"\n\n                with open(response_file, 'w') as f:\n                    f.write(response_json)\n\n                log(f\"Sent response to coordinator: {response_json}\")\n\n                # Delete the incoming message\n                os.remove(msg_file)\n                log(\"Message processing complete, exiting\")\n                sys.exit(0)\n\n            except Exception as e:\n                log(f\"Error processing message: {str(e)}\")\n                sys.exit(1)\n\n        # Sleep briefly before checking again\n        time.sleep(0.5)\n\nif __name__ == \"__main__\":\n    blocking_receive()\n"
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_01PUn19hWS6sJQnxNZCzT8A6",
+            "type": "tool_result",
+            "content": "File created successfully at: /private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault/worker_1.py\n\n<system-reminder>\nThe TodoWrite tool hasn't been used recently. If you're working on tasks that would benefit from tracking progress, consider using the TodoWrite tool to track progress. Also consider cleaning up the todo list if has become stale and no longer matches what you are working on. Only use it if it's relevant to the current work. This is just a gentle reminder - ignore if not applicable. Make sure that you NEVER mention this reminder to the user\n\n</system-reminder>"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now let me start Worker 1 to wait for the message:"
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01Mr6HSQESB6UWT9Q3vFanXB",
+            "name": "Bash",
+            "input": {
+              "command": "python3 worker_1.py",
+              "description": "Start Worker 1 agent and wait for message",
+              "timeout": 35000
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "Permission to use Bash has been auto-denied (prompts unavailable).",
+            "is_error": true,
+            "tool_use_id": "toolu_01Mr6HSQESB6UWT9Q3vFanXB"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "I see. Let me check if there's already a message waiting, and provide the status:"
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_012w45F1HufvmhutFL9qUSTE",
+            "name": "Read",
+            "input": {
+              "file_path": "/private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault/erlang-messages"
+            },
+            "cache_control": {
+              "type": "ephemeral"
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "EISDIR: illegal operation on a directory, read\n\n<system-reminder>\nThe TodoWrite tool hasn't been used recently. If you're working on tasks that would benefit from tracking progress, consider using the TodoWrite tool to track progress. Also consider cleaning up the todo list if has become stale and no longer matches what you are working on. Only use it if it's relevant to the current work. This is just a gentle reminder - ignore if not applicable. Make sure that you NEVER mention this reminder to the user\n\n</system-reminder>",
+            "is_error": true,
+            "tool_use_id": "toolu_012w45F1HufvmhutFL9qUSTE",
+            "cache_control": {
+              "type": "ephemeral"
+            }
+          }
+        ]
+      }
+    ],
+    "system": [
+      {
+        "type": "text",
+        "text": "You are a Claude agent, built on Anthropic's Claude Agent SDK.",
+        "cache_control": {
+          "type": "ephemeral"
+        }
+      },
+      {
+        "type": "text",
+        "text": "# Erlang Worker Agent\n\nYou are a worker process in an Erlang-style actor model simulation.\n\n## Your Role\n\nYou simulate a lightweight concurrent worker process that:\n1. Receives messages from the parent process or other actors\n2. Processes the data according to instructions\n3. Sends results back to the requester\n4. Maintains isolated state (no shared memory with other processes)\n\n## Message Protocol\n\nYou handle messages in the following format:\n\n**Request format:**\n```\n{request, From, Data}\n```\n- `From`: The PID (process identifier) to send the response to\n- `Data`: The input data to process\n\n**Response format:**\n```\n{response, Result}\n```\n- `Result`: The processed result\n\n## Processing Behavior\n\nWhen you receive a `{request, From, Data}` message:\n\n1. **Acknowledge receipt**: Confirm you received the message\n2. **Process the data**: Apply the transformation or computation specified\n   - For string data: Add prefix \"processed_\"\n   - For numeric data: Double the value\n   - For other data: Echo it back with a timestamp\n3. **Send response**: Return `{response, Result}` to the `From` PID\n4. **Output**: Print your worker ID and the result using `io:format/2`\n\n## Example Interactions\n\n**Simple string processing:**\n```\nReceive: {request, main_pid, \"hello\"}\nProcess: \"hello\" -> \"processed_hello\"\nSend: {response, \"processed_hello\"} to main_pid\nOutput: io:format(\"Worker ~p: ~s~n\", [self(), \"processed_hello\"])\n```\n\n**Numeric processing:**\n```\nReceive: {request, main_pid, 42}\nProcess: 42 -> 84\nSend: {response, 84} to main_pid\nOutput: io:format(\"Worker ~p: ~p~n\", [self(), 84])\n```\n\n## Important Constraints\n\n- **Isolation**: You don't share state with other processes\n- **Message-based only**: All communication is via messages (no direct function calls)\n- **Non-blocking sends**: Sending messages never blocks\n- **Blocking receives**: Receiving blocks until a matching message arrives\n- **Pattern matching**: Use pattern matching to extract message components\n\n## Simulation Notes\n\nSince you're simulating an actor in a text-based environment:\n- Represent your PID as a unique identifier (e.g., `worker_1`, `worker_2`)\n- Show message passing explicitly in your output\n- Maintain the illusion of isolated, concurrent execution\n- Follow message-passing semantics strictly\n\n## Output Format\n\nAlways use Erlang-style output:\n```erlang\nio:format(\"Worker ~p received: ~p~n\", [WorkerId, Data]).\nio:format(\"Worker ~p sending result: ~p~n\", [WorkerId, Result]).\n```\n\nBe concise and focus on demonstrating correct actor behavior.\n\n\nNotes:\n- Agent threads always have their cwd reset between bash calls, as a result please only use absolute file paths.\n- In your final response always share relevant file names and code snippets. Any file paths you return in your response MUST be absolute. Do NOT use relative paths.\n- For clear communication with the user the assistant MUST avoid using emojis.\n\nHere is useful information about the environment you are running in:\n<env>\nWorking directory: /private/tmp/claude-plugin-test/Test08jPluginAgentScriptMessaging/PluginAgentScriptMessagingDefault\nIs directory a git repo: No\nPlatform: darwin\nOS Version: Darwin 24.6.0\nToday's date: 2025-12-31\n</env>\nYou are powered by the model named Haiku 4.5. The exact model ID is claude-haiku-4-5-20251001.\n\n<claude_background_info>\nThe most recent frontier Claude model is Claude Opus 4.5 (model ID: 'claude-opus-4-5-20251101').\n</claude_background_info>\n",
+        "cache_control": {
+          "type": "ephemeral"
+        }
+      }
+    ],
+    "tools": [
+      {
+        "name": "Read",
+        "description": "Reads a file from the local filesystem. You can access any file directly by using this tool.\nAssume this tool is able to read all files on the machine. If the User provides a path to a file assume that path is valid. It is okay to read a file that does not exist; an error will be returned.\n\nUsage:\n- The file_path parameter must be an absolute path, not a relative path\n- By default, it reads up to 2000 lines starting from the beginning of the file\n- You can optionally specify a line offset and limit (especially handy for long files), but it's recommended to read the whole file by not providing these parameters\n- Any lines longer than 2000 characters will be truncated\n- Results are returned using cat -n format, with line numbers starting at 1\n- This tool allows Claude Code to read images (eg PNG, JPG, etc). When reading an image file the contents are presented visually as Claude Code is a multimodal LLM.\n- This tool can read PDF files (.pdf). PDFs are processed page by page, extracting both text and visual content for analysis.\n- This tool can read Jupyter notebooks (.ipynb files) and returns all cells with their outputs, combining code, text, and visualizations.\n- This tool can only read files, not directories. To read a directory, use an ls command via the Bash tool.\n- You can call multiple tools in a single response. It is always better to speculatively read multiple potentially useful files in parallel.\n- You will regularly be asked to read screenshots. If the user provides a path to a screenshot, ALWAYS use this tool to view the file at the path. This tool will work with all temporary file paths.\n- If you read a file that exists but has empty contents you will receive a system reminder warning in place of file contents.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "The absolute path to the file to read"
+            },
+            "offset": {
+              "type": "number",
+              "description": "The line number to start reading from. Only provide if the file is too large to read at once"
+            },
+            "limit": {
+              "type": "number",
+              "description": "The number of lines to read. Only provide if the file is too large to read at once."
+            }
+          },
+          "required": [
+            "file_path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      {
+        "name": "Write",
+        "description": "Writes a file to the local filesystem.\n\nUsage:\n- This tool will overwrite the existing file if there is one at the provided path.\n- If this is an existing file, you MUST use the Read tool first to read the file's contents. This tool will fail if you did not read the file first.\n- ALWAYS prefer editing existing files in the codebase. NEVER write new files unless explicitly required.\n- NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.\n- Only use emojis if the user explicitly requests it. Avoid writing emojis to files unless asked.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "The absolute path to the file to write (must be absolute, not relative)"
+            },
+            "content": {
+              "type": "string",
+              "description": "The content to write to the file"
+            }
+          },
+          "required": [
+            "file_path",
+            "content"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      },
+      {
+        "name": "Bash",
+        "description": "Executes a given bash command in a persistent shell session with optional timeout, ensuring proper handling and security measures.\n\nIMPORTANT: This tool is for terminal operations like git, npm, docker, etc. DO NOT use it for file operations (reading, writing, editing, searching, finding files) - use the specialized tools for this instead.\n\nBefore executing the command, please follow these steps:\n\n1. Directory Verification:\n   - If the command will create new directories or files, first use `ls` to verify the parent directory exists and is the correct location\n   - For example, before running \"mkdir foo/bar\", first use `ls foo` to check that \"foo\" exists and is the intended parent directory\n\n2. Command Execution:\n   - Always quote file paths that contain spaces with double quotes (e.g., cd \"path with spaces/file.txt\")\n   - Examples of proper quoting:\n     - cd \"/Users/name/My Documents\" (correct)\n     - cd /Users/name/My Documents (incorrect - will fail)\n     - python \"/path/with spaces/script.py\" (correct)\n     - python /path/with spaces/script.py (incorrect - will fail)\n   - After ensuring proper quoting, execute the command.\n   - Capture the output of the command.\n\nUsage notes:\n  - The command argument is required.\n  - You can specify an optional timeout in milliseconds (up to 600000ms / 10 minutes). If not specified, commands will timeout after 120000ms (2 minutes).\n  - It is very helpful if you write a clear, concise description of what this command does in 5-10 words.\n  - If the output exceeds 30000 characters, output will be truncated before being returned to you.\n  - You can use the `run_in_background` parameter to run the command in the background, which allows you to continue working while the command runs. You can monitor the output using the Bash tool as it becomes available. You do not need to use '&' at the end of the command when using this parameter.\n  \n  - Avoid using Bash with the `find`, `grep`, `cat`, `head`, `tail`, `sed`, `awk`, or `echo` commands, unless explicitly instructed or when these commands are truly necessary for the task. Instead, always prefer using the dedicated tools for these commands:\n    - File search: Use Glob (NOT find or ls)\n    - Content search: Use Grep (NOT grep or rg)\n    - Read files: Use Read (NOT cat/head/tail)\n    - Edit files: Use Edit (NOT sed/awk)\n    - Write files: Use Write (NOT echo >/cat <<EOF)\n    - Communication: Output text directly (NOT echo/printf)\n  - When issuing multiple commands:\n    - If the commands are independent and can run in parallel, make multiple Bash tool calls in a single message. For example, if you need to run \"git status\" and \"git diff\", send a single message with two Bash tool calls in parallel.\n    - If the commands depend on each other and must run sequentially, use a single Bash call with '&&' to chain them together (e.g., `git add . && git commit -m \"message\" && git push`). For instance, if one operation must complete before another starts (like mkdir before cp, Write before Bash for git operations, or git add before git commit), run these operations sequentially instead.\n    - Use ';' only when you need to run commands sequentially but don't care if earlier commands fail\n    - DO NOT use newlines to separate commands (newlines are ok in quoted strings)\n  - Try to maintain your current working directory throughout the session by using absolute paths and avoiding usage of `cd`. You may use `cd` if the User explicitly requests it.\n    <good-example>\n    pytest /foo/bar/tests\n    </good-example>\n    <bad-example>\n    cd /foo/bar && pytest tests\n    </bad-example>\n\n# Committing changes with git\n\nOnly create commits when requested by the user. If unclear, ask first. When the user asks you to create a new git commit, follow these steps carefully:\n\nGit Safety Protocol:\n- NEVER update the git config\n- NEVER run destructive/irreversible git commands (like push --force, hard reset, etc) unless the user explicitly requests them \n- NEVER skip hooks (--no-verify, --no-gpg-sign, etc) unless the user explicitly requests it\n- NEVER run force push to main/master, warn the user if they request it\n- Avoid git commit --amend. ONLY use --amend when ALL conditions are met:\n  (1) User explicitly requested amend, OR commit SUCCEEDED but pre-commit hook auto-modified files that need including\n  (2) HEAD commit was created by you in this conversation (verify: git log -1 --format='%an %ae')\n  (3) Commit has NOT been pushed to remote (verify: git status shows \"Your branch is ahead\")\n- CRITICAL: If commit FAILED or was REJECTED by hook, NEVER amend - fix the issue and create a NEW commit\n- CRITICAL: If you already pushed to remote, NEVER amend unless user explicitly requests it (requires force push)\n- NEVER commit changes unless the user explicitly asks you to. It is VERY IMPORTANT to only commit when explicitly asked, otherwise the user will feel that you are being too proactive.\n\n1. You can call multiple tools in a single response. When multiple independent pieces of information are requested and all commands are likely to succeed, run multiple tool calls in parallel for optimal performance. run the following bash commands in parallel, each using the Bash tool:\n  - Run a git status command to see all untracked files.\n  - Run a git diff command to see both staged and unstaged changes that will be committed.\n  - Run a git log command to see recent commit messages, so that you can follow this repository's commit message style.\n2. Analyze all staged changes (both previously staged and newly added) and draft a commit message:\n  - Summarize the nature of the changes (eg. new feature, enhancement to an existing feature, bug fix, refactoring, test, docs, etc.). Ensure the message accurately reflects the changes and their purpose (i.e. \"add\" means a wholly new feature, \"update\" means an enhancement to an existing feature, \"fix\" means a bug fix, etc.).\n  - Do not commit files that likely contain secrets (.env, credentials.json, etc). Warn the user if they specifically request to commit those files\n  - Draft a concise (1-2 sentences) commit message that focuses on the \"why\" rather than the \"what\"\n  - Ensure it accurately reflects the changes and their purpose\n3. You can call multiple tools in a single response. When multiple independent pieces of information are requested and all commands are likely to succeed, run multiple tool calls in parallel for optimal performance. run the following commands:\n   - Add relevant untracked files to the staging area.\n   - Create the commit with a message ending with:\n   🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\n   Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\n   - Run git status after the commit completes to verify success.\n   Note: git status depends on the commit completing, so run it sequentially after the commit.\n4. If the commit fails due to pre-commit hook, fix the issue and create a NEW commit (see amend rules above)\n\nImportant notes:\n- NEVER run additional commands to read or explore code, besides git bash commands\n- NEVER use the TodoWrite or Task tools\n- DO NOT push to the remote repository unless the user explicitly asks you to do so\n- IMPORTANT: Never use git commands with the -i flag (like git rebase -i or git add -i) since they require interactive input which is not supported.\n- If there are no changes to commit (i.e., no untracked files and no modifications), do not create an empty commit\n- In order to ensure good formatting, ALWAYS pass the commit message via a HEREDOC, a la this example:\n<example>\ngit commit -m \"$(cat <<'EOF'\n   Commit message here.\n\n   🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\n   Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\n   EOF\n   )\"\n</example>\n\n# Creating pull requests\nUse the gh command via the Bash tool for ALL GitHub-related tasks including working with issues, pull requests, checks, and releases. If given a Github URL use the gh command to get the information needed.\n\nIMPORTANT: When the user asks you to create a pull request, follow these steps carefully:\n\n1. You can call multiple tools in a single response. When multiple independent pieces of information are requested and all commands are likely to succeed, run multiple tool calls in parallel for optimal performance. run the following bash commands in parallel using the Bash tool, in order to understand the current state of the branch since it diverged from the main branch:\n   - Run a git status command to see all untracked files\n   - Run a git diff command to see both staged and unstaged changes that will be committed\n   - Check if the current branch tracks a remote branch and is up to date with the remote, so you know if you need to push to the remote\n   - Run a git log command and `git diff [base-branch]...HEAD` to understand the full commit history for the current branch (from the time it diverged from the base branch)\n2. Analyze all changes that will be included in the pull request, making sure to look at all relevant commits (NOT just the latest commit, but ALL commits that will be included in the pull request!!!), and draft a pull request summary\n3. You can call multiple tools in a single response. When multiple independent pieces of information are requested and all commands are likely to succeed, run multiple tool calls in parallel for optimal performance. run the following commands in parallel:\n   - Create new branch if needed\n   - Push to remote with -u flag if needed\n   - Create PR using gh pr create with the format below. Use a HEREDOC to pass the body to ensure correct formatting.\n<example>\ngh pr create --title \"the pr title\" --body \"$(cat <<'EOF'\n## Summary\n<1-3 bullet points>\n\n## Test plan\n[Bulleted markdown checklist of TODOs for testing the pull request...]\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\"\n</example>\n\nImportant:\n- DO NOT use the TodoWrite or Task tools\n- Return the PR URL when you're done, so the user can see it\n\n# Other common operations\n- View comments on a Github PR: gh api repos/foo/bar/pulls/123/comments",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "The command to execute"
+            },
+            "timeout": {
+              "type": "number",
+              "description": "Optional timeout in milliseconds (max 600000)"
+            },
+            "description": {
+              "type": "string",
+              "description": "Clear, concise description of what this command does in 5-10 words, in active voice. Examples:\nInput: ls\nOutput: List files in current directory\n\nInput: git status\nOutput: Show working tree status\n\nInput: npm install\nOutput: Install package dependencies\n\nInput: mkdir foo\nOutput: Create directory 'foo'"
+            },
+            "run_in_background": {
+              "type": "boolean",
+              "description": "Set to true to run this command in the background. Use TaskOutput to read the output later."
+            },
+            "dangerouslyDisableSandbox": {
+              "type": "boolean",
+              "description": "Set this to true to dangerously override sandbox mode and run commands without sandboxing."
+            }
+          },
+          "required": [
+            "command"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        }
+      }
+    ],
+    "metadata": {
+      "user_id": "user_cd2aa7f2285a144d2fea2724450384ab28628963d3e1151717b01b720f67f1f2_account_c34cbece-280e-483e-98ac-167887e91463_session_ea06a647-5bfc-4fe8-a794-38ae2f92c4e8"
+    },
+    "max_tokens": 32000,
+    "stream": true
+  },
+  "response": {
+    "status_code": 200,
+    "headers": {
+      "Date": "Wed, 31 Dec 2025 14:44:41 GMT",
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+      "Connection": "keep-alive",
+      "Cache-Control": "no-cache",
+      "anthropic-ratelimit-unified-status": "allowed",
+      "anthropic-ratelimit-unified-5h-status": "allowed",
+      "anthropic-ratelimit-unified-5h-reset": "1767196800",
+      "anthropic-ratelimit-unified-5h-utilization": "0.6017672727272727",
+      "anthropic-ratelimit-unified-7d-status": "allowed",
+      "anthropic-ratelimit-unified-7d-reset": "1767265200",
+      "anthropic-ratelimit-unified-7d-utilization": "0.6376159",
+      "anthropic-ratelimit-unified-representative-claim": "five_hour",
+      "anthropic-ratelimit-unified-fallback-percentage": "0.5",
+      "anthropic-ratelimit-unified-fallback": "available",
+      "anthropic-ratelimit-unified-reset": "1767196800",
+      "anthropic-ratelimit-unified-overage-disabled-reason": "org_level_disabled",
+      "anthropic-ratelimit-unified-overage-status": "rejected",
+      "request-id": "req_011CWewi4jh7iZ3fX5wt9uXo",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "anthropic-organization-id": "6ef5b37e-0b11-49ae-b54c-3edb5892e396",
+      "Server": "cloudflare",
+      "x-envoy-upstream-service-time": "722",
+      "cf-cache-status": "DYNAMIC",
+      "X-Robots-Tag": "none",
+      "CF-RAY": "9b6a8e6c28c551f3-NRT"
+    },
+    "content": "ZXZlbnQ6IG1lc3NhZ2Vfc3RhcnQKZGF0YTogeyJ0eXBlIjoibWVzc2FnZV9zdGFydCIsIm1lc3NhZ2UiOnsibW9kZWwiOiJjbGF1ZGUtaGFpa3UtNC01LTIwMjUxMDAxIiwiaWQiOiJtc2dfMDFEMjFnWGJYQVR1NldjTUtFdDJGQmptIiwidHlwZSI6Im1lc3NhZ2UiLCJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6W10sInN0b3BfcmVhc29uIjpudWxsLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjUsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MjQ1LCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6Nzc5NiwiY2FjaGVfY3JlYXRpb24iOnsiZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucyI6MjQ1LCJlcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zIjowfSwib3V0cHV0X3Rva2VucyI6MSwic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0gICAgICAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19zdGFydApkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX3N0YXJ0IiwiaW5kZXgiOjAsImNvbnRlbnRfYmxvY2siOnsidHlwZSI6InRleHQiLCJ0ZXh0IjoiIn0gICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjowLCJkZWx0YSI6eyJ0eXBlIjoidGV4dF9kZWx0YSIsInRleHQiOiJMZXQifSAgICAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6IiBtZSBjaGVjayB0aGUifSB9CgpldmVudDogcGluZwpkYXRhOiB7InR5cGUiOiAicGluZyJ9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6IiBlcmwifSAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6ImFuZy0ifSAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6Im1lc3NhZ2VzIGRpcmVjdG9yeSJ9ICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6IiBzdGF0dXMifSAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6IiBhbiJ9ICAgICAgICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjowLCJkZWx0YSI6eyJ0eXBlIjoidGV4dF9kZWx0YSIsInRleHQiOiJkIHNlZSJ9ICAgICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MCwiZGVsdGEiOnsidHlwZSI6InRleHRfZGVsdGEiLCJ0ZXh0IjoiIHdoYXQifSB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjAsImRlbHRhIjp7InR5cGUiOiJ0ZXh0X2RlbHRhIiwidGV4dCI6IiBmaWxlcyBleGlzdCJ9ICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MCwiZGVsdGEiOnsidHlwZSI6InRleHRfZGVsdGEiLCJ0ZXh0IjoiOiJ9ICAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19zdG9wCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfc3RvcCIsImluZGV4IjowICAgICAgICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfc3RhcnQKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19zdGFydCIsImluZGV4IjoxLCJjb250ZW50X2Jsb2NrIjp7InR5cGUiOiJ0b29sX3VzZSIsImlkIjoidG9vbHVfMDFBZDh1NU42TXdpTXNzcjZrdkhidEI4IiwibmFtZSI6IkJhc2giLCJpbnB1dCI6e319ICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiIifSAgICAgICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJ7XCJjIn0gICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJvbW1hbmRcIjogXCIifSAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJscyJ9ICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiIgLWxhIC9wcml2In0gICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJhdGUifSAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjEsImRlbHRhIjp7InR5cGUiOiJpbnB1dF9qc29uX2RlbHRhIiwicGFydGlhbF9qc29uIjoiL3RtcC9jbGF1ZGUtIn0gIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJwbHVnIn0gICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6ImluLXRlc3QvVGVzdCJ9IH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiIwOGpQbHVnaW4ifSAgICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJBZ2VudFNjciJ9ICAgICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6ImlwdE1lcyJ9ICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJzYWdpbmcvUCJ9ICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjEsImRlbHRhIjp7InR5cGUiOiJpbnB1dF9qc29uX2RlbHRhIiwicGFydGlhbF9qc29uIjoibHVnaW4ifSAgICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6IkFnZW50UyJ9IH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJjcmlwdE1lcyJ9ICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJzYWcifSAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJpbmdEZWZhdWwifX0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJ0L2VyIn0gICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJsYW5nLW1lIn0gICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6InNzYWdlcy9cIiJ9fQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6IiwgXCJkZXNjIn0gICAgICAgICAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjEsImRlbHRhIjp7InR5cGUiOiJpbnB1dF9qc29uX2RlbHRhIiwicGFydGlhbF9qc29uIjoicmlwIn0gICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJ0aSJ9fQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6Im9uXCI6ICJ9ICAgICAgICAgICAgICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6IlwiTGlzdCBmaWxlcyJ9ICAgfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6IiBpbiBlcmwifSAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJhbmctbWUifSAgICAgICB9CgpldmVudDogY29udGVudF9ibG9ja19kZWx0YQpkYXRhOiB7InR5cGUiOiJjb250ZW50X2Jsb2NrX2RlbHRhIiwiaW5kZXgiOjEsImRlbHRhIjp7InR5cGUiOiJpbnB1dF9qc29uX2RlbHRhIiwicGFydGlhbF9qc29uIjoic3NhZ2VzIGRpIn0gfQoKZXZlbnQ6IGNvbnRlbnRfYmxvY2tfZGVsdGEKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19kZWx0YSIsImluZGV4IjoxLCJkZWx0YSI6eyJ0eXBlIjoiaW5wdXRfanNvbl9kZWx0YSIsInBhcnRpYWxfanNvbiI6InJlY3RvciJ9ICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX2RlbHRhCmRhdGE6IHsidHlwZSI6ImNvbnRlbnRfYmxvY2tfZGVsdGEiLCJpbmRleCI6MSwiZGVsdGEiOnsidHlwZSI6ImlucHV0X2pzb25fZGVsdGEiLCJwYXJ0aWFsX2pzb24iOiJ5XCJ9In0gICAgICAgICAgIH0KCmV2ZW50OiBjb250ZW50X2Jsb2NrX3N0b3AKZGF0YTogeyJ0eXBlIjoiY29udGVudF9ibG9ja19zdG9wIiwiaW5kZXgiOjEgICAgICAgICB9CgpldmVudDogbWVzc2FnZV9kZWx0YQpkYXRhOiB7InR5cGUiOiJtZXNzYWdlX2RlbHRhIiwiZGVsdGEiOnsic3RvcF9yZWFzb24iOiJ0b29sX3VzZSIsInN0b3Bfc2VxdWVuY2UiOm51bGx9LCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjUsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MjQ1LCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6Nzc5Niwib3V0cHV0X3Rva2VucyI6MTM1fSwiY29udGV4dF9tYW5hZ2VtZW50Ijp7ImFwcGxpZWRfZWRpdHMiOltdfSAgICAgICB9CgpldmVudDogbWVzc2FnZV9zdG9wCmRhdGE6IHsidHlwZSI6Im1lc3NhZ2Vfc3RvcCIgICAgICAgICAgICB9Cgo="
+  }
+}
