@@ -200,3 +200,109 @@ func Test08gSupervisor(t *testing.T) {
 
 	RunTestCases(t, tests)
 }
+
+// Test08hPluginAgentSpawn tests 08h-plugin-agent-spawn command
+func Test08hPluginAgentSpawn(t *testing.T) {
+	tests := []TestCase{
+		{
+			Name:    "PluginAgentSpawnDefault",
+			Command: "/code-like-prompt:08h-plugin-agent-spawn",
+			Args:    map[string]interface{}{},
+			CustomAssert: func(t *testing.T, output string) {
+				// Should contain "hello" (default message) and "processed_hello" (worker response)
+				assert.Contains(t, output, "hello")
+				assert.Contains(t, output, "processed_hello")
+				// Should show main/worker flow
+				helloIdx := strings.Index(output, "hello")
+				processedIdx := strings.Index(output, "processed_hello")
+				assert.True(t, helloIdx < processedIdx, "hello should appear before processed_hello")
+			},
+		},
+		{
+			Name:    "PluginAgentSpawnCustomMessage",
+			Command: "/code-like-prompt:08h-plugin-agent-spawn",
+			Args:    map[string]interface{}{"message": "test"},
+			CustomAssert: func(t *testing.T, output string) {
+				// Should contain "test" and "processed_test"
+				assert.Contains(t, output, "test")
+				assert.Contains(t, output, "processed_test")
+			},
+		},
+	}
+
+	RunTestCases(t, tests)
+}
+
+// Test08iPluginAgentMessaging tests 08i-plugin-agent-messaging command
+func Test08iPluginAgentMessaging(t *testing.T) {
+	tests := []TestCase{
+		{
+			Name:    "PluginAgentMessagingDefault",
+			Command: "/code-like-prompt:08i-plugin-agent-messaging",
+			Args:    map[string]interface{}{},
+			CustomAssert: func(t *testing.T, output string) {
+				// Should contain default messages "foo" and "bar"
+				assert.Contains(t, output, "foo")
+				assert.Contains(t, output, "bar")
+				// Should contain processed results
+				assert.Contains(t, output, "processed_foo")
+				assert.Contains(t, output, "processed_bar")
+				// Should contain combined result
+				hasFoobar := strings.Contains(output, "processed_fooprocessed_bar")
+				hasBarfoo := strings.Contains(output, "processed_barprocessed_foo")
+				assert.True(t, hasFoobar || hasBarfoo, "Output should contain combined result")
+			},
+		},
+		{
+			Name:    "PluginAgentMessagingCustomMessages",
+			Command: "/code-like-prompt:08i-plugin-agent-messaging",
+			Args:    map[string]interface{}{"message1": "alpha", "message2": "beta"},
+			CustomAssert: func(t *testing.T, output string) {
+				// Should contain custom messages
+				assert.Contains(t, output, "alpha")
+				assert.Contains(t, output, "beta")
+				// Should contain processed results
+				assert.Contains(t, output, "processed_alpha")
+				assert.Contains(t, output, "processed_beta")
+			},
+		},
+	}
+
+	RunTestCases(t, tests)
+}
+
+// Test08jPluginAgentScriptMessaging tests 08j-plugin-agent-script-messaging command
+func Test08jPluginAgentScriptMessaging(t *testing.T) {
+	tests := []TestCase{
+		{
+			Name:    "PluginAgentScriptMessagingDefault",
+			Command: "/code-like-prompt:08j-plugin-agent-script-messaging",
+			Args:    map[string]interface{}{},
+			CustomAssert: func(t *testing.T, output string) {
+				// Should contain default messages "foo" and "bar"
+				assert.Contains(t, output, "foo")
+				assert.Contains(t, output, "bar")
+				// Should mention script usage or message passing
+				hasScriptUsage := strings.Contains(output, "send-message.sh") ||
+					strings.Contains(output, "receive-message.sh") ||
+					strings.Contains(output, "/tmp/erlang-messages")
+				hasProcessedResults := strings.Contains(output, "processed_foo") &&
+					strings.Contains(output, "processed_bar")
+				// At least one of these should be true
+				assert.True(t, hasScriptUsage || hasProcessedResults, "Output should show script usage or processed results")
+			},
+		},
+		{
+			Name:    "PluginAgentScriptMessagingCustomMessages",
+			Command: "/code-like-prompt:08j-plugin-agent-script-messaging",
+			Args:    map[string]interface{}{"message1": "gamma", "message2": "delta"},
+			CustomAssert: func(t *testing.T, output string) {
+				// Should contain custom messages
+				assert.Contains(t, output, "gamma")
+				assert.Contains(t, output, "delta")
+			},
+		},
+	}
+
+	RunTestCases(t, tests)
+}
