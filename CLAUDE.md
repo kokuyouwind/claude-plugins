@@ -134,11 +134,12 @@ This workflow is necessary because Claude Code loads plugin commands at session 
 - **IMPORTANT**: When testing in non-interactive mode, skip argument-less interactive input patterns (commands that require user input via AskUserQuestion). These patterns cannot be tested in non-interactive mode and should only be tested manually in interactive sessions.
 
 **Test Execution**:
-- **IMPORTANT**: Go tests for code-like-prompt must be run from the `test/code-like-prompt/` directory
+- **IMPORTANT**: Go tests for code-like-prompt must be run from the `test/` directory
 - Running tests from project root will fail - you must cd into the test directory first:
   ```bash
-  cd test/code-like-prompt
-  go test -v ./...
+  cd test
+  mise exec -- go test -v ./code-like-prompt -run Test05  # Test05系のみ実行
+  mise exec -- go test -v ./code-like-prompt              # 全テスト実行
   ```
 - This is because the test suite uses relative paths and expects to be run from within the test directory
 
