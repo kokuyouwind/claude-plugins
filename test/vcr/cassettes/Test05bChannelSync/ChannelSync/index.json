@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "cassette": "ChannelSync",
+  "recordings": {
+    "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9": {
+      "cache_key": "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T17:15:17.580419",
+      "request_size": 295,
+      "response_size": 448,
+      "stream": false,
+      "status_code": 200
+    },
+    "45724f521dd9fc8539a4cd72ceeabc1d8cc33a7a343f97c25fb3b36050e12913": {
+      "cache_key": "45724f521dd9fc8539a4cd72ceeabc1d8cc33a7a343f97c25fb3b36050e12913",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T17:15:19.142345",
+      "request_size": 92529,
+      "response_size": 2298,
+      "stream": true,
+      "status_code": 200
+    },
+    "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283": {
+      "cache_key": "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T17:15:20.045457",
+      "request_size": 3589,
+      "response_size": 9963,
+      "stream": true,
+      "status_code": 200
+    },
+    "dfadead45d3afd87d3b8483dd8cb2359284fbbaec40661b506a805b61cba0181": {
+      "cache_key": "dfadead45d3afd87d3b8483dd8cb2359284fbbaec40661b506a805b61cba0181",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T17:15:20.752412",
+      "request_size": 92927,
+      "response_size": 3963,
+      "stream": true,
+      "status_code": 200
+    },
+    "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1": {
+      "cache_key": "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1",
+      "model": "claude-sonnet-4-5-20250929",
+      "recorded_at": "2025-12-31T17:15:23.222832",
+      "request_size": 4019,
+      "response_size": 10481,
+      "stream": true,
+      "status_code": 200
+    }
+  }
+}
