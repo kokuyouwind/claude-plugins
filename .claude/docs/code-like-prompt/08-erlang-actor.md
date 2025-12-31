@@ -309,6 +309,173 @@ main() ->
 
 **Testing goal**: Can Claude understand supervision patterns?
 
+### 08h: Plugin-Defined Agent Spawn
+
+Test spawning a plugin-defined agent using Erlang-style syntax.
+
+```erlang
+-module(plugin_agent_spawn_test).
+-export([main/1]).
+
+main(Message) ->
+    Self = self(),
+
+    % Spawn the erlang-worker agent defined in plugins/code-like-prompt/agents/
+    WorkerPid = spawn(erlang_worker, loop, []),
+
+    % Send a request message to the worker
+    io:format("Main: Sending message to worker: ~s~n", [Message]),
+    WorkerPid ! {request, Self, Message},
+
+    % Wait for response from worker
+    receive
+        {response, Result} ->
+            io:format("Main: Received response: ~s~n", [Result])
+    end,
+
+    io:format("Main: Done~n").
+```
+
+**Expected behavior**:
+- If agent spawning works: Claude uses Task tool with `subagent_type: "erlang-worker"`
+- Worker agent processes message according to its agent definition
+- Output: "Main: Sending message to worker: hello", worker output, "Main: Received response: processed_hello", "Main: Done"
+- If simulation: Shows message passing flow textually
+
+**Testing goal**: Does Claude recognize plugin-defined agent names and spawn actual agents via Task tool?
+
+**Key difference from 08b**: Uses pre-defined agent from plugin's `agents/` directory instead of inline function definition.
+
+### 08i: Plugin-Defined Multi-Agent Messaging
+
+Test coordinating multiple plugin-defined agents with message routing.
+
+```erlang
+-module(plugin_agent_messaging_test).
+-export([main/2]).
+
+main(Message1, Message2) ->
+    Self = self(),
+
+    % Spawn coordinator agent first
+    io:format("Main: Spawning coordinator~n"),
+    CoordinatorPid = spawn(erlang_coordinator, loop, [2]),
+
+    % Spawn two worker agents
+    io:format("Main: Spawning worker 1~n"),
+    Worker1Pid = spawn(erlang_worker, loop, []),
+
+    io:format("Main: Spawning worker 2~n"),
+    Worker2Pid = spawn(erlang_worker, loop, []),
+
+    % Send messages to workers (they will send results to coordinator)
+    io:format("Main: Sending ~s to worker 1~n", [Message1]),
+    Worker1Pid ! {request, CoordinatorPid, Message1},
+
+    io:format("Main: Sending ~s to worker 2~n", [Message2]),
+    Worker2Pid ! {request, CoordinatorPid, Message2},
+
+    % Wait for coordinator to finish aggregating results
+    receive
+        {done, CombinedResult} ->
+            io:format("Main: Coordinator finished with result: ~s~n", [CombinedResult])
+    end,
+
+    io:format("Main: All done~n").
+```
+
+**Expected behavior**:
+- If agent spawning works: Claude spawns 3 agents (2 workers + 1 coordinator) using Task tool
+- Workers process messages in parallel (potentially)
+- Workers send results to coordinator (not main)
+- Coordinator aggregates results and sends to main
+- Output: Shows full message flow with combined result "processed_fooprocessed_bar"
+- If simulation: Shows multi-hop message routing textually
+
+**Testing goal**: Can Claude:
+1. Spawn multiple plugin-defined agents simultaneously?
+2. Route messages between agents (worker → coordinator, not just main ↔ agent)?
+3. Handle result aggregation in coordinator pattern?
+4. Execute parallel worker processing?
+
+**Key difference from 08f**: Uses plugin-defined agents (erlang-worker and erlang-coordinator) instead of inline definitions, testing whether agent recognition triggers actual multi-agent execution.
+
+### 08j: Script-Based Message Synchronization
+
+Test multi-agent coordination using actual message passing via erlang-message-sync skill scripts.
+
+```erlang
+-module(plugin_agent_script_messaging_test).
+-export([main/2]).
+
+-define(SKILL_DIR, "~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync").
+-define(SEND_SCRIPT, ?SKILL_DIR ++ "/scripts/send-message.sh").
+-define(RECV_SCRIPT, ?SKILL_DIR ++ "/scripts/receive-message.sh").
+
+send(From, To, MessageJson) ->
+    os:cmd(io_lib:format("bash ~s ~s ~s '~s'", [?SEND_SCRIPT, From, To, MessageJson])).
+
+receive_msg(Pid, FromPattern, Timeout) ->
+    os:cmd(io_lib:format("bash ~s ~s ~s ~p", [?RECV_SCRIPT, Pid, FromPattern, Timeout])).
+
+main(Message1, Message2) ->
+    Self = "main",
+
+    % Initialize message system
+    io:format("Main: Initializing message system~n"),
+    os:cmd("rm -rf /tmp/erlang-messages"),
+
+    % Spawn coordinator and workers
+    io:format("Main: Spawning coordinator~n"),
+    CoordinatorPid = spawn(erlang_coordinator, loop_with_scripts, [2]),
+
+    io:format("Main: Spawning worker 1~n"),
+    Worker1Pid = spawn(erlang_worker, loop_with_scripts, []),
+
+    io:format("Main: Spawning worker 2~n"),
+    Worker2Pid = spawn(erlang_worker, loop_with_scripts, []),
+
+    % Send messages to workers via script
+    io:format("Main: Sending ~s to worker_1 via script~n", [Message1]),
+    send(Self, "worker_1", io_lib:format("{\"data\":\"~s\"}", [Message1])),
+
+    io:format("Main: Sending ~s to worker_2 via script~n", [Message2]),
+    send(Self, "worker_2", io_lib:format("{\"data\":\"~s\"}", [Message2])),
+
+    % Workers receive from main, process, send to coordinator
+    % Coordinator receives from both workers, aggregates, sends to main
+
+    % Wait for coordinator result via script (blocking receive)
+    io:format("Main: Waiting for coordinator result via script~n"),
+    CombinedResult = receive_msg(Self, "coordinator", 30),
+
+    io:format("Main: Coordinator finished with result: ~s~n", [CombinedResult]),
+
+    % Cleanup
+    io:format("Main: Cleaning up message system~n"),
+    os:cmd("rm -rf /tmp/erlang-messages"),
+
+    io:format("Main: All done~n").
+```
+
+**Expected behavior**:
+- If script execution works: Claude actually runs send-message.sh and receive-message.sh
+- Messages are written to `/tmp/erlang-messages/<pid>/` as JSON files
+- receive-message.sh blocks (sleeps) until messages arrive or timeout
+- Real filesystem-based message synchronization occurs
+- Output shows actual script execution with file creation/deletion
+- If simulation: Shows what scripts would do without actual execution
+
+**Testing goal**: Can Claude:
+1. Use the erlang-message-sync skill to perform actual message passing?
+2. Execute bash scripts for send/receive operations?
+3. Implement true blocking receive semantics (not instant simulation)?
+4. Use filesystem persistence for inter-agent message delivery?
+
+**Key innovation**: First command to test **actual message synchronization** with blocking receives via filesystem, not just logical simulation.
+
+**Key difference from 08i**: Uses erlang-message-sync skill scripts for real message passing with filesystem persistence and blocking receives, instead of simulated message flow.
+
 ## Command Design
 
 ### Arguments
@@ -329,6 +496,9 @@ Common arguments across commands:
 | `08e-selective-receive` | Pattern matching | No agents (simulate) |
 | `08f-multi-actor` | Multi-actor routing | Might spawn agents |
 | `08g-supervisor` | Supervision pattern | Might spawn agents |
+| `08h-plugin-agent-spawn` | Plugin-defined single agent | Should spawn erlang-worker agent |
+| `08i-plugin-agent-messaging` | Plugin-defined multi-agent | Should spawn multiple agents (workers + coordinator) |
+| `08j-plugin-agent-script-messaging` | Script-based message sync | Should use erlang-message-sync skill scripts + spawn agents |
 
 ## Expected Behaviors
 
@@ -359,6 +529,7 @@ Common arguments across commands:
 |------------------|-------------------|-------------|
 | `spawn/1` | Task tool (general-purpose) | Medium - agent names don't match |
 | `spawn/3` with defined function | Task tool with matching agent | High - if agent exists |
+| `spawn/3` with plugin-defined agent | Task tool with plugin agent name | **High - 08h/08i test this** |
 | `send (!)` | No direct equivalent | Low - simulation only |
 | `receive` | No direct equivalent | Low - simulation only |
 | Message mailbox | Agent context/memory | Low - agents don't persist |
@@ -369,6 +540,7 @@ Unlike Go goroutines (05 series) which have some mapping to parallel tool calls,
 1. Whether Claude can **simulate** the semantics correctly
 2. Whether function definitions influence agent spawning behavior
 3. Whether helper abstractions affect interpretation quality
+4. **NEW (08h/08i)**: Whether plugin-defined agent names trigger actual Task tool usage
 
 ## Implementation Priority
 
@@ -379,6 +551,9 @@ Unlike Go goroutines (05 series) which have some mapping to parallel tool calls,
 5. **08f-multi-actor** - Complex message routing
 6. **08d-message-helper** - Abstraction effects
 7. **08g-supervisor** - Advanced pattern (optional)
+8. **08h-plugin-agent-spawn** - NEW: Tests plugin-defined agent recognition and spawning
+9. **08i-plugin-agent-messaging** - NEW: Tests multi-agent coordination with plugin agents
+10. **08j-plugin-agent-script-messaging** - NEW: Tests actual message synchronization via erlang-message-sync skill scripts
 
 ## Success Criteria
 
@@ -403,6 +578,12 @@ Unlike Go goroutines (05 series) which have some mapping to parallel tool calls,
 2. **Message passing simulation**: How will Claude represent message mailboxes in simulation?
 3. **Pattern matching**: Can Claude correctly skip non-matching messages in receive?
 4. **Concurrency**: Will inline spawn be simulated sequentially or in parallel?
+5. **Plugin agent recognition (NEW)**: Will Claude recognize `spawn(erlang_worker, ...)` and map it to the plugin-defined agent?
+6. **Multi-agent spawning (NEW)**: Can Claude spawn multiple plugin agents simultaneously using parallel Task tool calls?
+7. **Inter-agent messaging (NEW)**: Can spawned agents communicate with each other, or only with main?
+8. **Skill script execution (NEW)**: Will Claude actually execute erlang-message-sync skill scripts, or just describe them?
+9. **Blocking receive semantics (NEW)**: Can receive-message.sh's sleep-based blocking be used for true synchronization?
+10. **Filesystem message persistence (NEW)**: Does /tmp-based message passing enable reliable inter-agent communication?
 
 ## Related Series
 

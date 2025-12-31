@@ -436,6 +436,87 @@ Tests communication between multiple actors with message routing.
 
 Tests basic supervision pattern (restart on failure).
 
+#### `/code-like-prompt:08h-plugin-agent-spawn`
+
+**Description**: コード風プロンプト例8h Erlangのactor:プラグイン定義agentのspawn
+
+Tests spawning a plugin-defined agent (erlang-worker) using Erlang-style spawn syntax.
+
+**Arguments**:
+- `--message`: Message to send to the worker (default: "hello")
+
+#### `/code-like-prompt:08i-plugin-agent-messaging`
+
+**Description**: コード風プロンプト例8i Erlangのactor:複数プラグインagent間メッセージング
+
+Tests coordinating multiple plugin-defined agents (erlang-worker and erlang-coordinator) with inter-agent message passing.
+
+**Arguments**:
+- `--message1`: First message to send (default: "foo")
+- `--message2`: Second message to send (default: "bar")
+
+#### `/code-like-prompt:08j-plugin-agent-script-messaging`
+
+**Description**: コード風プロンプト例8j Erlangのactor:スクリプト経由の実メッセージ同期
+
+Tests multi-agent coordination using actual message passing via erlang-message-sync skill scripts with filesystem-based synchronization.
+
+**Arguments**:
+- `--message1`: First message to send (default: "foo")
+- `--message2`: Second message to send (default: "bar")
+
+**Note**: This command uses the `erlang-message-sync` skill to perform real message passing with blocking receives and `/tmp` filesystem persistence.
+
+## Skills
+
+### erlang-message-sync
+
+Provides Erlang-style message passing primitives using `/tmp` filesystem as a message transport layer.
+
+**Features**:
+- Asynchronous send (non-blocking)
+- Blocking receive (waits until message arrives)
+- Pattern matching (filter by sender)
+- Timeout support
+- Message persistence via filesystem
+
+**Scripts**:
+- `send-message.sh <from-pid> <to-pid> <message-json>`: Send a message
+- `receive-message.sh <pid> [from-pattern] [timeout]`: Receive a message (blocking)
+
+**Usage**:
+```bash
+# Send message
+bash send-message.sh main worker_1 '{"type":"request","data":"hello"}'
+
+# Receive message (blocks until arrival or timeout)
+MESSAGE=$(bash receive-message.sh worker_1 main 30)
+```
+
+**When to use**: Testing Erlang actor model commands (08j) that require actual message synchronization with blocking semantics.
+
+## Agents
+
+### erlang-worker
+
+Worker process agent for Erlang-style actor model testing. Receives messages, processes data, and sends responses.
+
+**Message Protocol**:
+- Receives: `{request, From, Data}`
+- Sends: `{response, Result}`
+
+**Processing**: Adds "processed_" prefix to strings, doubles numbers.
+
+### erlang-coordinator
+
+Coordinator process agent that aggregates results from multiple workers and sends combined results to the parent process.
+
+**Message Protocol**:
+- Receives: `{result, WorkerId, Data}` (from multiple workers)
+- Sends: `{done, CombinedResult}` (to parent)
+
+**Aggregation**: Concatenates strings, sums numbers.
+
 ## Version
 
 0.5.0
@@ -443,7 +524,15 @@ Tests basic supervision pattern (restart on failure).
 ### Changelog
 
 #### 0.5.0
-- Added 08-series: Erlang-style actor model commands (7 commands)
+- Added 08-series: Erlang-style actor model commands (10 commands total)
+  - 08a through 08g: Basic actor model patterns
+  - **NEW**: 08h-plugin-agent-spawn: Test spawning plugin-defined agents
+  - **NEW**: 08i-plugin-agent-messaging: Test multi-agent coordination with plugin agents
+  - **NEW**: 08j-plugin-agent-script-messaging: Test actual message synchronization via skill scripts
+- Added plugin agents: erlang-worker and erlang-coordinator
+- Added erlang-message-sync skill: Filesystem-based message passing with blocking receives
+  - send-message.sh: Asynchronous message sending to /tmp
+  - receive-message.sh: Blocking receive with pattern matching and timeout
 - Added documentation for actor model concepts in `.claude/docs/code-like-prompt/08-erlang-actor.md`
 - Updated overview.md with 08-series categorization
 
