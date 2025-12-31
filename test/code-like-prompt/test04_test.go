@@ -329,12 +329,12 @@ func Test04fExhaustive(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04paBasicFacts tests 04p-a-basic-facts command
-func Test04paBasicFacts(t *testing.T) {
+// Test07aBasicFacts tests 07-a-basic-facts command
+func Test07aBasicFacts(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "BasicQuery",
-			Command: "/code-like-prompt:04p-a-basic-facts",
+			Command: "/code-like-prompt:07-a-basic-facts",
 			Args:    map[string]interface{}{},
 			ExpectedOutputs: []string{
 				"corge",
@@ -351,12 +351,12 @@ func Test04paBasicFacts(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04pbMultiClause tests 04p-b-multi-clause command
-func Test04pbMultiClause(t *testing.T) {
+// Test07bMultiClause tests 07-b-multi-clause command
+func Test07bMultiClause(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "Backtracking",
-			Command: "/code-like-prompt:04p-b-multi-clause",
+			Command: "/code-like-prompt:07-b-multi-clause",
 			Args:    map[string]interface{}{},
 			CustomAssert: func(t *testing.T, output string) {
 				// Should contain expected outputs: b c c d d
@@ -370,12 +370,12 @@ func Test04pbMultiClause(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04pcCut tests 04p-c-cut command
-func Test04pcCut(t *testing.T) {
+// Test07cCut tests 07-c-cut command
+func Test07cCut(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "CutOperator",
-			Command: "/code-like-prompt:04p-c-cut",
+			Command: "/code-like-prompt:07-c-cut",
 			Args:    map[string]interface{}{},
 			CustomAssert: func(t *testing.T, output string) {
 				// Should contain bar and corge (cut prevents backtracking)
@@ -390,12 +390,12 @@ func Test04pcCut(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04pdTreeTraverse tests 04p-d-tree-traverse command
-func Test04pdTreeTraverse(t *testing.T) {
+// Test07dTreeTraverse tests 07-d-tree-traverse command
+func Test07dTreeTraverse(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "DFSTraversal",
-			Command: "/code-like-prompt:04p-d-tree-traverse",
+			Command: "/code-like-prompt:07-d-tree-traverse",
 			Args:    map[string]interface{}{},
 			CustomAssert: func(t *testing.T, output string) {
 				// Should contain all leaf values in DFS order: baz qux corge grault
@@ -414,12 +414,12 @@ func Test04pdTreeTraverse(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04peFinadall tests 04p-e-findall command
-func Test04peFindall(t *testing.T) {
+// Test07eFindall tests 07-e-findall command
+func Test07eFindall(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "CollectAllSolutions",
-			Command: "/code-like-prompt:04p-e-findall",
+			Command: "/code-like-prompt:07-e-findall",
 			Args:    map[string]interface{}{},
 			CustomAssert: func(t *testing.T, output string) {
 				// Should contain collected solutions: baz, quux
@@ -432,12 +432,12 @@ func Test04peFindall(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04pfNegation tests 04p-f-negation command
-func Test04pfNegation(t *testing.T) {
+// Test07fNegation tests 07-f-negation command
+func Test07fNegation(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "NegationAsFailure",
-			Command: "/code-like-prompt:04p-f-negation",
+			Command: "/code-like-prompt:07-f-negation",
 			Args:    map[string]interface{}{},
 			ExpectedOutputs: []string{
 				"bar",
@@ -448,12 +448,12 @@ func Test04pfNegation(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04pgConstraints tests 04p-g-constraints command
-func Test04pgConstraints(t *testing.T) {
+// Test07gConstraints tests 07-g-constraints command
+func Test07gConstraints(t *testing.T) {
 	tests := []TestCase{
 		{
 			Name:    "GraphColoring",
-			Command: "/code-like-prompt:04p-g-constraints",
+			Command: "/code-like-prompt:07-g-constraints",
 			Args:    map[string]interface{}{},
 			CustomAssert: func(t *testing.T, output string) {
 				// Should contain valid 3-colorings

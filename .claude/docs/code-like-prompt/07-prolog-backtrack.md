@@ -1,4 +1,4 @@
-# 04-prolog-backtrack Specification
+# 07-prolog-backtrack Specification
 
 ## Concept
 
@@ -11,7 +11,7 @@ Test Claude's ability to interpret Prolog-style logic programming constructs, fo
 
 ## Test Scenarios
 
-### 04p-a: Basic Facts and Queries
+### 07-a: Basic Facts and Queries
 
 Test simple fact database and queries.
 
@@ -35,7 +35,7 @@ Expected behavior:
 
 Output: corge, grault
 
-### 04p-b: Backtracking with Multiple Clauses
+### 07-b: Backtracking with Multiple Clauses
 
 Test backtracking through alternative rule definitions.
 
@@ -60,7 +60,7 @@ Expected: All reachable nodes from 'a' via backtracking.
 
 Output should include: b c c d d (order depends on search order)
 
-### 04p-c: Cut Operator
+### 07-c: Cut Operator
 
 Test cut (!) preventing backtracking.
 
@@ -81,7 +81,7 @@ Expected:
 - test(a, R): foo(a, R) succeeds with bar, cut prevents backtracking to baz or corge → "bar"
 - test(c, R): foo(c, R) fails, tries second clause → "corge"
 
-### 04p-d: Tree Structure Traversal
+### 07-d: Tree Structure Traversal
 
 Test recursive tree traversal with backtracking.
 
@@ -102,7 +102,7 @@ leaf_value(node(_, _, R), V) :- leaf_value(R, V).
 Expected: All leaf values in DFS order
 Output: baz qux corge grault
 
-### 04p-e: Findall - Collecting All Solutions
+### 07-e: Findall - Collecting All Solutions
 
 Test collecting all solutions without manual backtracking.
 
@@ -117,7 +117,7 @@ foo(quux, 2).
 
 Expected: [baz, quux]
 
-### 04p-f: Negation as Failure
+### 07-f: Negation as Failure
 
 Test `\+` (not provable) operator.
 
@@ -133,7 +133,7 @@ test(X) :- foo(X), \+ qux(X).
 
 Expected: bar (only bar satisfies foo(X) and not qux(X))
 
-### 04p-g: Complex Backtracking with Constraints
+### 07-g: Complex Backtracking with Constraints
 
 Test backtracking with accumulating constraints.
 
@@ -169,13 +169,13 @@ Expected: All valid 3-colorings of a triangle
 
 | Command | Focus |
 |---------|-------|
-| `04p-a-basic-facts` | Simple facts and queries |
-| `04p-b-multi-clause` | Backtracking through multiple clauses |
-| `04p-c-cut` | Cut operator behavior |
-| `04p-d-tree-traverse` | Recursive tree traversal |
-| `04p-e-findall` | Collecting all solutions |
-| `04p-f-negation` | Negation as failure |
-| `04p-g-constraints` | Graph coloring with constraints |
+| `07-a-basic-facts` | Simple facts and queries |
+| `07-b-multi-clause` | Backtracking through multiple clauses |
+| `07-c-cut` | Cut operator behavior |
+| `07-d-tree-traverse` | Recursive tree traversal |
+| `07-e-findall` | Collecting all solutions |
+| `07-f-negation` | Negation as failure |
+| `07-g-constraints` | Graph coloring with constraints |
 
 ## Expected Behaviors
 
@@ -187,29 +187,29 @@ Expected: All valid 3-colorings of a triangle
 
 ## Key Test Points
 
-### Backtracking Order (04p-a, 04p-b)
+### Backtracking Order (07-a, 07-b)
 Solutions should appear in the order determined by clause ordering and DFS traversal.
 
-### Cut Semantics (04p-c)
+### Cut Semantics (07-c)
 - Cut commits to current choice for the clause containing the cut
 - Alternative clauses for the same predicate are not tried after cut
 - Cut does NOT affect callers
 
-### Tree Traversal Order (04p-d)
+### Tree Traversal Order (07-d)
 Left subtree fully explored before right subtree (DFS).
 
-### Constraint Propagation (04p-g)
+### Constraint Propagation (07-g)
 Tests whether Claude understands that constraints eliminate invalid combinations during backtracking.
 
 ## Implementation Priority
 
-1. `04p-d-tree-traverse` - Core backtracking on recursive structures
-2. `04p-c-cut` - Tests understanding of cut semantics
-3. `04p-g-constraints` - Complex constraint satisfaction
-4. `04p-b-multi-clause` - Path finding with backtracking
-5. `04p-e-findall` - Solution collection
-6. `04p-f-negation` - Negation as failure
-7. `04p-a-basic-facts` - Baseline verification
+1. `07-d-tree-traverse` - Core backtracking on recursive structures
+2. `07-c-cut` - Tests understanding of cut semantics
+3. `07-g-constraints` - Complex constraint satisfaction
+4. `07-b-multi-clause` - Path finding with backtracking
+5. `07-e-findall` - Solution collection
+6. `07-f-negation` - Negation as failure
+7. `07-a-basic-facts` - Baseline verification
 
 ## Test Results
 
@@ -219,13 +219,13 @@ Tests run in `/tmp` to isolate from CLAUDE.md configuration interference.
 
 | Command | Expected | Result | Pass |
 |---------|----------|--------|------|
-| 04p-a-basic-facts | corge, grault | corge, grault | ✓ |
-| 04p-b-multi-clause | b c c d d | b c c d d | ✓ |
-| 04p-c-cut | bar, corge | bar, corge | ✓ |
-| 04p-d-tree-traverse | baz qux corge grault | baz qux corge grault | ✓ |
-| 04p-e-findall | [baz, quux] | [baz, quux] | ✓ |
-| 04p-f-negation | bar | bar | ✓ |
-| 04p-g-constraints | (6 permutations) | foo-bar-baz, foo-baz-bar, bar-foo-baz, bar-baz-foo, baz-foo-bar, baz-bar-foo | ✓ |
+| 07-a-basic-facts | corge, grault | corge, grault | ✓ |
+| 07-b-multi-clause | b c c d d | b c c d d | ✓ |
+| 07-c-cut | bar, corge | bar, corge | ✓ |
+| 07-d-tree-traverse | baz qux corge grault | baz qux corge grault | ✓ |
+| 07-e-findall | [baz, quux] | [baz, quux] | ✓ |
+| 07-f-negation | bar | bar | ✓ |
+| 07-g-constraints | (6 permutations) | foo-bar-baz, foo-baz-bar, bar-foo-baz, bar-baz-foo, baz-foo-bar, baz-bar-foo | ✓ |
 
 **Overall: 7/7 (100%)**
 
@@ -238,17 +238,17 @@ Tests run in `/tmp` to isolate from CLAUDE.md configuration interference.
 - Negation as failure
 - Constraint satisfaction with backtracking
 
-**04p-e-findall**: Perfect. Claude correctly:
+**07-e-findall**: Perfect. Claude correctly:
 - Collects all solutions without manual backtracking
 - Filters by predicate conditions (foo(X, 2))
 - Returns list of matching values: [baz, quux]
 
-**04p-f-negation**: Perfect. Claude correctly:
+**07-f-negation**: Perfect. Claude correctly:
 - Implements negation as failure (`\+`)
 - Only outputs values that satisfy foo(X) but not qux(X)
 - Correctly outputs: bar (satisfies foo(bar) and not qux(bar))
 
-**04p-g-constraints**: Perfect. Claude correctly:
+**07-g-constraints**: Perfect. Claude correctly:
 - Generates all possible combinations
 - Applies inequality constraints (R1 ≠ R2, R2 ≠ R3, R3 ≠ R1)
 - Eliminates invalid colorings during backtracking
