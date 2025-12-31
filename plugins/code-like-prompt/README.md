@@ -519,9 +519,19 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.5.0
+0.6.0
 
 ### Changelog
+
+#### 0.6.0
+- Added 08h/08i/08j: Plugin agent commands with message synchronization
+  - 08h-plugin-agent-spawn: Test spawning plugin-defined agents
+  - 08i-plugin-agent-messaging: Test multi-agent coordination with plugin agents
+  - 08j-plugin-agent-script-messaging: Test actual message synchronization via skill scripts
+- Added plugin agents: erlang-worker and erlang-coordinator
+- Added erlang-message-sync skill: Filesystem-based message passing with blocking receives
+  - send-message.sh: Asynchronous message sending to /tmp
+  - receive-message.sh: Blocking receive with pattern matching and timeout
 
 #### 0.5.0
 - Added 08-series: Erlang-style actor model commands (10 commands total)
