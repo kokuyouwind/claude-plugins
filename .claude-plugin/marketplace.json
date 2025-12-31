@@ -27,7 +27,7 @@
       "name": "dev-guidelines",
       "source": "./plugins/dev-guidelines",
       "description": "Development workflow guidelines with skills for Git repository workflow, debugging/investigation, architecture decisions, and PR descriptions",
-      "version": "1.3.0",
+      "version": "1.3.1",
       "author": {
         "name": "kokuyouwind",
         "url": "https://github.com/kokuyouwind"
