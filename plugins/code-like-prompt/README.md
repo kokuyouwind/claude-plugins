@@ -519,9 +519,14 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.6.0
+0.6.1
 
 ### Changelog
+
+#### 0.6.1
+- Refactored 08h/08i/08j commands to use "Emulate the following~" format
+- Updated spawn syntax to use `claude_agent` module with subagent names in second argument
+- Refactored erlang-worker and erlang-coordinator agents to use Erlang pseudo-code format
 
 #### 0.6.0
 - Added 08h/08i/08j: Plugin agent commands with message synchronization
