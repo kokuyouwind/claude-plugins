@@ -240,49 +240,49 @@ Tests exhaustive pattern matching in Rust-style enum matching.
 
 **Arguments**: `--color`, `--r`, `--g`, `--b`
 
-### 04p-series: Prolog-style Backtracking
+### 07-series: Prolog-style Backtracking
 
 Commands demonstrating logic programming concepts like unification, backtracking, and constraint propagation.
 
-#### `/code-like-prompt:04p-a-basic-facts`
+#### `/code-like-prompt:07-a-basic-facts`
 
-**Description**: コード風プロンプト例4p-a Prologバックトラック:基本的なファクトとクエリ
+**Description**: コード風プロンプト例07-a Prologバックトラック:基本的なファクトとクエリ
 
 Simple facts and queries with backtracking.
 
-#### `/code-like-prompt:04p-b-multi-clause`
+#### `/code-like-prompt:07-b-multi-clause`
 
-**Description**: コード風プロンプト例4p-b Prologバックトラック:複数節でのパス探索
+**Description**: コード風プロンプト例07-b Prologバックトラック:複数節でのパス探索
 
 Path finding with backtracking through multiple clauses.
 
-#### `/code-like-prompt:04p-c-cut`
+#### `/code-like-prompt:07-c-cut`
 
-**Description**: コード風プロンプト例4p-c Prologバックトラック:カット演算子
+**Description**: コード風プロンプト例07-c Prologバックトラック:カット演算子
 
 Cut operator (!) preventing backtracking.
 
-#### `/code-like-prompt:04p-d-tree-traverse`
+#### `/code-like-prompt:07-d-tree-traverse`
 
-**Description**: コード風プロンプト例4p-d Prologバックトラック:再帰的な木の走査
+**Description**: コード風プロンプト例07-d Prologバックトラック:再帰的な木の走査
 
 Recursive tree traversal with DFS order.
 
-#### `/code-like-prompt:04p-e-findall`
+#### `/code-like-prompt:07-e-findall`
 
-**Description**: コード風プロンプト例4p-e Prologバックトラック:全解の収集
+**Description**: コード風プロンプト例07-e Prologバックトラック:全解の収集
 
 Collecting all solutions with findall.
 
-#### `/code-like-prompt:04p-f-negation`
+#### `/code-like-prompt:07-f-negation`
 
-**Description**: コード風プロンプト例4p-f Prologバックトラック:失敗による否定
+**Description**: コード風プロンプト例07-f Prologバックトラック:失敗による否定
 
 Negation as failure (\+).
 
-#### `/code-like-prompt:04p-g-constraints`
+#### `/code-like-prompt:07-g-constraints`
 
-**Description**: コード風プロンプト例4p-g Prologバックトラック:制約伝播によるグラフ彩色
+**Description**: コード風プロンプト例07-g Prologバックトラック:制約伝播によるグラフ彩色
 
 Graph coloring with constraint propagation.
 
@@ -392,9 +392,12 @@ Tests whether Go-style concurrency syntax can influence Claude to use parallel p
 
 ## Version
 
-0.2.2
+0.3.0
 
 ### Changelog
+
+#### 0.3.0
+- Renamed 04p-series (Prolog-style backtracking) commands to 07-series for better categorization
 
 #### 0.2.2
 - Extended internal emulation approach to 02-05 series commands (43 files total)
