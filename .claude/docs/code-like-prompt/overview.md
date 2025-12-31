@@ -57,8 +57,8 @@ Commands are numbered for organization:
 | 02c | deep-nesting | Complex 5-level nesting with mixed patterns | Planned |
 | 03a-j | loop variants | For/while/each/break/continue/nested/accumulator | Planned |
 | 04a-f | pattern-match variants | Regex, structural, list, nested, guards | Planned |
-| 04p-a-g | prolog-backtrack variants | Facts, multi-clause, cut, tree, findall, negation, constraints | Planned |
 | 05a-k | golang-goroutine variants | Goroutines, channels, select, workers, pipeline, subagents | Planned |
+| 07-a-g | prolog-backtrack variants | Facts, multi-clause, cut, tree, findall, negation, constraints | Planned |
 
 ## Documentation Structure
 
