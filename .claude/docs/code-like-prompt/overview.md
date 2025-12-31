@@ -39,7 +39,10 @@ Commands are numbered for organization:
 - `02-*`: Nested conditionals
 - `03-*`: Loop constructs
 - `04-*`: Pattern matching (multiple experiments)
-- `05-*`: Concurrent/parallel constructs
+- `05-*`: Concurrent/parallel constructs (Go-style)
+- `06-*`: Function constructs
+- `07-*`: Logic programming (Prolog-style)
+- `08-*`: Actor model (Erlang-style)
 
 ### Testing Philosophy
 
@@ -58,7 +61,9 @@ Commands are numbered for organization:
 | 03a-j | loop variants | For/while/each/break/continue/nested/accumulator | Planned |
 | 04a-f | pattern-match variants | Regex, structural, list, nested, guards | Planned |
 | 05a-k | golang-goroutine variants | Goroutines, channels, select, workers, pipeline, subagents | Planned |
-| 07-a-g | prolog-backtrack variants | Facts, multi-clause, cut, tree, findall, negation, constraints | Planned |
+| 06a-c | function variants | Arguments, return values, refactoring | Planned |
+| 07a-g | prolog-backtrack variants | Facts, multi-clause, cut, tree, findall, negation, constraints | Planned |
+| 08a-g | erlang-actor variants | Inline actors, agent spawn, message passing, selective receive, supervision | Planned |
 
 ## Documentation Structure
 
@@ -68,8 +73,10 @@ Commands are numbered for organization:
 ├── 02-nested-if.md         # Nested if specification (dangling else, deep nesting)
 ├── 03-loop.md              # Loop specification (10 variants)
 ├── 04-pattern-match.md     # Pattern matching specification (6 variants)
-├── 04-prolog-backtrack.md  # Prolog backtracking specification (7 variants)
-└── 05-golang-goroutine.md  # Goroutine specification (11 variants)
+├── 05-golang-goroutine.md  # Goroutine specification (11 variants)
+├── 06-function.md          # Function specification (3 variants)
+├── 07-prolog-backtrack.md  # Prolog backtracking specification (7 variants)
+└── 08-erlang-actor.md      # Erlang actor specification (7 variants)
 ```
 
 ## Implementation Guidelines

@@ -390,11 +390,62 @@ Tests whether Go-style concurrency syntax can influence Claude to use parallel p
 **Arguments**:
 - `--topics`: Comma-separated list of topics (default: "foo,bar,baz")
 
+### 08-series: Erlang-style Actor Model
+
+Commands demonstrating actor model concepts with message passing and process isolation.
+
+#### `/code-like-prompt:08a-inline-actor`
+
+**Description**: コード風プロンプト例8a Erlangのactor:インラインアクター（エージェント定義なし）
+
+Tests inline actor simulation without separate function definitions.
+
+#### `/code-like-prompt:08b-agent-spawn`
+
+**Description**: コード風プロンプト例8b Erlangのactor:エージェント定義ありのspawn
+
+Tests actor spawning with defined functions to check if Claude uses Task tool.
+
+#### `/code-like-prompt:08c-message-direct`
+
+**Description**: コード風プロンプト例8c Erlangのactor:メッセージパッシング（直接記述）
+
+Tests basic message passing with pattern matching.
+
+#### `/code-like-prompt:08d-message-helper`
+
+**Description**: コード風プロンプト例8d Erlangのactor:メッセージパッシング（ヘルパー関数経由）
+
+Tests message passing abstracted through helper functions.
+
+#### `/code-like-prompt:08e-selective-receive`
+
+**Description**: コード風プロンプト例8e Erlangのactor:パターンマッチングによる選択的受信
+
+Tests selective message reception with pattern matching.
+
+#### `/code-like-prompt:08f-multi-actor`
+
+**Description**: コード風プロンプト例8f Erlangのactor:複数アクター間のメッセージルーティング
+
+Tests communication between multiple actors with message routing.
+
+#### `/code-like-prompt:08g-supervisor`
+
+**Description**: コード風プロンプト例8g Erlangのactor:監視パターン（supervisor）
+
+Tests basic supervision pattern (restart on failure).
+
 ## Version
 
-0.4.0
+0.5.0
 
 ### Changelog
+
+#### 0.5.0
+- Added 08-series: Erlang-style actor model commands (7 commands)
+- Added documentation for actor model concepts in `.claude/docs/code-like-prompt/08-erlang-actor.md`
+- Updated overview.md with 08-series categorization
 
 #### 0.3.0
 - Renamed 04p-series (Prolog-style backtracking) commands to 07-series for better categorization
