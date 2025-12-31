@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "cassette": "BreakAt0",
+  "recordings": {
+    "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9": {
+      "cache_key": "d78659368962acb628fbbe28825af9408cc77f45c8fcf33229e1418186ed29c9",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T02:01:47.523197",
+      "request_size": 295,
+      "response_size": 448,
+      "stream": false,
+      "status_code": 200
+    },
+    "5f5ff55d84245a0624b91180c4e9a1d9b9c52dc3a2d73d36191e19d68543bdbc": {
+      "cache_key": "5f5ff55d84245a0624b91180c4e9a1d9b9c52dc3a2d73d36191e19d68543bdbc",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T02:01:48.489940",
+      "request_size": 92213,
+      "response_size": 1953,
+      "stream": true,
+      "status_code": 200
+    },
+    "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283": {
+      "cache_key": "3169e746041cb3c5b2bd1572a3a4c80e3290060355a39297ab8bdb1451737283",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2025-12-31T02:01:48.934023",
+      "request_size": 3584,
+      "response_size": 6347,
+      "stream": true,
+      "status_code": 200
+    },
+    "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1": {
+      "cache_key": "1acc95cb821ee72c7483e9f67becfeaee1b4ddd7137bf680057f72034e3cd1c1",
+      "model": "claude-sonnet-4-5-20250929",
+      "recorded_at": "2025-12-31T02:01:54.234032",
+      "request_size": 4014,
+      "response_size": 12376,
+      "stream": true,
+      "status_code": 200
+    }
+  }
+}

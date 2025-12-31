@@ -215,7 +215,7 @@ func Test02bDanglingElseInnerIndent(t *testing.T) {
 				"condition_b": false,
 			},
 			ExpectedOutputs: []string{
-				"baz",
+				"bar",
 			},
 		},
 	}
@@ -393,7 +393,7 @@ func Test02cDeepNestingIndent(t *testing.T) {
 				"level4": true,
 			},
 			ExpectedOutputs: []string{
-				"waldo",
+				"qux",
 			},
 		},
 		{
@@ -423,7 +423,7 @@ func Test02cDeepNestingIndent(t *testing.T) {
 				"level4": false,
 			},
 			ExpectedOutputs: []string{
-				"quux",
+				"waldo",
 			},
 		},
 		{

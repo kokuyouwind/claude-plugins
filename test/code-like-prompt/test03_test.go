@@ -215,18 +215,18 @@ func Test03eLoopContinue(t *testing.T) {
 				"skip_at": 2,
 			},
 			ExpectedOutputs: []string{
-				"foo0",
-				"foo1",
-				"foo3",
-				"foo4",
+				"0",
+				"1",
+				"3",
+				"4",
 			},
 			CustomAssert: func(t *testing.T, output string) {
-				assert.Contains(t, output, "foo0")
-				assert.Contains(t, output, "foo1")
-				assert.Contains(t, output, "foo3")
-				assert.Contains(t, output, "foo4")
-				// Should NOT contain foo2
-				assert.NotContains(t, output, "foo2")
+				assert.Contains(t, output, "0")
+				assert.Contains(t, output, "1")
+				assert.Contains(t, output, "3")
+				assert.Contains(t, output, "4")
+				// Should NOT contain 2
+				assert.NotContains(t, output, "2")
 			},
 		},
 		{

@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -32,6 +34,22 @@ type vcrProxy struct {
 
 var globalProxy *vcrProxy
 var globalTmpDir string
+
+// Track all VCR proxy processes for cleanup
+var allProxies []*vcrProxy
+var proxiesMutex sync.Mutex
+
+// findAvailablePort finds an available port starting from the given port
+func findAvailablePort(startPort int) (int, error) {
+	for port := startPort; port < startPort+100; port++ {
+		listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+		if err == nil {
+			listener.Close()
+			return port, nil
+		}
+	}
+	return 0, fmt.Errorf("no available port found in range %d-%d", startPort, startPort+100)
+}
 
 // startVCRProxyForTest starts the VCR proxy for a specific test case
 func startVCRProxyForTest(t *testing.T, cassetteName string) *vcrProxy {
@@ -58,8 +76,12 @@ func startVCRProxyForTest(t *testing.T, cassetteName string) *vcrProxy {
 	// VCR script path
 	vcrScript := filepath.Join(absRepoPath, "test", "vcr", "claude_vcr.py")
 
+	// Find an available port starting from 8001
+	availablePort, err := findAvailablePort(8001)
+	require.NoError(t, err, "Failed to find available port")
+	port := fmt.Sprintf("%d", availablePort)
+
 	// Start mitmdump with VCR script
-	port := "8001"
 	cmd := exec.Command("mitmdump",
 		"-s", vcrScript,
 		"--mode", "reverse:https://api.anthropic.com",
@@ -83,10 +105,17 @@ func startVCRProxyForTest(t *testing.T, cassetteName string) *vcrProxy {
 	// Wait a bit for the proxy to start
 	time.Sleep(3 * time.Second)
 
-	return &vcrProxy{
+	proxy := &vcrProxy{
 		cmd:  cmd,
 		port: port,
 	}
+
+	// Track this proxy for cleanup
+	proxiesMutex.Lock()
+	allProxies = append(allProxies, proxy)
+	proxiesMutex.Unlock()
+
+	return proxy
 }
 
 // startVCRProxy starts the VCR proxy unless DISABLE_BOOT_VCR environment variable is set
@@ -109,13 +138,51 @@ func stopVCRProxy(t *testing.T, proxy *vcrProxy) {
 	time.Sleep(2 * time.Second)
 
 	err := proxy.cmd.Process.Kill()
-	require.NoError(t, err, "Failed to kill VCR proxy process")
+	if err != nil && t != nil {
+		require.NoError(t, err, "Failed to kill VCR proxy process")
+	}
 
 	// Wait for process to exit
 	_, _ = proxy.cmd.Process.Wait()
 
+	// Remove from tracking list
+	proxiesMutex.Lock()
+	for i, p := range allProxies {
+		if p == proxy {
+			allProxies = append(allProxies[:i], allProxies[i+1:]...)
+			break
+		}
+	}
+	proxiesMutex.Unlock()
+
 	// Wait a bit for the port to be released
 	time.Sleep(1 * time.Second)
+}
+
+// cleanupAllProxies stops all remaining VCR proxy processes
+// This should be called at the end of all tests
+func cleanupAllProxies() {
+	proxiesMutex.Lock()
+	defer proxiesMutex.Unlock()
+
+	for _, proxy := range allProxies {
+		if proxy != nil && proxy.cmd != nil && proxy.cmd.Process != nil {
+			// Wait for streaming responses to complete
+			time.Sleep(2 * time.Second)
+
+			// Kill the process
+			_ = proxy.cmd.Process.Kill()
+
+			// Wait for process to exit
+			_, _ = proxy.cmd.Process.Wait()
+
+			// Wait for port to be released
+			time.Sleep(1 * time.Second)
+		}
+	}
+
+	// Clear the list
+	allProxies = nil
 }
 
 // setupTestEnvironmentForCase creates a temporary directory for a specific test case

@@ -12,5 +12,8 @@ func TestMain(m *testing.M) {
 	// Run all tests
 	exitCode := m.Run()
 
+	// Cleanup all VCR proxy processes
+	cleanupAllProxies()
+
 	os.Exit(exitCode)
 }

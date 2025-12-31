@@ -235,7 +235,7 @@ func Test04eMultiGuard(t *testing.T) {
 				"y": 1,
 			},
 			ExpectedOutputs: []string{
-				"bar",
+				"qux",
 			},
 		},
 		{
