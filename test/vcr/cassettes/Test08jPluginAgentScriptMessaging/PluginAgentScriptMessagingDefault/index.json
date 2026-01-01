@@ -937,6 +937,24 @@
       "response_size": 44177,
       "stream": true,
       "status_code": 200
+    },
+    "748e720f2eabcb83c8cd03901386871fde6dd59eb483a750c1e0a4db27b64f95": {
+      "cache_key": "748e720f2eabcb83c8cd03901386871fde6dd59eb483a750c1e0a4db27b64f95",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2026-01-01T01:51:13.282009",
+      "request_size": 96697,
+      "response_size": 4659,
+      "stream": true,
+      "status_code": 200
+    },
+    "00089f433e59846bd859015e28e8fc2e668f81a3b5cccd544377e3b1aebc34f3": {
+      "cache_key": "00089f433e59846bd859015e28e8fc2e668f81a3b5cccd544377e3b1aebc34f3",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2026-01-01T01:51:17.367730",
+      "request_size": 97243,
+      "response_size": 5934,
+      "stream": true,
+      "status_code": 200
     }
   }
 }
