@@ -34,6 +34,12 @@ main() ->
     io:format("=== 人狼ゲーム開始 ===~n"),
     os:cmd("rm -rf /tmp/erlang-messages"),
 
+    %% Create log directory with timestamp
+    Timestamp = os:cmd("date +%Y%m%d-%H%M%S"),
+    LogDir = io_lib:format(".claude/tmp/werewolf-~s", [string:trim(Timestamp)]),
+    os:cmd(io_lib:format("mkdir -p ~s", [LogDir])),
+    io:format("ログディレクトリ: ~s~n", [LogDir]),
+
     %% Define available roles (one will be randomly excluded)
     AllRoles = ["werewolf", "madman", "seer", "knight", "villager", "villager"],
 
@@ -55,12 +61,13 @@ main() ->
         PlayerPid = lists:nth(I, PlayerPids),
         Role = lists:nth(I, ShuffledRoles),
         Persona = lists:nth(I, ShuffledPersonas),
+        LogFile = io_lib:format("~s/~s.log", [LogDir, PlayerPid]),
 
         io:format("GM: ~s を起動 (役職: ~s, ペルソナ: ~s)~n", [PlayerPid, Role, Persona]),
         spawn(claude_agent, werewolf_player, []),
 
-        %% Assign role and persona
-        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\"}", [Role, Persona]),
+        %% Assign role and persona with log file path
+        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\"}", [Role, Persona, LogFile]),
         send(Self, PlayerPid, RoleMsg)
     end, lists:seq(1, 5)),
 
@@ -74,7 +81,9 @@ main() ->
         day => 1,
         alive_players => PlayerPids,
         player_roles => lists:zip(PlayerPids, ShuffledRoles),
-        player_personas => lists:zip(PlayerPids, ShuffledPersonas)
+        player_personas => lists:zip(PlayerPids, ShuffledPersonas),
+        log_dir => LogDir,
+        game_events => []  %% Track all game events for result log
     },
 
     FinalState = game_loop(Self, GameState),
@@ -100,6 +109,11 @@ main() ->
     io:format("~n--- GM総括 ---~n"),
     io:format("ゲームは~p日目で終了しました~n", [maps:get(day, FinalState)]),
     io:format("最終的な生存者: ~p~n", [maps:get(alive_players, FinalState)]),
+
+    %% Generate result log
+    io:format("~n--- リザルトログ生成中 ---~n"),
+    ResultLogPath = generate_result_log(FinalState),
+    io:format("リザルトログ: ~s~n", [ResultLogPath]),
 
     %% Cleanup
     os:cmd("rm -rf /tmp/erlang-messages"),
@@ -204,9 +218,22 @@ game_loop(Self, State) ->
     ExecutionTarget = determine_execution(Votes),
     io:format("投票結果: ~s が処刑されます~n", [ExecutionTarget]),
 
+    %% Record vote event
+    VoteEvent = #{
+        type => vote,
+        day => Day,
+        votes => Votes,
+        executed => ExecutionTarget
+    },
+    Events = maps:get(game_events, State, []),
+    UpdatedEvents = Events ++ [VoteEvent],
+
     %% Update alive players
     NewAlivePlayers = lists:delete(ExecutionTarget, AlivePlayers),
-    StateAfterExecution = State#{alive_players => NewAlivePlayers},
+    StateAfterExecution = State#{
+        alive_players => NewAlivePlayers,
+        game_events => UpdatedEvents
+    },
 
     %% Check win condition
     case check_win_condition(StateAfterExecution) of
@@ -222,16 +249,30 @@ game_loop(Self, State) ->
             %% Resolve night actions
             NightResult = resolve_night(NightActions),
 
+            %% Record night event
+            NightEvent = #{
+                type => night,
+                day => Day,
+                actions => NightActions,
+                result => NightResult
+            },
+            NightEvents = maps:get(game_events, StateAfterExecution, []),
+            UpdatedNightEvents = NightEvents ++ [NightEvent],
+
             %% Update state for next day
             StateAfterNight = case NightResult of
                 {victim, Victim} ->
                     FinalAlivePlayers = lists:delete(Victim, NewAlivePlayers),
                     StateAfterExecution#{
                         alive_players => FinalAlivePlayers,
-                        night_result => {victim, Victim}
+                        night_result => {victim, Victim},
+                        game_events => UpdatedNightEvents
                     };
                 no_death ->
-                    StateAfterExecution#{night_result => no_death}
+                    StateAfterExecution#{
+                        night_result => no_death,
+                        game_events => UpdatedNightEvents
+                    }
             end,
 
             %% Check win condition again
@@ -400,4 +441,30 @@ format_qa_json(AllAnswers) -> undefined.
 %%
 %% Implementation is inferred by AI - no explicit implementation needed
 generate_random_persona() -> undefined.
+
+%% Generate comprehensive result log with player profiles, game summary, and player replays
+%% Input: FinalState (map with game state including log_dir, player_roles, player_personas, game_events, etc.)
+%% Output: Path to generated result.md file
+%%
+%% The result log should include:
+%% 1. Player Profiles section - List each player with their role and persona
+%% 2. Game Summary section - Overview of each day including:
+%%    - Discussion highlights
+%%    - Vote results (who voted for whom)
+%%    - Night events (who was attacked, who was protected, divination results)
+%% 3. Player Replays section - For each player, a chronological narrative including:
+%%    - Their internal thoughts (read from player log files)
+%%    - Their actions (statements, votes, night actions)
+%%    - How their role influenced their decisions
+%%
+%% Implementation steps:
+%% 1. Read all player log files from log_dir
+%% 2. Parse game_events to extract discussion, votes, and night events
+%% 3. Combine player thoughts with game events to create detailed replays
+%% 4. Format everything as Markdown
+%% 5. Write to result.md in log_dir
+%% 6. Return the path to result.md
+%%
+%% Implementation is inferred by AI
+generate_result_log(FinalState) -> undefined.
 ```

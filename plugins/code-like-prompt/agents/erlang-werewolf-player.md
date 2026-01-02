@@ -30,18 +30,21 @@ loop() ->
 
     %% First, receive role assignment
     receive
-        {role_assign, Role, Persona} ->
+        {role_assign, Role, Persona, LogFile} ->
             io:format("[~s] 役職を受け取りました: ~s (ペルソナ: ~s)~n", [PlayerId, Role, Persona]),
 
-            %% Internal thought about role
+            %% Write initial thought to log file
+            log_thought(LogFile, io_lib:format("=== ゲーム開始 ===~n役職: ~s~nペルソナ: ~s~n~n内部思考: 私は~sとして~sの役割を演じます~n", [Role, Persona, Persona, Role])),
+
+            %% Internal thought about role (console output)
             io:format("[~s] 内部思考: 私は~sとして~sの役割を演じます~n", [PlayerId, Persona, Role]),
 
             %% Acknowledge to GM
             AckMsg = "{\"type\":\"ready\"}",
             send(PlayerId, "gm", AckMsg),
 
-            %% Enter game loop with assigned role and persona
-            game_loop(PlayerId, Role, Persona, #{known_info => []})
+            %% Enter game loop with assigned role, persona, and log file
+            game_loop(PlayerId, Role, Persona, #{known_info => [], log_file => LogFile})
     end.
 
 %% Main game loop for player
@@ -53,6 +56,9 @@ game_loop(PlayerId, Role, Persona, State) ->
 
             %% Internal thought - generate statement without knowing others
             Statement = generate_initial_statement(PlayerId, Role, Persona, State),
+            Thought = io_lib:format("~n--- 初回発言 ---~n内部思考: ~sと発言します~n発言: ~s~n", [Statement, Statement]),
+            LogFile = maps:get(log_file, State),
+            log_thought(LogFile, Thought),
             io:format("[~s] 内部思考: ~sと発言します~n", [PlayerId, Statement]),
 
             %% Send statement to GM
@@ -115,6 +121,9 @@ game_loop(PlayerId, Role, Persona, State) ->
 
             %% Internal thought process
             Target = decide_vote(PlayerId, Role, Persona, State),
+            VoteThought = io_lib:format("~n--- 投票 ---~n内部思考: ~sに投票します~n理由: ~sの発言や行動が怪しいと判断しました~n", [Target, Target]),
+            LogFile = maps:get(log_file, State),
+            log_thought(LogFile, VoteThought),
             io:format("[~s] 内部思考: ~sに投票します~n", [PlayerId, Target]),
 
             %% Send vote to GM
@@ -131,7 +140,11 @@ game_loop(PlayerId, Role, Persona, State) ->
 
                     %% Decide action based on role
                     Action = decide_night_action(PlayerId, Role, Persona, State),
-                    io:format("[~s] 内部思考: ~s~n", [PlayerId, format_action_thought(Role, Action)]),
+                    ActionThought = format_action_thought(Role, Action),
+                    NightThought = io_lib:format("~n--- 夜の行動 ---~n内部思考: ~s~n行動: ~s → ~s~n", [ActionThought, action_type(Role), Action]),
+                    LogFile = maps:get(log_file, State),
+                    log_thought(LogFile, NightThought),
+                    io:format("[~s] 内部思考: ~s~n", [PlayerId, ActionThought]),
 
                     %% Send action to GM
                     ActionMsg = io_lib:format("{\"type\":\"night_action\",\"action\":\"~s\",\"target\":\"~s\"}",
@@ -211,6 +224,12 @@ generate_answer(PlayerId, Role, Persona, FromPid, Question, State) -> undefined.
 generate_summary(PlayerId, Role, Persona, Winner, State) ->
     io_lib:format("私は~sとして~sを演じました。結果は~sの勝利でした。",
                   [Persona, Role, Winner]).
+
+%% Helper function to write thoughts to log file
+%% Input: LogFile (path to log file), Thought (string to write)
+%% Appends the thought to the log file with timestamp
+log_thought(LogFile, Thought) ->
+    file:write_file(LogFile, Thought, [append]).
 ```
 
 ## Important Constraints
