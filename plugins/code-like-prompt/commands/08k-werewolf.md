@@ -276,10 +276,11 @@ determine_execution(Votes) ->
     ExecutionTarget.
 
 %% Parse vote target from JSON message
-parse_vote_target(VoteMsg) ->
-    %% Simplified parsing - in real implementation would use JSON library
-    %% Assume format: {"type":"vote","target":"player_X"}
-    "player_1".  %% Placeholder
+%% Input: VoteMsg (JSON string with vote target)
+%% Expected format: {"type":"vote","target":"player_X"}
+%% Output: Target player ID (e.g., "player_1", "player_2", etc.)
+%% Implementation is inferred by AI
+parse_vote_target(VoteMsg) -> undefined.
 
 %% Collect night actions from players with roles
 collect_night_actions(Self, AlivePlayers, State) ->
@@ -335,9 +336,11 @@ resolve_night(NightActions) ->
     end.
 
 %% Parse action target from JSON message
-parse_action_target(ActionMsg) ->
-    %% Simplified parsing - placeholder
-    "player_1".
+%% Input: ActionMsg (JSON string with action target)
+%% Expected format: {"type":"night_action","action":"attack|divine|protect","target":"player_X"}
+%% Output: Target player ID (e.g., "player_1", "player_2", etc.)
+%% Implementation is inferred by AI
+parse_action_target(ActionMsg) -> undefined.
 
 %% Check win condition
 check_win_condition(State) ->
