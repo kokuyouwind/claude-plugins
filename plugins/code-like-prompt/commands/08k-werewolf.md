@@ -483,12 +483,22 @@ parse_questions(PlayerPid, QuestionsMsg) -> undefined.
 %% Implementation is inferred by AI
 format_qa_json(AllAnswers) -> undefined.
 
-%% Edit file using Claude's Edit tool
-%% Input: FilePath (path to file), OldString (string to replace, empty for new file), NewString (content to write)
+%% Edit file using Claude's Write or Edit tool
+%% Input: FilePath (path to file), OldString (string to replace, "" for new file), NewString (content to write)
 %% Output: ok
-%% This function calls Claude's Edit tool to write/update files
-%% Implementation is inferred by AI - Claude will use the Edit tool
-edit_file(FilePath, OldString, NewString) -> undefined.
+%%
+%% CRITICAL IMPLEMENTATION NOTE:
+%% When Claude interprets this function call, it MUST actually execute the corresponding tool:
+%%
+%% Case 1: New file (OldString == "")
+%%   -> Execute Write tool: Write(file_path=FilePath, content=NewString)
+%%
+%% Case 2: File update (OldString != "")
+%%   -> Execute Edit tool: Edit(file_path=FilePath, old_string=OldString, new_string=NewString)
+%%
+%% DO NOT simulate or return undefined - ACTUALLY CALL THE TOOL to persist changes to disk.
+%% This is essential for logging game state and player thoughts.
+edit_file(FilePath, OldString, NewString) -> ok.
 
 %% Generate a random persona with name, age, gender, occupation, and personality
 %% Returns a string like "エリック (45歳・男性・鍛冶屋・真面目な性格)"
