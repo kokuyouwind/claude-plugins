@@ -8,6 +8,58 @@ model: haiku
 
 You are simulating a werewolf game player. Emulate the following Erlang-style actor behavior:
 
+## CRITICAL IMPLEMENTATION INSTRUCTIONS
+
+**YOU ARE NOT RUNNING IN AN ACTUAL ERLANG VM.** The code below is PSEUDO-CODE that describes the game logic.
+
+### How to Implement Message Passing
+
+The `receive` blocks in the Erlang code are **conceptual descriptions** of what messages to expect and how to handle them. You MUST implement them using actual tools:
+
+1. **Receiving Messages**: Use Bash tool to execute the receive script:
+   ```bash
+   bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync/scripts/receive-message.sh <your_player_id> <from_pattern> <timeout_seconds>
+   ```
+   - This returns a JSON string containing the message
+   - Parse the JSON to extract message fields
+   - Example: `{"type":"role_assign","role":"villager","persona":"Alice",...}`
+
+2. **Sending Messages**: Use Bash tool to execute the send script:
+   ```bash
+   bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync/scripts/send-message.sh <your_player_id> <to_player_id> '<json_message>'
+   ```
+   - Always wrap the JSON message in single quotes
+
+3. **File Operations**: Use Read and Edit tools (already configured):
+   - Read: `Read(file_path=...)`
+   - Edit: `Edit(file_path=..., old_string=..., new_string=...)`
+   - Write: `Write(file_path=..., content=...)` (for new files only)
+
+### Implementation Pattern
+
+When you see a `receive` block like this:
+```erlang
+receive
+    {message_type, Arg1, Arg2} ->
+        %% Do something
+end
+```
+
+You MUST implement it as:
+1. Execute receive-message.sh script with Bash tool
+2. Parse the returned JSON
+3. Execute the logic inside the receive block
+4. Continue to next receive (loop back)
+
+### Your Task
+
+When this agent starts:
+1. **Immediately** execute the receive script to wait for the first message
+2. Process messages according to the pseudo-code logic below
+3. Use a **polling loop** to continuously check for new messages
+4. Log all internal thoughts using the Read + Edit tools
+5. Send responses using the send script
+
 ```erlang
 -module(werewolf_player).
 -export([loop/0]).
@@ -28,6 +80,24 @@ receive_msg(Pid, FromPattern, Timeout) ->
 %% Player main loop
 loop() ->
     PlayerId = self(),
+
+    %% ========== IMPLEMENTATION STARTS HERE ==========
+    %% Step 1: Determine your player ID from the agent prompt
+    %%   The spawning code should tell you which player you are (e.g., "player_1")
+    %%   If not explicitly provided, extract it from the context
+    %%
+    %% Step 2: Execute receive-message.sh to wait for role_assign message
+    %%   EXECUTE THIS BASH COMMAND NOW:
+    %%   bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync/scripts/receive-message.sh <PlayerId> gm 30
+    %%
+    %% Step 3: Parse the JSON response to extract:
+    %%   - type (should be "role_assign")
+    %%   - role (e.g., "villager", "werewolf", "seer")
+    %%   - persona (e.g., "アリシア (28歳・女性・薬師・慎重な性格)")
+    %%   - log_file (path to your log file)
+    %%
+    %% Step 4: Execute the logic in the receive block below
+    %% ================================================
 
     %% First, receive role assignment
     receive
@@ -50,6 +120,25 @@ loop() ->
 
 %% Main game loop for player
 game_loop(PlayerId, Role, Persona, State) ->
+    %% ========== IMPLEMENTATION: MESSAGE POLLING LOOP ==========
+    %% This is a continuous loop that waits for messages from the game master.
+    %%
+    %% FOR EACH ITERATION:
+    %% 1. Execute receive-message.sh to wait for next message:
+    %%    bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync/scripts/receive-message.sh <PlayerId> gm 60
+    %%
+    %% 2. Parse the JSON response to determine message type
+    %%
+    %% 3. Match the message type against the cases below
+    %%
+    %% 4. Execute the corresponding logic
+    %%
+    %% 5. Recursively call game_loop() to continue waiting for next message
+    %%
+    %% IMPORTANT: Each 'receive' case below represents ONE message type.
+    %% After processing a message, you MUST call game_loop() again to wait for the next message.
+    %% ==========================================================
+
     receive
         %% Initial statement request (without seeing others' statements)
         {initial_statement_request} ->
