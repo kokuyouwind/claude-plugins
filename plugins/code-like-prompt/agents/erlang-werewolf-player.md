@@ -81,14 +81,29 @@ receive_msg(Pid, FromPattern, Timeout) ->
 loop() ->
     PlayerId = self(),
 
-    %% ========== IMPLEMENTATION STARTS HERE ==========
-    %% Step 1: Determine your player ID from the agent prompt
-    %%   The spawning code should tell you which player you are (e.g., "player_1")
-    %%   If not explicitly provided, extract it from the context
+    %% ****************************************************************************
+    %% !!! IMPLEMENTATION STARTS HERE !!! READ THIS CAREFULLY !!!
+    %% ****************************************************************************
     %%
-    %% Step 2: Execute receive-message.sh to wait for role_assign message
-    %%   EXECUTE THIS BASH COMMAND NOW:
-    %%   bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync/scripts/receive-message.sh <PlayerId> gm 30
+    %% >>> YOU MUST EXECUTE ACTUAL TOOLS - DO NOT SIMULATE <<<
+    %%
+    %% Step 1: Determine your player ID from the agent prompt
+    %%   - The spawning code tells you which player you are (e.g., "player_1")
+    %%   - Extract it from the Task tool's prompt parameter
+    %%
+    %% Step 2: EXECUTE Bash tool to wait for role_assign message
+    %%
+    %%   !!! STOP HERE AND EXECUTE THIS BASH COMMAND NOW !!!
+    %%
+    %%   Bash(command="bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/
+    %%                 plugins/code-like-prompt/skills/erlang-message-sync/
+    %%                 scripts/receive-message.sh <PlayerId> gm 30")
+    %%
+    %%   VERIFICATION - YOU MUST DO THESE:
+    %%     - Did you execute Bash tool?
+    %%       -> IF NO: STOP RIGHT NOW AND EXECUTE Bash TOOL
+    %%     - Did Bash return a JSON message?
+    %%       -> IF NO: OUTPUT "ERROR: Failed to receive message" AND ABORT
     %%
     %% Step 3: Parse the JSON response to extract:
     %%   - type (should be "role_assign")
@@ -97,7 +112,15 @@ loop() ->
     %%   - log_file (path to your log file)
     %%
     %% Step 4: Execute the logic in the receive block below
-    %% ================================================
+    %%   - This includes calling log_thought()
+    %%   - log_thought() MUST execute Write/Edit tool - see function definition
+    %%
+    %% IF MESSAGE RECEPTION FAILS:
+    %%   - OUTPUT: "ERROR: Failed to receive role assignment: <details>~n"
+    %%   - OUTPUT: "ABORTING: Cannot start without role assignment~n"
+    %%   - STOP EXECUTION IMMEDIATELY
+    %%
+    %% ****************************************************************************
 
     %% First, receive role assignment
     receive
@@ -120,24 +143,44 @@ loop() ->
 
 %% Main game loop for player
 game_loop(PlayerId, Role, Persona, State) ->
-    %% ========== IMPLEMENTATION: MESSAGE POLLING LOOP ==========
+    %% ****************************************************************************
+    %% !!! MESSAGE POLLING LOOP !!! READ THIS CAREFULLY !!!
+    %% ****************************************************************************
+    %%
     %% This is a continuous loop that waits for messages from the game master.
     %%
-    %% FOR EACH ITERATION:
-    %% 1. Execute receive-message.sh to wait for next message:
-    %%    bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync/scripts/receive-message.sh <PlayerId> gm 60
+    %% >>> FOR EACH ITERATION, YOU MUST DO THESE STEPS <<<
     %%
-    %% 2. Parse the JSON response to determine message type
+    %% Step 1: EXECUTE Bash TOOL to wait for next message
     %%
-    %% 3. Match the message type against the cases below
+    %%   !!! EXECUTE THIS BASH COMMAND NOW !!!
     %%
-    %% 4. Execute the corresponding logic
+    %%   Bash(command="bash ~/.claude/plugins/marketplaces/kokuyouwind-plugins/
+    %%                 plugins/code-like-prompt/skills/erlang-message-sync/
+    %%                 scripts/receive-message.sh <PlayerId> gm 60")
     %%
-    %% 5. Recursively call game_loop() to continue waiting for next message
+    %%   VERIFICATION - YOU MUST DO THESE:
+    %%     - Did you execute Bash tool?
+    %%       -> IF NO: STOP RIGHT NOW AND EXECUTE Bash TOOL
+    %%     - Did Bash return a JSON message?
+    %%       -> IF NO: OUTPUT "ERROR: Failed to receive message" AND ABORT
     %%
-    %% IMPORTANT: Each 'receive' case below represents ONE message type.
-    %% After processing a message, you MUST call game_loop() again to wait for the next message.
-    %% ==========================================================
+    %% Step 2: Parse the JSON response to determine message type
+    %%
+    %% Step 3: Match the message type against the cases below
+    %%
+    %% Step 4: Execute the corresponding logic
+    %%   - This includes calling log_thought()
+    %%   - log_thought() MUST execute Read + Write/Edit tools
+    %%
+    %% Step 5: Recursively call game_loop() to continue waiting for next message
+    %%
+    %% !!! CRITICAL !!!
+    %% - Each 'receive' case below represents ONE message type
+    %% - After processing a message, you MUST call game_loop() again
+    %% - DO NOT simulate message reception - ACTUALLY EXECUTE Bash tool
+    %%
+    %% ****************************************************************************
 
     receive
         %% Initial statement request (without seeing others' statements)
@@ -330,59 +373,132 @@ generate_summary(PlayerId, Role, Persona, Winner, State) ->
 %% Input: LogFile (path to log file), Thought (string to write)
 %% Appends the thought to the log file
 %%
-%% CRITICAL IMPLEMENTATION NOTE:
-%% When Claude interprets this function, it MUST:
-%% 1. Use Read tool to read current file content (or get empty string if file doesn't exist)
-%% 2. Append Thought to current content
-%% 3. Use Edit tool (if file exists) or Write tool (if new file) to save the updated content
+%% ******************************************************************************
+%% !!! CRITICAL !!! TOOL EXECUTION REQUIRED !!! READ THIS NOW !!!
+%% ******************************************************************************
 %%
-%% DO NOT simulate - ACTUALLY EXECUTE THE TOOLS to persist player thoughts to disk.
+%% >>> YOU MUST EXECUTE ACTUAL TOOLS - THIS IS NOT OPTIONAL <<<
+%%
+%% REQUIRED EXECUTION STEPS:
+%%
+%% Step 1: Read current content
+%%   - Call read_file_content(LogFile)
+%%   - read_file_content() MUST execute Read tool (see function definition)
+%%   - This returns CurrentContent (or "" if file doesn't exist)
+%%   - VERIFY: Did read_file_content() actually call Read tool?
+%%     -> IF NO: STOP AND CALL Read TOOL NOW
+%%
+%% Step 2: Append new thought
+%%   - NewContent = CurrentContent ++ Thought
+%%
+%% Step 3: Write updated content
+%%   - Call edit_file(LogFile, CurrentContent, NewContent)
+%%   - edit_file() MUST execute Write/Edit tool (see function definition)
+%%   - VERIFY: Did edit_file() actually call Write/Edit tool?
+%%     -> IF NO: STOP AND CALL Write/Edit TOOL NOW
+%%
+%% IF ANY STEP FAILS:
+%%   - OUTPUT: "ERROR: Failed to log thought to ~s: <error_details>~n"
+%%   - OUTPUT: "ABORTING: Cannot continue without logging capability~n"
+%%   - STOP EXECUTION IMMEDIATELY
+%%
+%% !!! DO NOT SIMULATE - ACTUALLY EXECUTE THE TOOLS TO PERSIST THOUGHTS !!!
+%% ******************************************************************************
 log_thought(LogFile, Thought) ->
-    %% Step 1: Read current content using Read tool
-    %%   If file doesn't exist, CurrentContent = ""
-    %% Step 2: NewContent = CurrentContent ++ Thought
-    %% Step 3: Call edit_file(LogFile, CurrentContent, NewContent)
+    %% !!! STEP 1: EXECUTE read_file_content() - MUST call Read tool !!!
     CurrentContent = read_file_content(LogFile),
+
+    %% Step 2: Append new thought
     NewContent = CurrentContent ++ Thought,
+
+    %% !!! STEP 3: EXECUTE edit_file() - MUST call Write/Edit tool !!!
     edit_file(LogFile, CurrentContent, NewContent).
 
 %% Read file content using Claude's Read tool
 %% Returns file content as string, or "" if file doesn't exist
 %%
-%% *** MANDATORY EXECUTION REQUIREMENT ***
-%% YOU MUST ACTUALLY CALL THE Read TOOL NOW - THIS IS NOT OPTIONAL:
-%% 1. EXECUTE: Read(file_path=FilePath)
-%% 2. If file exists: RETURN the actual file content as a string
-%% 3. If file doesn't exist or Read fails: RETURN empty string ""
+%% ******************************************************************************
+%% !!! MANDATORY !!! Read TOOL EXECUTION REQUIRED !!! READ THIS NOW !!!
+%% ******************************************************************************
 %%
-%% DO NOT return a placeholder value.
-%% DO NOT simulate this function.
-%% DO NOT skip the Read tool execution.
-%% EXECUTE THE Read TOOL IMMEDIATELY BEFORE PROCEEDING.
+%% >>> YOU MUST ACTUALLY CALL THE Read TOOL NOW - THIS IS NOT OPTIONAL <<<
+%%
+%% STOP HERE AND EXECUTE THIS TOOL NOW:
+%%   Read(file_path=FilePath)
+%%
+%% VERIFICATION STEPS - YOU MUST DO THESE:
+%%   1. Did you just call Read tool?
+%%      -> IF NO: STOP RIGHT NOW AND CALL Read TOOL
+%%   2. Did the tool succeed?
+%%      -> IF YES: RETURN file content as string
+%%   3. Did the tool fail (file not found)?
+%%      -> IF YES: RETURN empty string ""
+%%
+%% IF READ TOOL FAILS UNEXPECTEDLY (NOT file not found):
+%%   - OUTPUT: "ERROR: Failed to read file ~s: <error_details>~n"
+%%   - OUTPUT: "ABORTING: Cannot continue without file access~n"
+%%   - STOP EXECUTION IMMEDIATELY - DO NOT CONTINUE
+%%
+%% DO NOT DO THESE THINGS:
+%%   - DO NOT return undefined
+%%   - DO NOT return a placeholder value
+%%   - DO NOT simulate this function
+%%   - DO NOT skip the Read tool execution
+%%   - DO NOT continue execution if Read fails unexpectedly
 %%
 %% Example execution flow:
 %%   FilePath = ".claude/tmp/werewolf-123/player_1.log"
-%%   -> Call Read(file_path=".claude/tmp/werewolf-123/player_1.log")
-%%   -> If successful, return "# player_1 のプロフィール\n\n役職: seer\n..."
-%%   -> If file not found, return ""
+%%   -> EXECUTE: Read(file_path=".claude/tmp/werewolf-123/player_1.log")
+%%   -> If successful: RETURN "# player_1 のプロフィール\n\n..."
+%%   -> If file not found: RETURN ""
+%%   -> If unexpected error: OUTPUT ERROR AND ABORT
+%%
+%% !!! THIS IS ESSENTIAL FOR LOGGING PLAYER THOUGHTS !!!
+%% ******************************************************************************
 read_file_content(FilePath) ->
-    %% STOP HERE: You must execute Read tool with FilePath before continuing
+    %% !!! STOP HERE: You must execute Read tool with FilePath before continuing !!!
     undefined.
 
 %% Edit file using Claude's Write or Edit tool
 %% Input: FilePath (path to file), OldString (current content, "" for new file), NewString (new content)
 %% Output: ok
 %%
-%% CRITICAL IMPLEMENTATION NOTE:
-%% When Claude interprets this function call, it MUST actually execute the corresponding tool:
+%% ******************************************************************************
+%% !!! MANDATORY !!! TOOL EXECUTION REQUIRED !!! READ THIS NOW !!!
+%% ******************************************************************************
+%%
+%% >>> YOU MUST ACTUALLY EXECUTE THE CORRESPONDING TOOL - THIS IS NOT OPTIONAL <<<
+%%
+%% STOP HERE AND EXECUTE ONE OF THESE TOOLS NOW:
 %%
 %% Case 1: New file (OldString == "")
-%%   -> Execute Write tool: Write(file_path=FilePath, content=NewString)
+%%   -> EXECUTE NOW: Write(file_path=FilePath, content=NewString)
 %%
 %% Case 2: File update (OldString != "")
-%%   -> Execute Edit tool: Edit(file_path=FilePath, old_string=OldString, new_string=NewString)
+%%   -> EXECUTE NOW: Edit(file_path=FilePath, old_string=OldString,
+%%                        new_string=NewString)
 %%
-%% DO NOT simulate or return undefined - ACTUALLY CALL THE TOOL to persist changes to disk.
+%% VERIFICATION STEPS - YOU MUST DO THESE:
+%%   1. Did you just call Write or Edit tool?
+%%      -> IF NO: STOP RIGHT NOW AND CALL THE TOOL
+%%   2. Did the tool succeed?
+%%      -> IF NO: OUTPUT "ERROR: Failed to write file ~s" AND ABORT
+%%   3. Can you verify the file was written?
+%%      -> IF NO: OUTPUT "ERROR: Cannot verify file write" AND ABORT
+%%
+%% IF THE WRITE/EDIT TOOL FAILS:
+%%   - OUTPUT: "ERROR: Failed to write file ~s: <error_details>~n"
+%%   - OUTPUT: "ABORTING: Cannot continue without file logging~n"
+%%   - STOP EXECUTION IMMEDIATELY - DO NOT CONTINUE
+%%
+%% DO NOT DO THESE THINGS:
+%%   - DO NOT simulate this function
+%%   - DO NOT return undefined without executing tools
+%%   - DO NOT continue execution if Write/Edit fails
+%%   - DO NOT skip verification steps
+%%
+%% !!! THIS IS ESSENTIAL FOR LOGGING PLAYER THOUGHTS !!!
+%% ******************************************************************************
 edit_file(FilePath, OldString, NewString) -> ok.
 ```
 
