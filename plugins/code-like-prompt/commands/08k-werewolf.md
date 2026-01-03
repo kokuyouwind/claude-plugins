@@ -6,7 +6,46 @@ Emulate the following Erlang-style code internally (without using external tools
 
 **IMPORTANT**: This code uses `send()` and `receive_msg()` helper functions that call bash scripts from the `erlang-message-sync` skill. If you want to test actual filesystem-based message synchronization, execute the scripts. Otherwise, simulate the behavior.
 
-**IMPORTANT**: When you see `spawn(claude_agent, werewolf_player, [...])`, it means spawning a Claude Code subagent named "code-like-prompt:erlang-werewolf-player". If you recognize this as a plugin-defined agent, you MAY use the Task tool with `subagent_type: "code-like-prompt:erlang-werewolf-player"` to actually execute the agent. Otherwise, simulate the player's behavior based on the agent definition.
+%% ******************************************************************************
+%% !!! CRITICAL !!! MANDATORY SUBAGENT SPAWNING !!! READ THIS NOW !!!
+%% ******************************************************************************
+%%
+%% When you see `spawn(claude_agent, werewolf_player, [...])`:
+%%
+%% >>> YOU MUST EXECUTE THE Task TOOL TO SPAWN THE ACTUAL SUBAGENT <<<
+%% >>> THIS IS NOT OPTIONAL - THIS IS A REQUIRED ACTION <<<
+%% >>> DO NOT SIMULATE - ACTUALLY CALL THE Task TOOL <<<
+%%
+%% REQUIRED ACTION - EXECUTE THIS TOOL NOW:
+%%
+%%   Task(
+%%     subagent_type: "code-like-prompt:erlang-werewolf-player",
+%%     description: "Spawn player <player_id>",
+%%     prompt: "You are <player_id>. Wait for and process messages from the game
+%%             master following the erlang-werewolf-player agent behavior.",
+%%     run_in_background: true
+%%   )
+%%
+%% VERIFICATION STEPS - YOU MUST DO THESE:
+%%   1. Did you just call the Task tool?
+%%      -> IF NO: STOP RIGHT NOW AND CALL THE Task TOOL
+%%   2. Did the Task tool succeed?
+%%      -> IF NO: OUTPUT "ERROR: Failed to spawn player <player_id>" AND ABORT
+%%   3. Did you receive a task_id?
+%%      -> IF NO: OUTPUT "ERROR: No task_id received" AND ABORT
+%%
+%% IF SPAWNING FAILS:
+%%   - OUTPUT: "ERROR: Failed to spawn player <player_id>: <error_details>~n"
+%%   - OUTPUT: "ABORTING: Cannot continue without all players~n"
+%%   - STOP EXECUTION IMMEDIATELY - DO NOT CONTINUE THE GAME
+%%
+%% DO NOT DO THESE THINGS:
+%%   - DO NOT simulate player behavior in the main thread
+%%   - DO NOT continue without spawning actual subagents
+%%   - DO NOT ignore Task tool failures
+%%
+%% !!! THIS IS ESSENTIAL FOR PROPER MULTI-AGENT WEREWOLF GAME SIMULATION !!!
+%% ******************************************************************************
 
 ```erlang
 -module(werewolf_game).
@@ -67,9 +106,19 @@ main() ->
 
         %% Create player profile and write to log file using Edit tool
         ProfileContent = io_lib:format("# ~s のプロフィール~n~n役職: ~s~nペルソナ: ~s~n~n## ゲーム記録~n~n", [PlayerPid, Role, Persona]),
+
+        %% *** STOP HERE AND EXECUTE Write TOOL NOW ***
+        %% This edit_file() call REQUIRES actual Write tool execution
+        %% See the MANDATORY EXECUTION REQUIREMENT in edit_file() function definition
+        %% DO NOT CONTINUE without calling Write tool and verifying file was created
         edit_file(LogFile, "", ProfileContent),
 
         io:format("~s: ~s (役職: ~s)~n", [PlayerPid, Persona, Role]),
+
+        %% *** STOP HERE AND EXECUTE Task TOOL NOW ***
+        %% This spawn() call REQUIRES actual Task tool execution
+        %% See the CRITICAL SUBAGENT SPAWNING REQUIREMENT at the top of this file
+        %% DO NOT CONTINUE without calling Task tool and verifying success
         spawn(claude_agent, werewolf_player, []),
 
         %% Assign role and persona with log file path
@@ -487,17 +536,44 @@ format_qa_json(AllAnswers) -> undefined.
 %% Input: FilePath (path to file), OldString (string to replace, "" for new file), NewString (content to write)
 %% Output: ok
 %%
-%% CRITICAL IMPLEMENTATION NOTE:
-%% When Claude interprets this function call, it MUST actually execute the corresponding tool:
+%% ******************************************************************************
+%% !!! MANDATORY !!! TOOL EXECUTION REQUIRED !!! READ THIS NOW !!!
+%% ******************************************************************************
+%%
+%% >>> YOU MUST ACTUALLY EXECUTE THE CORRESPONDING TOOL <<<
+%% >>> THIS IS NOT OPTIONAL - THIS IS A REQUIRED ACTION <<<
+%% >>> DO NOT SIMULATE - ACTUALLY CALL Write OR Edit TOOL <<<
+%%
+%% STOP HERE AND EXECUTE ONE OF THESE TOOLS NOW:
 %%
 %% Case 1: New file (OldString == "")
-%%   -> Execute Write tool: Write(file_path=FilePath, content=NewString)
+%%   -> EXECUTE NOW: Write(file_path=FilePath, content=NewString)
 %%
 %% Case 2: File update (OldString != "")
-%%   -> Execute Edit tool: Edit(file_path=FilePath, old_string=OldString, new_string=NewString)
+%%   -> EXECUTE NOW: Edit(file_path=FilePath, old_string=OldString,
+%%                        new_string=NewString)
 %%
-%% DO NOT simulate or return undefined - ACTUALLY CALL THE TOOL to persist changes to disk.
-%% This is essential for logging game state and player thoughts.
+%% VERIFICATION STEPS - YOU MUST DO THESE:
+%%   1. Did you just call Write or Edit tool?
+%%      -> IF NO: STOP RIGHT NOW AND CALL THE TOOL
+%%   2. Did the tool succeed?
+%%      -> IF NO: OUTPUT "ERROR: Failed to write file ~s" AND ABORT
+%%   3. Can you verify the file was written?
+%%      -> IF NO: OUTPUT "ERROR: Cannot verify file write" AND ABORT
+%%
+%% IF THE WRITE/EDIT TOOL FAILS:
+%%   - OUTPUT: "ERROR: Failed to write file ~s: <error_details>~n"
+%%   - OUTPUT: "ABORTING: Cannot continue without file logging~n"
+%%   - STOP EXECUTION IMMEDIATELY - DO NOT CONTINUE THE GAME
+%%
+%% DO NOT DO THESE THINGS:
+%%   - DO NOT simulate this function
+%%   - DO NOT return undefined without executing tools
+%%   - DO NOT continue execution if Write/Edit fails
+%%   - DO NOT skip verification steps
+%%
+%% !!! THIS IS ESSENTIAL FOR LOGGING GAME STATE AND PLAYER THOUGHTS !!!
+%% ******************************************************************************
 edit_file(FilePath, OldString, NewString) -> ok.
 
 %% Generate a random persona with name, age, gender, occupation, and personality
