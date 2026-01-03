@@ -6,6 +6,8 @@ Emulate the following Erlang-style code internally (without using external tools
 
 **IMPORTANT**: This code uses `send()` and `receive_msg()` helper functions that call bash scripts from the `erlang-message-sync` skill. If you want to test actual filesystem-based message synchronization, execute the scripts. Otherwise, simulate the behavior.
 
+**IMPORTANT**: When you see `spawn(claude_agent, werewolf_player, [...])`, it means spawning a Claude Code subagent named "code-like-prompt:erlang-werewolf-player". If you recognize this as a plugin-defined agent, you MAY use the Task tool with `subagent_type: "code-like-prompt:erlang-werewolf-player"` to actually execute the agent. Otherwise, simulate the player's behavior based on the agent definition.
+
 ```erlang
 -module(werewolf_game).
 -export([main/0]).
