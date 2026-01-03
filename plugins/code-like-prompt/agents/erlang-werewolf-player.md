@@ -82,6 +82,10 @@ game_loop(PlayerId, Role, Persona, State) ->
 
             %% Internal thought - decide who to question and what to ask
             {Target1, Question1, Target2, Question2} = generate_questions(PlayerId, Role, Persona, State),
+            QuestionThought = io_lib:format("~n--- 質問 ---~n内部思考: ~sに「~s」、~sに「~s」と質問します~n質問1: ~s → ~s~n質問2: ~s → ~s~n",
+                                           [Target1, Question1, Target2, Question2, Target1, Question1, Target2, Question2]),
+            LogFile = maps:get(log_file, State),
+            log_thought(LogFile, QuestionThought),
             io:format("[~s] 内部思考: ~sに「~s」、~sに「~s」と質問します~n",
                      [PlayerId, Target1, Question1, Target2, Question2]),
 
@@ -98,6 +102,10 @@ game_loop(PlayerId, Role, Persona, State) ->
 
             %% Internal thought - formulate answer
             Answer = generate_answer(PlayerId, Role, Persona, FromPid, Question, State),
+            AnswerThought = io_lib:format("~n--- 回答 ---~n質問元: ~s~n質問内容: ~s~n内部思考: ~sと回答します~n回答: ~s~n",
+                                         [FromPid, Question, Answer, Answer]),
+            LogFile = maps:get(log_file, State),
+            log_thought(LogFile, AnswerThought),
             io:format("[~s] 内部思考: ~sと回答します~n", [PlayerId, Answer]),
 
             %% Send answer to GM
@@ -162,6 +170,9 @@ game_loop(PlayerId, Role, Persona, State) ->
 
             %% Generate summary
             Summary = generate_summary(PlayerId, Role, Persona, Winner, State),
+            EndThought = io_lib:format("~n=== ゲーム終了 ===~n勝者: ~s~n総括: ~s~n", [Winner, Summary]),
+            LogFile = maps:get(log_file, State),
+            log_thought(LogFile, EndThought),
             io:format("[~s] 総括: ~s~n", [PlayerId, Summary]),
 
             %% Send summary to GM
@@ -225,11 +236,23 @@ generate_summary(PlayerId, Role, Persona, Winner, State) ->
     io_lib:format("私は~sとして~sを演じました。結果は~sの勝利でした。",
                   [Persona, Role, Winner]).
 
-%% Helper function to write thoughts to log file
+%% Helper function to write thoughts to log file using Edit tool
 %% Input: LogFile (path to log file), Thought (string to write)
-%% Appends the thought to the log file with timestamp
+%% Appends the thought to the log file using Claude's Edit tool
+%% The Edit tool reads current content, then writes old content + new thought
 log_thought(LogFile, Thought) ->
-    file:write_file(LogFile, Thought, [append]).
+    %% Read current content from file
+    CurrentContent = case file:read_file(LogFile) of
+        {ok, Binary} -> binary_to_list(Binary);
+        {error, _} -> ""
+    end,
+    %% Append new thought to current content
+    NewContent = CurrentContent ++ Thought,
+    %% Use Edit tool to update file
+    edit_file(LogFile, CurrentContent, NewContent).
+
+%% Edit file using Claude's Edit tool (to be inferred by AI)
+edit_file(FilePath, OldString, NewString) -> undefined.
 ```
 
 ## Important Constraints
