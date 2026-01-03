@@ -236,23 +236,48 @@ generate_summary(PlayerId, Role, Persona, Winner, State) ->
     io_lib:format("私は~sとして~sを演じました。結果は~sの勝利でした。",
                   [Persona, Role, Winner]).
 
-%% Helper function to write thoughts to log file using Edit tool
+%% Helper function to write thoughts to log file using Read + Edit/Write tool
 %% Input: LogFile (path to log file), Thought (string to write)
-%% Appends the thought to the log file using Claude's Edit tool
-%% The Edit tool reads current content, then writes old content + new thought
+%% Appends the thought to the log file
+%%
+%% CRITICAL IMPLEMENTATION NOTE:
+%% When Claude interprets this function, it MUST:
+%% 1. Use Read tool to read current file content (or get empty string if file doesn't exist)
+%% 2. Append Thought to current content
+%% 3. Use Edit tool (if file exists) or Write tool (if new file) to save the updated content
+%%
+%% DO NOT simulate - ACTUALLY EXECUTE THE TOOLS to persist player thoughts to disk.
 log_thought(LogFile, Thought) ->
-    %% Read current content from file
-    CurrentContent = case file:read_file(LogFile) of
-        {ok, Binary} -> binary_to_list(Binary);
-        {error, _} -> ""
-    end,
-    %% Append new thought to current content
+    %% Step 1: Read current content using Read tool
+    %%   If file doesn't exist, CurrentContent = ""
+    %% Step 2: NewContent = CurrentContent ++ Thought
+    %% Step 3: Call edit_file(LogFile, CurrentContent, NewContent)
+    CurrentContent = read_file_content(LogFile),
     NewContent = CurrentContent ++ Thought,
-    %% Use Edit tool to update file
     edit_file(LogFile, CurrentContent, NewContent).
 
-%% Edit file using Claude's Edit tool (to be inferred by AI)
-edit_file(FilePath, OldString, NewString) -> undefined.
+%% Read file content using Claude's Read tool
+%% Returns file content as string, or "" if file doesn't exist
+%%
+%% CRITICAL: Execute Read tool -> Read(file_path=FilePath)
+%% If file doesn't exist, return empty string ""
+read_file_content(FilePath) -> "".
+
+%% Edit file using Claude's Write or Edit tool
+%% Input: FilePath (path to file), OldString (current content, "" for new file), NewString (new content)
+%% Output: ok
+%%
+%% CRITICAL IMPLEMENTATION NOTE:
+%% When Claude interprets this function call, it MUST actually execute the corresponding tool:
+%%
+%% Case 1: New file (OldString == "")
+%%   -> Execute Write tool: Write(file_path=FilePath, content=NewString)
+%%
+%% Case 2: File update (OldString != "")
+%%   -> Execute Edit tool: Edit(file_path=FilePath, old_string=OldString, new_string=NewString)
+%%
+%% DO NOT simulate or return undefined - ACTUALLY CALL THE TOOL to persist changes to disk.
+edit_file(FilePath, OldString, NewString) -> ok.
 ```
 
 ## Important Constraints
