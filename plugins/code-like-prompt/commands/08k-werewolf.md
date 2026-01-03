@@ -63,7 +63,11 @@ main() ->
         Persona = lists:nth(I, ShuffledPersonas),
         LogFile = io_lib:format("~s/~s.log", [LogDir, PlayerPid]),
 
-        io:format("GM: ~s を起動 (役職: ~s, ペルソナ: ~s)~n", [PlayerPid, Role, Persona]),
+        %% Create player profile and write to log file using Edit tool
+        ProfileContent = io_lib:format("# ~s のプロフィール~n~n役職: ~s~nペルソナ: ~s~n~n## ゲーム記録~n~n", [PlayerPid, Role, Persona]),
+        edit_file(LogFile, "", ProfileContent),
+
+        io:format("~s: ~s (役職: ~s)~n", [PlayerPid, Persona, Role]),
         spawn(claude_agent, werewolf_player, []),
 
         %% Assign role and persona with log file path
@@ -75,6 +79,14 @@ main() ->
     lists:foreach(fun(PlayerPid) ->
         receive_msg(Self, PlayerPid, 10)
     end, PlayerPids),
+
+    %% Display all player profiles
+    io:format("~n=== プレイヤー一覧 ===~n"),
+    lists:foreach(fun(I) ->
+        PlayerPid = lists:nth(I, PlayerPids),
+        Persona = lists:nth(I, ShuffledPersonas),
+        io:format("~s: ~s~n", [PlayerPid, Persona])
+    end, lists:seq(1, 5)),
 
     %% Game loop
     GameState = #{
@@ -125,6 +137,7 @@ game_loop(Self, State) ->
     AlivePlayers = maps:get(alive_players, State),
 
     io:format("~n=== ~p日目 ===~n", [Day]),
+    io:format("生存者: ~p~n", [AlivePlayers]),
 
     %% Day phase
     if
@@ -214,9 +227,15 @@ game_loop(Self, State) ->
     io:format("~n--- 投票フェーズ ---~n"),
     Votes = collect_votes(Self, AlivePlayers),
 
+    %% Display vote details
+    io:format("投票結果:~n"),
+    lists:foreach(fun({Voter, Target}) ->
+        io:format("  ~s → ~s~n", [Voter, Target])
+    end, Votes),
+
     %% Determine execution target
     ExecutionTarget = determine_execution(Votes),
-    io:format("投票結果: ~s が処刑されます~n", [ExecutionTarget]),
+    io:format("~n処刑対象: ~s~n", [ExecutionTarget]),
 
     %% Record vote event
     VoteEvent = #{
@@ -230,12 +249,17 @@ game_loop(Self, State) ->
 
     %% Update alive players
     NewAlivePlayers = lists:delete(ExecutionTarget, AlivePlayers),
+    io:format("~n処刑後の生存者: ~p~n", [NewAlivePlayers]),
+
     StateAfterExecution = State#{
         alive_players => NewAlivePlayers,
         game_events => UpdatedEvents
     },
 
-    %% Check win condition
+    %% Check win condition after execution
+    %% Victory conditions:
+    %% - Villager team wins if all werewolves are dead
+    %% - Werewolf team wins if werewolves >= villagers
     case check_win_condition(StateAfterExecution) of
         {game_end, Winner} ->
             StateAfterExecution#{winner => Winner};
@@ -246,8 +270,32 @@ game_loop(Self, State) ->
             %% Collect night actions
             NightActions = collect_night_actions(Self, NewAlivePlayers, StateAfterExecution),
 
+            %% Display night actions
+            lists:foreach(fun({PlayerPid, Role, ActionMsg}) ->
+                Target = parse_action_target(ActionMsg),
+                case Role of
+                    "werewolf" ->
+                        io:format("~s (人狼) が ~s を襲撃対象に選択~n", [PlayerPid, Target]);
+                    "seer" ->
+                        io:format("~s (占い師) が ~s を占い対象に選択~n", [PlayerPid, Target]);
+                    "knight" ->
+                        io:format("~s (騎士) が ~s を護衛対象に選択~n", [PlayerPid, Target]);
+                    _ ->
+                        ok
+                end
+            end, NightActions),
+
             %% Resolve night actions
             NightResult = resolve_night(NightActions),
+
+            %% Display night result
+            io:format("~n--- 夜の結果 ---~n"),
+            case NightResult of
+                {victim, Victim} ->
+                    io:format("襲撃成功: ~s が死亡しました~n", [Victim]);
+                no_death ->
+                    io:format("襲撃は失敗しました（護衛成功または襲撃なし）~n")
+            end,
 
             %% Record night event
             NightEvent = #{
@@ -275,7 +323,10 @@ game_loop(Self, State) ->
                     }
             end,
 
-            %% Check win condition again
+            %% Check win condition after night attack
+            %% Victory conditions:
+            %% - Villager team wins if all werewolves are dead
+            %% - Werewolf team wins if werewolves >= villagers
             case check_win_condition(StateAfterNight) of
                 {game_end, Winner} ->
                     StateAfterNight#{winner => Winner};
@@ -429,6 +480,13 @@ parse_questions(PlayerPid, QuestionsMsg) -> undefined.
 %% Output: JSON string like "[{\"from\":\"player_1\",\"to\":\"player_2\",\"question\":\"...\",\"answer\":\"...\"}, ...]"
 %% Implementation is inferred by AI
 format_qa_json(AllAnswers) -> undefined.
+
+%% Edit file using Claude's Edit tool
+%% Input: FilePath (path to file), OldString (string to replace, empty for new file), NewString (content to write)
+%% Output: ok
+%% This function calls Claude's Edit tool to write/update files
+%% Implementation is inferred by AI - Claude will use the Edit tool
+edit_file(FilePath, OldString, NewString) -> undefined.
 
 %% Generate a random persona with name, age, gender, occupation, and personality
 %% Returns a string like "エリック (45歳・男性・鍛冶屋・真面目な性格)"
