@@ -1,7 +1,8 @@
 ---
 name: erlang-werewolf-player
 description: Player agent for werewolf game simulation. Each player has a role and persona, participates in discussions, votes, and performs night actions.
-tools: Read, Write, Bash
+tools: Read, Write, Edit, Bash
+permissionMode: acceptEdits
 model: haiku
 ---
 
@@ -259,9 +260,25 @@ log_thought(LogFile, Thought) ->
 %% Read file content using Claude's Read tool
 %% Returns file content as string, or "" if file doesn't exist
 %%
-%% CRITICAL: Execute Read tool -> Read(file_path=FilePath)
-%% If file doesn't exist, return empty string ""
-read_file_content(FilePath) -> "".
+%% *** MANDATORY EXECUTION REQUIREMENT ***
+%% YOU MUST ACTUALLY CALL THE Read TOOL NOW - THIS IS NOT OPTIONAL:
+%% 1. EXECUTE: Read(file_path=FilePath)
+%% 2. If file exists: RETURN the actual file content as a string
+%% 3. If file doesn't exist or Read fails: RETURN empty string ""
+%%
+%% DO NOT return a placeholder value.
+%% DO NOT simulate this function.
+%% DO NOT skip the Read tool execution.
+%% EXECUTE THE Read TOOL IMMEDIATELY BEFORE PROCEEDING.
+%%
+%% Example execution flow:
+%%   FilePath = ".claude/tmp/werewolf-123/player_1.log"
+%%   -> Call Read(file_path=".claude/tmp/werewolf-123/player_1.log")
+%%   -> If successful, return "# player_1 のプロフィール\n\n役職: seer\n..."
+%%   -> If file not found, return ""
+read_file_content(FilePath) ->
+    %% STOP HERE: You must execute Read tool with FilePath before continuing
+    undefined.
 
 %% Edit file using Claude's Write or Edit tool
 %% Input: FilePath (path to file), OldString (current content, "" for new file), NewString (new content)
