@@ -519,9 +519,16 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.8
+0.7.9
 
 ### Changelog
+
+#### 0.7.9
+- Improved 08k-werewolf command:
+  - Player summaries are now logged to player log files using append-log.sh script
+  - Removed mkdir from game initialization (now handled by append-log.sh script)
+  - Simplified profile generation: removed occupation field (now shows name, role, age, gender, personality only)
+  - Enhanced discussion mechanics: fortune teller CO and divination results discussion based on personality traits (cautious personalities hide/avoid fake claims, bold personalities come out/fake claims)
 
 #### 0.7.8
 - Improved 08k-werewolf command:
