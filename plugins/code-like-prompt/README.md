@@ -519,9 +519,17 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.6.1
+0.7.8
 
 ### Changelog
+
+#### 0.7.8
+- Improved 08k-werewolf command:
+  - Changed log output to use append-log.sh script instead of Edit tool
+  - Game now starts from first night (day 0) with fortune teller divination only
+  - First discussion phase encourages role CO (Coming Out) and divination results sharing
+  - Limited questions to 1 target per player (reduced from 2)
+  - No execution when voting results in a tie (no single majority)
 
 #### 0.6.1
 - Refactored 08h/08i/08j commands to use "Emulate the following~" format

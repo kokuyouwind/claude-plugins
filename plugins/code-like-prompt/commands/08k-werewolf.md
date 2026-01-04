@@ -55,6 +55,7 @@ Emulate the following Erlang-style code internally (without using external tools
 -define(SKILL_DIR, "~/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/erlang-message-sync").
 -define(SEND_SCRIPT, ?SKILL_DIR ++ "/scripts/send-message.sh").
 -define(RECV_SCRIPT, ?SKILL_DIR ++ "/scripts/receive-message.sh").
+-define(APPEND_LOG_SCRIPT, ?SKILL_DIR ++ "/scripts/append-log.sh").
 
 %% Helper functions for message passing via scripts
 send(From, To, MessageJson) ->
@@ -66,6 +67,10 @@ receive_msg(Pid) ->
 receive_msg(Pid, FromPattern, Timeout) ->
     Result = os:cmd(io_lib:format("bash ~s ~s ~s ~p", [?RECV_SCRIPT, Pid, FromPattern, Timeout])),
     Result.
+
+%% Helper function for appending to log files via script
+append_log(Directory, Filename, Content) ->
+    os:cmd(io_lib:format("bash ~s '~s' '~s' '~s'", [?APPEND_LOG_SCRIPT, Directory, Filename, Content])).
 
 %% Game master main function
 main() ->
@@ -102,16 +107,16 @@ main() ->
         PlayerPid = lists:nth(I, PlayerPids),
         Role = lists:nth(I, ShuffledRoles),
         Persona = lists:nth(I, ShuffledPersonas),
-        LogFile = io_lib:format("~s/~s.log", [LogDir, PlayerPid]),
+        LogFilename = io_lib:format("~s.log", [PlayerPid]),
 
-        %% Create player profile and write to log file using Edit tool
+        %% Create player profile and write to log file using append_log script
         ProfileContent = io_lib:format("# ~s のプロフィール~n~n役職: ~s~nペルソナ: ~s~n~n## ゲーム記録~n~n", [PlayerPid, Role, Persona]),
 
-        %% *** STOP HERE AND EXECUTE Write TOOL NOW ***
-        %% This edit_file() call REQUIRES actual Write tool execution
-        %% See the MANDATORY EXECUTION REQUIREMENT in edit_file() function definition
-        %% DO NOT CONTINUE without calling Write tool and verifying file was created
-        edit_file(LogFile, "", ProfileContent),
+        %% *** STOP HERE AND EXECUTE Bash TOOL NOW ***
+        %% This append_log() call REQUIRES actual Bash tool execution
+        %% to run the append-log.sh script
+        %% DO NOT CONTINUE without calling Bash tool and verifying file was created
+        append_log(LogDir, LogFilename, ProfileContent),
 
         io:format("~s: ~s (役職: ~s)~n", [PlayerPid, Persona, Role]),
 
@@ -122,7 +127,8 @@ main() ->
         spawn(claude_agent, werewolf_player, []),
 
         %% Assign role and persona with log file path
-        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\"}", [Role, Persona, LogFile]),
+        LogFilePath = io_lib:format("~s/~s", [LogDir, LogFilename]),
+        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\"}", [Role, Persona, LogFilePath]),
         send(Self, PlayerPid, RoleMsg)
     end, lists:seq(1, 5)),
 
@@ -139,9 +145,12 @@ main() ->
         io:format("~s: ~s~n", [PlayerPid, Persona])
     end, lists:seq(1, 5)),
 
-    %% Game loop
+    %% Start with night 0 (first night) - fortune teller divination only
+    io:format("~n=== 0日目の夜 ===~n"),
+    io:format("--- 占い師の占いフェーズ ---~n"),
+
     GameState = #{
-        day => 1,
+        day => 0,
         alive_players => PlayerPids,
         player_roles => lists:zip(PlayerPids, ShuffledRoles),
         player_personas => lists:zip(PlayerPids, ShuffledPersonas),
@@ -149,7 +158,36 @@ main() ->
         game_events => []  %% Track all game events for result log
     },
 
-    FinalState = game_loop(Self, GameState),
+    %% Collect fortune teller's divination on night 0
+    Night0Actions = collect_night_actions(Self, PlayerPids, GameState, first_night),
+
+    %% Display divination action
+    lists:foreach(fun({PlayerPid, Role, ActionMsg}) ->
+        case Role of
+            "seer" ->
+                Target = parse_action_target(ActionMsg),
+                io:format("~s (占い師) が ~s を占い対象に選択~n", [PlayerPid, Target]);
+            _ ->
+                ok
+        end
+    end, Night0Actions),
+
+    %% Record night 0 event
+    Night0Event = #{
+        type => night,
+        day => 0,
+        actions => Night0Actions,
+        result => no_death  %% No attack on first night
+    },
+    InitialEvents = [Night0Event],
+
+    %% Start day loop from day 1
+    StateAfterNight0 = GameState#{
+        day => 1,
+        game_events => InitialEvents
+    },
+
+    FinalState = game_loop(Self, StateAfterNight0),
 
     %% Game end - request summaries from all players
     io:format("~n=== ゲーム終了 ===~n"),
@@ -190,11 +228,9 @@ game_loop(Self, State) ->
     io:format("~n=== ~p日目 ===~n", [Day]),
     io:format("生存者: ~p~n", [AlivePlayers]),
 
-    %% Day phase
+    %% Day phase - announce previous night results (starting from day 2)
     if
-        Day == 1 ->
-            io:format("--- 自己紹介フェーズ ---~n");
-        true ->
+        Day > 1 ->
             %% Announce night results
             case maps:get(night_result, State, none) of
                 none -> ok;
@@ -202,7 +238,9 @@ game_loop(Self, State) ->
                     io:format("昨夜、~s が襲撃されました~n", [Victim]);
                 no_death ->
                     io:format("昨夜は誰も死にませんでした~n")
-            end
+            end;
+        true ->
+            ok
     end,
 
     %% Discussion phase with questions and answers
@@ -211,7 +249,13 @@ game_loop(Self, State) ->
     %% Step 1: Collect initial statements from all players simultaneously
     io:format("--- 初回発言収集 ---~n"),
     lists:foreach(fun(PlayerPid) ->
-        InitialRequestMsg = "{\"type\":\"initial_statement_request\"}",
+        %% On day 1, encourage CO (Coming Out) with role claims and divination results
+        InitialRequestMsg = if
+            Day == 1 ->
+                "{\"type\":\"initial_statement_request\",\"encourage_co\":true}";
+            true ->
+                "{\"type\":\"initial_statement_request\"}"
+        end,
         send(Self, PlayerPid, InitialRequestMsg)
     end, AlivePlayers),
 
@@ -230,7 +274,7 @@ game_loop(Self, State) ->
         send(Self, PlayerPid, BroadcastMsg)
     end, AlivePlayers),
 
-    %% Step 3: Request questions from each player (to 2 other players)
+    %% Step 3: Request questions from each player (to 1 other player)
     io:format("~n--- 質問収集 ---~n"),
     lists:foreach(fun(PlayerPid) ->
         QuestionRequestMsg = "{\"type\":\"question_request\"}",
@@ -240,28 +284,26 @@ game_loop(Self, State) ->
     %% Collect questions from all players
     AllQuestions = lists:map(fun(PlayerPid) ->
         QuestionsMsg = receive_msg(Self, PlayerPid, 30),
-        %% Parse questions: {from: PlayerPid, questions: [{to: "player_X", question: "..."}, ...]}
-        ParsedQuestions = parse_questions(PlayerPid, QuestionsMsg),
-        io:format("~s からの質問: ~p~n", [PlayerPid, ParsedQuestions]),
-        ParsedQuestions
+        %% Parse question: {from: PlayerPid, question: {to: "player_X", question: "..."}}
+        ParsedQuestion = parse_question(PlayerPid, QuestionsMsg),
+        io:format("~s からの質問: ~p~n", [PlayerPid, ParsedQuestion]),
+        ParsedQuestion
     end, AlivePlayers),
 
     %% Step 4: Send questions to targets and collect answers
     io:format("~n--- 質問・回答 ---~n"),
-    AllAnswers = lists:flatmap(fun({FromPid, Questions}) ->
-        lists:map(fun({ToPid, Question}) ->
-            %% Send question to target player
-            AnswerRequestMsg = io_lib:format("{\"type\":\"answer_request\",\"from\":\"~s\",\"question\":\"~s\"}",
-                                            [FromPid, Question]),
-            send(Self, ToPid, AnswerRequestMsg),
+    AllAnswers = lists:map(fun({FromPid, {ToPid, Question}}) ->
+        %% Send question to target player
+        AnswerRequestMsg = io_lib:format("{\"type\":\"answer_request\",\"from\":\"~s\",\"question\":\"~s\"}",
+                                        [FromPid, Question]),
+        send(Self, ToPid, AnswerRequestMsg),
 
-            %% Receive answer
-            Answer = receive_msg(Self, ToPid, 30),
-            io:format("~s から ~s への質問: ~s~n", [FromPid, ToPid, Question]),
-            io:format("~s の回答: ~s~n", [ToPid, Answer]),
+        %% Receive answer
+        Answer = receive_msg(Self, ToPid, 30),
+        io:format("~s から ~s への質問: ~s~n", [FromPid, ToPid, Question]),
+        io:format("~s の回答: ~s~n", [ToPid, Answer]),
 
-            {FromPid, ToPid, Question, Answer}
-        end, Questions)
+        {FromPid, ToPid, Question, Answer}
     end, AllQuestions),
 
     %% Step 5: Broadcast all Q&A to all players
@@ -286,21 +328,28 @@ game_loop(Self, State) ->
 
     %% Determine execution target
     ExecutionTarget = determine_execution(Votes),
-    io:format("~n処刑対象: ~s~n", [ExecutionTarget]),
+
+    %% Handle execution or no execution
+    {NewAlivePlayers, ExecutedPlayer} = case ExecutionTarget of
+        "none" ->
+            io:format("~n投票結果: 同数のため処刑なし~n"),
+            {AlivePlayers, "none"};
+        _ ->
+            io:format("~n処刑対象: ~s~n", [ExecutionTarget]),
+            UpdatedAlivePlayers = lists:delete(ExecutionTarget, AlivePlayers),
+            io:format("~n処刑後の生存者: ~p~n", [UpdatedAlivePlayers]),
+            {UpdatedAlivePlayers, ExecutionTarget}
+    end,
 
     %% Record vote event
     VoteEvent = #{
         type => vote,
         day => Day,
         votes => Votes,
-        executed => ExecutionTarget
+        executed => ExecutedPlayer
     },
     Events = maps:get(game_events, State, []),
     UpdatedEvents = Events ++ [VoteEvent],
-
-    %% Update alive players
-    NewAlivePlayers = lists:delete(ExecutionTarget, AlivePlayers),
-    io:format("~n処刑後の生存者: ~p~n", [NewAlivePlayers]),
 
     StateAfterExecution = State#{
         alive_players => NewAlivePlayers,
@@ -318,8 +367,8 @@ game_loop(Self, State) ->
             %% Night phase
             io:format("~n--- 夜フェーズ ---~n"),
 
-            %% Collect night actions
-            NightActions = collect_night_actions(Self, NewAlivePlayers, StateAfterExecution),
+            %% Collect night actions (normal night, not first night)
+            NightActions = collect_night_actions(Self, NewAlivePlayers, StateAfterExecution, normal_night),
 
             %% Display night actions
             lists:foreach(fun({PlayerPid, Role, ActionMsg}) ->
@@ -402,6 +451,7 @@ collect_votes(Self, AlivePlayers) ->
     end, AlivePlayers).
 
 %% Determine execution target from votes
+%% Returns: ExecutionTarget (player ID) or "none" if no single majority
 determine_execution(Votes) ->
     %% Count votes for each target
     TargetCounts = lists:foldl(fun({_Voter, Target}, Acc) ->
@@ -409,14 +459,21 @@ determine_execution(Votes) ->
     end, #{}, Votes),
 
     %% Find target with most votes
-    {ExecutionTarget, _MaxVotes} = lists:foldl(fun({Target, Count}, {CurrentTarget, CurrentMax}) ->
+    {ExecutionTarget, MaxVotes} = lists:foldl(fun({Target, Count}, {CurrentTarget, CurrentMax}) ->
         if
             Count > CurrentMax -> {Target, Count};
             true -> {CurrentTarget, CurrentMax}
         end
     end, {"", 0}, maps:to_list(TargetCounts)),
 
-    ExecutionTarget.
+    %% Check if there's a tie (multiple players with max votes)
+    MaxVoteTargets = lists:filter(fun({_Target, Count}) -> Count == MaxVotes end,
+                                   maps:to_list(TargetCounts)),
+
+    case length(MaxVoteTargets) of
+        1 -> ExecutionTarget;  %% Single majority - execute
+        _ -> "none"            %% Tie or no votes - no execution
+    end.
 
 %% Parse vote target from JSON message
 %% Input: VoteMsg (JSON string with vote target)
@@ -426,19 +483,31 @@ determine_execution(Votes) ->
 parse_vote_target(VoteMsg) -> undefined.
 
 %% Collect night actions from players with roles
-collect_night_actions(Self, AlivePlayers, State) ->
+%% NightType: first_night (only seer) or normal_night (werewolf, seer, knight)
+collect_night_actions(Self, AlivePlayers, State, NightType) ->
     PlayerRoles = maps:get(player_roles, State),
 
     lists:filtermap(fun(PlayerPid) ->
         case lists:keyfind(PlayerPid, 1, PlayerRoles) of
-            {PlayerPid, Role} when Role == "werewolf"; Role == "seer"; Role == "knight" ->
-                %% Request night action
-                ActionRequestMsg = io_lib:format("{\"type\":\"night_action_request\",\"role\":\"~s\"}", [Role]),
-                send(Self, PlayerPid, ActionRequestMsg),
+            {PlayerPid, Role} ->
+                %% On first night, only seer can act
+                ShouldAct = case NightType of
+                    first_night -> Role == "seer";
+                    normal_night -> Role == "werewolf" orelse Role == "seer" orelse Role == "knight"
+                end,
 
-                %% Receive action
-                ActionMsg = receive_msg(Self, PlayerPid, 30),
-                {true, {PlayerPid, Role, ActionMsg}};
+                if
+                    ShouldAct ->
+                        %% Request night action
+                        ActionRequestMsg = io_lib:format("{\"type\":\"night_action_request\",\"role\":\"~s\"}", [Role]),
+                        send(Self, PlayerPid, ActionRequestMsg),
+
+                        %% Receive action
+                        ActionMsg = receive_msg(Self, PlayerPid, 30),
+                        {true, {PlayerPid, Role, ActionMsg}};
+                    true ->
+                        false
+                end;
             _ ->
                 false
         end
@@ -519,12 +588,12 @@ shuffle(List) ->
 %% Implementation is inferred by AI
 format_statements_json(Statements) -> undefined.
 
-%% Parse questions from player message
-%% Input: PlayerPid, QuestionsMsg (JSON string with questions to 2 players)
-%% Output: {PlayerPid, [{TargetPid, Question}, {TargetPid, Question}]}
-%% Expected format: {"type":"questions","targets":["player_1","player_2"],"questions":["question1","question2"]}
+%% Parse question from player message
+%% Input: PlayerPid, QuestionMsg (JSON string with question to 1 player)
+%% Output: {PlayerPid, {TargetPid, Question}}
+%% Expected format: {"type":"question","target":"player_X","question":"question text"}
 %% Implementation is inferred by AI
-parse_questions(PlayerPid, QuestionsMsg) -> undefined.
+parse_question(PlayerPid, QuestionMsg) -> undefined.
 
 %% Format Q&A list as JSON array
 %% Input: [{FromPid, ToPid, Question, Answer}, ...]
@@ -532,49 +601,47 @@ parse_questions(PlayerPid, QuestionsMsg) -> undefined.
 %% Implementation is inferred by AI
 format_qa_json(AllAnswers) -> undefined.
 
-%% Edit file using Claude's Write or Edit tool
-%% Input: FilePath (path to file), OldString (string to replace, "" for new file), NewString (content to write)
+%% Append content to log file using append-log.sh script
+%% Input: Directory (log directory path), Filename (log file name), Content (content to append)
 %% Output: ok
 %%
 %% ******************************************************************************
 %% !!! MANDATORY !!! TOOL EXECUTION REQUIRED !!! READ THIS NOW !!!
 %% ******************************************************************************
 %%
-%% >>> YOU MUST ACTUALLY EXECUTE THE CORRESPONDING TOOL <<<
+%% >>> YOU MUST ACTUALLY EXECUTE THE Bash TOOL <<<
 %% >>> THIS IS NOT OPTIONAL - THIS IS A REQUIRED ACTION <<<
-%% >>> DO NOT SIMULATE - ACTUALLY CALL Write OR Edit TOOL <<<
+%% >>> DO NOT SIMULATE - ACTUALLY CALL Bash TOOL <<<
 %%
-%% STOP HERE AND EXECUTE ONE OF THESE TOOLS NOW:
+%% STOP HERE AND EXECUTE Bash TOOL NOW:
 %%
-%% Case 1: New file (OldString == "")
-%%   -> EXECUTE NOW: Write(file_path=FilePath, content=NewString)
-%%
-%% Case 2: File update (OldString != "")
-%%   -> EXECUTE NOW: Edit(file_path=FilePath, old_string=OldString,
-%%                        new_string=NewString)
+%%   Bash(
+%%     command: "bash " ++ ?APPEND_LOG_SCRIPT ++ " '" ++ Directory ++ "' '" ++ Filename ++ "' '" ++ Content ++ "'",
+%%     description: "Append log to " ++ Filename
+%%   )
 %%
 %% VERIFICATION STEPS - YOU MUST DO THESE:
-%%   1. Did you just call Write or Edit tool?
+%%   1. Did you just call Bash tool?
 %%      -> IF NO: STOP RIGHT NOW AND CALL THE TOOL
 %%   2. Did the tool succeed?
-%%      -> IF NO: OUTPUT "ERROR: Failed to write file ~s" AND ABORT
+%%      -> IF NO: OUTPUT "ERROR: Failed to append log to ~s/~s" AND ABORT
 %%   3. Can you verify the file was written?
-%%      -> IF NO: OUTPUT "ERROR: Cannot verify file write" AND ABORT
+%%      -> IF NO: OUTPUT "ERROR: Cannot verify log append" AND ABORT
 %%
-%% IF THE WRITE/EDIT TOOL FAILS:
-%%   - OUTPUT: "ERROR: Failed to write file ~s: <error_details>~n"
+%% IF THE Bash TOOL FAILS:
+%%   - OUTPUT: "ERROR: Failed to append log to ~s/~s: <error_details>~n"
 %%   - OUTPUT: "ABORTING: Cannot continue without file logging~n"
 %%   - STOP EXECUTION IMMEDIATELY - DO NOT CONTINUE THE GAME
 %%
 %% DO NOT DO THESE THINGS:
 %%   - DO NOT simulate this function
 %%   - DO NOT return undefined without executing tools
-%%   - DO NOT continue execution if Write/Edit fails
+%%   - DO NOT continue execution if Bash fails
 %%   - DO NOT skip verification steps
 %%
 %% !!! THIS IS ESSENTIAL FOR LOGGING GAME STATE AND PLAYER THOUGHTS !!!
 %% ******************************************************************************
-edit_file(FilePath, OldString, NewString) -> ok.
+append_log(Directory, Filename, Content) -> ok.
 
 %% Generate a random persona with name, age, gender, occupation, and personality
 %% Returns a string like "エリック (45歳・男性・鍛冶屋・真面目な性格)"
