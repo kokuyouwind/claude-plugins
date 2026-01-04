@@ -519,9 +519,23 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.9
+0.7.11
 
 ### Changelog
+
+#### 0.7.11
+- Improved 08k-werewolf command:
+  - Added random assignment scripts for roles and personas (generate-random-persona.sh, assign-random-roles.sh)
+  - Changed output from directory to single file: `.claude/tmp/werewolf-TIMESTAMP-result.md`
+  - Enhanced randomness in role assignment and persona generation
+
+#### 0.7.10
+- Improved 08k-werewolf command:
+  - Added role objectives, win conditions, and strategies for each role
+  - Enhanced information isolation: each player knows only their own role
+  - Changed logging from file-based to memory-based management
+  - Players return thought timeline at game end
+  - GM generates comprehensive result.md with all player thoughts
 
 #### 0.7.9
 - Improved 08k-werewolf command:
