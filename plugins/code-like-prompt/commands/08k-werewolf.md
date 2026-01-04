@@ -127,7 +127,7 @@ main() ->
 
         %% Assign role and persona with log file path
         LogFilePath = io_lib:format("~s/~s", [LogDir, LogFilename]),
-        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\"}", [Role, Persona, LogFilePath]),
+        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\",\"instruction\":\"All logs, thoughts, and outputs must be written in Japanese (すべてのログ、思考、出力は日本語で記述してください)\"}", [Role, Persona, LogFilePath]),
         send(Self, PlayerPid, RoleMsg)
     end, lists:seq(1, 5)),
 
@@ -194,7 +194,7 @@ main() ->
     io:format("勝者: ~s~n~n", [Winner]),
 
     lists:foreach(fun(PlayerPid) ->
-        EndMsg = io_lib:format("{\"type\":\"game_end\",\"winner\":\"~s\"}", [Winner]),
+        EndMsg = io_lib:format("{\"type\":\"game_end\",\"winner\":\"~s\",\"instruction\":\"Provide your game summary in Japanese (ゲームの総括を日本語で提供してください)\"}", [Winner]),
         send(Self, PlayerPid, EndMsg)
     end, PlayerPids),
 
@@ -260,9 +260,9 @@ game_loop(Self, State) ->
         %% Players should consider their role and personality when deciding whether to CO
         InitialRequestMsg = if
             Day == 1 ->
-                "{\"type\":\"initial_statement_request\",\"encourage_co\":true,\"instruction\":\"Consider your personality when deciding whether to come out as fortune teller. Cautious players may hide, bold players may claim (真占い師・騙り占い師問わず、性格に応じて占い師COするかを判断してください。慎重な性格なら隠す、大胆な性格なら名乗り出る・騙ることを検討してください)\"}";
+                "{\"type\":\"initial_statement_request\",\"encourage_co\":true,\"instruction\":\"Consider your personality when deciding whether to come out as fortune teller. Cautious players may hide, bold players may claim. Respond in Japanese. (真占い師・騙り占い師問わず、性格に応じて占い師COするかを判断してください。慎重な性格なら隠す、大胆な性格なら名乗り出る・騙ることを検討してください。回答は日本語で行ってください)\"}";
             true ->
-                "{\"type\":\"initial_statement_request\"}"
+                "{\"type\":\"initial_statement_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}"
         end,
         send(Self, PlayerPid, InitialRequestMsg)
     end, AlivePlayers),
@@ -288,9 +288,9 @@ game_loop(Self, State) ->
     lists:foreach(fun(PlayerPid) ->
         QuestionRequestMsg = if
             Day == 1 ->
-                "{\"type\":\"question_request\",\"instruction\":\"Focus your question on fortune teller claims (CO) and divination results. Ask about who claimed to be the seer, what they divined, or question suspicious claims (占い師CO・占い結果に関する質問を中心にしてください。誰が占い師を名乗ったか、何を占ったか、怪しい主張について質問してください)\"}";
+                "{\"type\":\"question_request\",\"instruction\":\"Focus your question on fortune teller claims (CO) and divination results. Ask about who claimed to be the seer, what they divined, or question suspicious claims. Respond in Japanese. (占い師CO・占い結果に関する質問を中心にしてください。誰が占い師を名乗ったか、何を占ったか、怪しい主張について質問してください。回答は日本語で行ってください)\"}";
             true ->
-                "{\"type\":\"question_request\"}"
+                "{\"type\":\"question_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}"
         end,
         send(Self, PlayerPid, QuestionRequestMsg)
     end, AlivePlayers),
@@ -308,7 +308,7 @@ game_loop(Self, State) ->
     io:format("~n--- 質問・回答 ---~n"),
     AllAnswers = lists:map(fun({FromPid, {ToPid, Question}}) ->
         %% Send question to target player
-        AnswerRequestMsg = io_lib:format("{\"type\":\"answer_request\",\"from\":\"~s\",\"question\":\"~s\"}",
+        AnswerRequestMsg = io_lib:format("{\"type\":\"answer_request\",\"from\":\"~s\",\"question\":\"~s\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}",
                                         [FromPid, Question]),
         send(Self, ToPid, AnswerRequestMsg),
 
@@ -453,7 +453,7 @@ game_loop(Self, State) ->
 %% Collect votes from all alive players
 collect_votes(Self, AlivePlayers) ->
     lists:foreach(fun(PlayerPid) ->
-        VoteRequestMsg = "{\"type\":\"vote_request\"}",
+        VoteRequestMsg = "{\"type\":\"vote_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}",
         send(Self, PlayerPid, VoteRequestMsg)
     end, AlivePlayers),
 
@@ -513,7 +513,7 @@ collect_night_actions(Self, AlivePlayers, State, NightType) ->
                 if
                     ShouldAct ->
                         %% Request night action
-                        ActionRequestMsg = io_lib:format("{\"type\":\"night_action_request\",\"role\":\"~s\"}", [Role]),
+                        ActionRequestMsg = io_lib:format("{\"type\":\"night_action_request\",\"role\":\"~s\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}", [Role]),
                         send(Self, PlayerPid, ActionRequestMsg),
 
                         %% Receive action
