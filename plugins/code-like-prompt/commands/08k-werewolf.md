@@ -56,6 +56,8 @@ Emulate the following Erlang-style code internally (without using external tools
 -define(SEND_SCRIPT, ?SKILL_DIR ++ "/scripts/send-message.sh").
 -define(RECV_SCRIPT, ?SKILL_DIR ++ "/scripts/receive-message.sh").
 -define(APPEND_LOG_SCRIPT, ?SKILL_DIR ++ "/scripts/append-log.sh").
+-define(PERSONA_SCRIPT, ?SKILL_DIR ++ "/scripts/generate-random-persona.sh").
+-define(ROLES_SCRIPT, ?SKILL_DIR ++ "/scripts/assign-random-roles.sh").
 
 %% Helper functions for message passing via scripts
 send(From, To, MessageJson) ->
@@ -113,23 +115,20 @@ main() ->
     io:format("=== 人狼ゲーム開始 ===~n"),
     os:cmd("rm -rf /tmp/erlang-messages"),
 
-    %% Create log directory with timestamp
+    %% Create result log file path with timestamp
     Timestamp = os:cmd("date +%Y%m%d-%H%M%S"),
-    LogDir = io_lib:format(".claude/tmp/werewolf-~s", [string:trim(Timestamp)]),
-    io:format("ログディレクトリ: ~s~n", [LogDir]),
+    ResultLogPath = io_lib:format(".claude/tmp/werewolf-~s-result.md", [string:trim(Timestamp)]),
+    io:format("結果ファイル: ~s~n", [ResultLogPath]),
 
-    %% Define available roles (one will be randomly excluded)
-    AllRoles = ["werewolf", "madman", "seer", "knight", "villager", "villager"],
+    %% Ensure .claude/tmp directory exists
+    os:cmd("mkdir -p .claude/tmp"),
 
-    %% Randomly exclude one role to make 5 players
-    ExcludeIdx = rand:uniform(length(AllRoles)),
-    GameRoles = lists:sublist(AllRoles, ExcludeIdx - 1) ++ lists:sublist(AllRoles, ExcludeIdx + 1, length(AllRoles)),
+    %% Generate random roles using external script
+    RolesJson = os:cmd(io_lib:format("bash ~s", [?ROLES_SCRIPT])),
+    ShuffledRoles = parse_json_array(string:trim(RolesJson)),
 
-    %% Shuffle roles
-    ShuffledRoles = shuffle(GameRoles),
-
-    %% Generate random personas for 5 players
-    ShuffledPersonas = [generate_random_persona() || _ <- lists:seq(1, 5)],
+    %% Generate random personas for 5 players using external script
+    ShuffledPersonas = [string:trim(os:cmd(io_lib:format("bash ~s", [?PERSONA_SCRIPT]))) || _ <- lists:seq(1, 5)],
 
     %% Spawn 5 player agents
     PlayerPids = ["player_1", "player_2", "player_3", "player_4", "player_5"],
@@ -176,7 +175,7 @@ main() ->
         alive_players => PlayerPids,
         player_roles => lists:zip(PlayerPids, ShuffledRoles),
         player_personas => lists:zip(PlayerPids, ShuffledPersonas),
-        log_dir => LogDir,
+        result_log_path => ResultLogPath,
         game_events => []  %% Track all game events for result log
     },
 
@@ -223,7 +222,6 @@ main() ->
 
     %% Collect player thought timelines
     io:format("--- プレイヤー思考タイムライン収集 ---~n"),
-    LogDir = maps:get(log_dir, FinalState),
     PlayerTimelines = lists:map(fun(PlayerPid) ->
         TimelineMsg = receive_msg(Self, PlayerPid, 30),
         %% Parse timeline message: {"type":"thought_timeline","content":"..."}
@@ -639,6 +637,12 @@ parse_question(PlayerPid, QuestionMsg) -> undefined.
 %% Implementation is inferred by AI
 format_qa_json(AllAnswers) -> undefined.
 
+%% Parse JSON array string into Erlang list
+%% Input: JSON array string like "[\"werewolf\",\"madman\",\"seer\",\"knight\",\"villager\"]"
+%% Output: Erlang list like ["werewolf", "madman", "seer", "knight", "villager"]
+%% Implementation is inferred by AI
+parse_json_array(JsonString) -> undefined.
+
 %% Parse thought timeline from JSON message
 %% Input: TimelineMsg (JSON string with thought timeline)
 %% Expected format: {"type":"thought_timeline","content":"..."}
@@ -658,7 +662,7 @@ parse_thought_timeline(TimelineMsg) -> undefined.
 generate_random_persona() -> undefined.
 
 %% Generate comprehensive result log with player profiles, game summary, and player thought timelines
-%% Input: FinalState (map with game state including log_dir, player_roles, player_personas, game_events, player_timelines, etc.)
+%% Input: FinalState (map with game state including result_log_path, player_roles, player_personas, game_events, player_timelines, etc.)
 %% Output: Path to generated result.md file
 %%
 %% The result log should include:
@@ -681,8 +685,8 @@ generate_random_persona() -> undefined.
 %%    - Section 1: Player profiles with role and persona
 %%    - Section 2: Game summary by day
 %%    - Section 3: Each player's thought timeline
-%% 5. Write to result.md in log_dir
-%% 6. Return the path to result.md
+%% 5. Write to file at result_log_path from FinalState
+%% 6. Return the path to the result log file
 %%
 %% Implementation is inferred by AI
 generate_result_log(FinalState) -> undefined.
