@@ -519,9 +519,15 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.11
+0.7.12
 
 ### Changelog
+
+#### 0.7.12
+- Improved 08k-werewolf command:
+  - Fixed role assignment to guarantee werewolf presence (werewolf is always included, other roles randomly excluded)
+  - Removed personality trait from persona generation (now only name, age, gender)
+  - Updated CO (Coming Out) decision logic based on role instead of personality
 
 #### 0.7.11
 - Improved 08k-werewolf command:

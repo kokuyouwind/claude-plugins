@@ -276,13 +276,13 @@ game_loop(Self, State) ->
     %% Step 1: Collect initial statements from all players simultaneously
     io:format("--- 初回発言収集 ---~n"),
     lists:foreach(fun(PlayerPid) ->
-        %% On day 1, encourage CO (Coming Out) based on personality
-        %% - Cautious personality: Real seer may hide, werewolf/madman won't claim
-        %% - Bold personality: Real seer may come out, werewolf/madman may fake claim
-        %% Players should consider their role and personality when deciding whether to CO
+        %% On day 1, encourage CO (Coming Out)
+        %% - Seer: Consider coming out as fortune teller
+        %% - Werewolf/Madman: Consider faking fortune teller claim
+        %% - Others: Make statements based on role
         InitialRequestMsg = if
             Day == 1 ->
-                "{\"type\":\"initial_statement_request\",\"encourage_co\":true,\"instruction\":\"Consider your personality when deciding whether to come out as fortune teller. Cautious players may hide, bold players may claim. Respond in Japanese. (真占い師・騙り占い師問わず、性格に応じて占い師COするかを判断してください。慎重な性格なら隠す、大胆な性格なら名乗り出る・騙ることを検討してください。回答は日本語で行ってください)\"}";
+                "{\"type\":\"initial_statement_request\",\"encourage_co\":true,\"instruction\":\"If you are the seer, consider coming out. If you are werewolf or madman, consider faking seer claim. Respond in Japanese. (占い師なら占い師COを検討、人狼や狂人なら占い師騙りを検討してください。回答は日本語で行ってください)\"}";
             true ->
                 "{\"type\":\"initial_statement_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}"
         end,
@@ -650,13 +650,12 @@ parse_json_array(JsonString) -> undefined.
 %% Implementation is inferred by AI
 parse_thought_timeline(TimelineMsg) -> undefined.
 
-%% Generate a random persona with name, age, gender, and personality
-%% Returns a string like "エリック (45歳・男性・真面目な性格)"
+%% Generate a random persona with name, age, and gender
+%% Returns a string like "エリック (45歳・男性)"
 %%
 %% - Name: Randomly generated Western fantasy-style name in katakana (e.g., エリック、アリシア、トーマス、イザベラ、etc.)
 %% - Age: Random age between 20-70
 %% - Gender: Randomly selected from "男性" or "女性"
-%% - Personality: Randomly selected personality trait (e.g., 真面目、明るい、冷静、熱血、慎重、大胆、直感的、etc.)
 %%
 %% Implementation is inferred by AI - no explicit implementation needed
 generate_random_persona() -> undefined.

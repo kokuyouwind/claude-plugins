@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generate random persona with name, age, gender, and personality
+# Generate random persona with name, age, and gender
 
 # Western fantasy-style names in katakana
 MALE_NAMES=(
@@ -12,12 +12,6 @@ FEMALE_NAMES=(
     "アリシア" "イザベラ" "エミリア" "オリビア" "シャーロット"
     "ソフィア" "エリザベス" "マーガレット" "キャサリン" "ビクトリア"
     "アナスタシア" "ジェシカ" "レベッカ" "アマンダ" "サマンサ"
-)
-
-PERSONALITIES=(
-    "真面目な性格" "明るい性格" "冷静な性格" "熱血な性格"
-    "慎重な性格" "大胆な性格" "直感的な性格" "論理的な性格"
-    "社交的な性格" "内向的な性格" "楽観的な性格" "悲観的な性格"
 )
 
 # Randomly select gender
@@ -36,9 +30,5 @@ NAME="${NAME_ARRAY[$NAME_INDEX]}"
 # Random age between 20-70
 AGE=$((RANDOM % 51 + 20))
 
-# Random personality
-PERSONALITY_INDEX=$((RANDOM % ${#PERSONALITIES[@]}))
-PERSONALITY="${PERSONALITIES[$PERSONALITY_INDEX]}"
-
 # Output in the expected format
-echo "${NAME} (${AGE}歳・${GENDER}・${PERSONALITY})"
+echo "${NAME} (${AGE}歳・${GENDER})"
