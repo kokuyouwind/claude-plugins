@@ -1,18 +1,21 @@
 #!/bin/bash
 # Assign random roles for werewolf game
-# Takes 6 roles, randomly excludes one, and shuffles the remaining 5
+# Werewolf is always included, randomly excludes one from other 5 roles
 
-# All available roles (6 total)
-ALL_ROLES=("werewolf" "madman" "seer" "knight" "villager" "villager")
+# Werewolf is mandatory
+WEREWOLF="werewolf"
 
-# Randomly exclude one role to make 5 players
-EXCLUDE_IDX=$((RANDOM % 6))
+# Other roles (5 total, one will be randomly excluded)
+OTHER_ROLES=("madman" "seer" "knight" "villager" "villager")
 
-# Build array with excluded role removed
-GAME_ROLES=()
-for i in "${!ALL_ROLES[@]}"; do
+# Randomly exclude one role from OTHER_ROLES to make 4 other players
+EXCLUDE_IDX=$((RANDOM % 5))
+
+# Build array with werewolf and 4 other roles (excluded role removed)
+GAME_ROLES=("$WEREWOLF")
+for i in "${!OTHER_ROLES[@]}"; do
     if [ $i -ne $EXCLUDE_IDX ]; then
-        GAME_ROLES+=("${ALL_ROLES[$i]}")
+        GAME_ROLES+=("${OTHER_ROLES[$i]}")
     fi
 done
 
