@@ -72,6 +72,39 @@ receive_msg(Pid, FromPattern, Timeout) ->
 append_log(Directory, Filename, Content) ->
     os:cmd(io_lib:format("bash ~s '~s' '~s' '~s'", [?APPEND_LOG_SCRIPT, Directory, Filename, Content])).
 
+%% Get role objective and win condition description
+%% Returns {Objective, WinCondition, Strategy} for the given role
+get_role_info("werewolf") ->
+    {
+        "人狼陣営として村人を排除する。夜に1人を襲撃できる。",
+        "人狼の数が村人以上になれば人狼陣営の勝利",
+        "正体を隠し、村人のふりをする。占い師を騙ることも検討する。他者に疑いを向ける。"
+    };
+get_role_info("madman") ->
+    {
+        "人狼陣営として人狼を支援する。誰が人狼かは知らない。夜の行動はない。",
+        "人狼の数が村人以上になれば人狼陣営の勝利",
+        "村人を混乱させ、人狼らしきプレイヤーを守る。占い師を騙って本物の占い師と対立することも有効。"
+    };
+get_role_info("seer") ->
+    {
+        "村人陣営として人狼を見つけ出す。夜に1人を占い、人狼かどうかを知ることができる。",
+        "全ての人狼を処刑すれば村人陣営の勝利",
+        "占い結果を活用する。いつ正体を明かすかを慎重に判断する。偽占い師に注意。"
+    };
+get_role_info("knight") ->
+    {
+        "村人陣営として人狼の襲撃から村人を守る。夜に1人を護衛できる。",
+        "全ての人狼を処刑すれば村人陣営の勝利",
+        "襲撃されそうなプレイヤーを守る。自分の正体は隠す（人狼に狙われる）。"
+    };
+get_role_info("villager") ->
+    {
+        "村人陣営として議論と投票で人狼を見つけ出す。特殊能力はない。",
+        "全ての人狼を処刑すれば村人陣営の勝利",
+        "論理的に推理し、怪しい発言や行動を見抜く。占い師の主張を検証する。"
+    }.
+
 %% Game master main function
 main() ->
     Self = "gm",
@@ -106,16 +139,6 @@ main() ->
         PlayerPid = lists:nth(I, PlayerPids),
         Role = lists:nth(I, ShuffledRoles),
         Persona = lists:nth(I, ShuffledPersonas),
-        LogFilename = io_lib:format("~s.log", [PlayerPid]),
-
-        %% Create player profile and write to log file using append_log script
-        ProfileContent = io_lib:format("# ~s のプロフィール~n~n役職: ~s~nペルソナ: ~s~n~n## ゲーム記録~n~n", [PlayerPid, Role, Persona]),
-
-        %% *** STOP HERE AND EXECUTE Bash TOOL NOW ***
-        %% This append_log() call REQUIRES actual Bash tool execution
-        %% to run the append-log.sh script
-        %% DO NOT CONTINUE without calling Bash tool and verifying file was created
-        append_log(LogDir, LogFilename, ProfileContent),
 
         io:format("~s: ~s (役職: ~s)~n", [PlayerPid, Persona, Role]),
 
@@ -125,9 +148,9 @@ main() ->
         %% DO NOT CONTINUE without calling Task tool and verifying success
         spawn(claude_agent, werewolf_player, []),
 
-        %% Assign role and persona with log file path
-        LogFilePath = io_lib:format("~s/~s", [LogDir, LogFilename]),
-        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\",\"instruction\":\"All logs, thoughts, and outputs must be written in Japanese (すべてのログ、思考、出力は日本語で記述してください)\"}", [Role, Persona, LogFilePath]),
+        %% Assign role and persona with role information
+        {Objective, WinCondition, Strategy} = get_role_info(Role),
+        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"objective\":\"~s\",\"win_condition\":\"~s\",\"strategy\":\"~s\",\"instruction\":\"All logs, thoughts, and outputs must be written in Japanese (すべてのログ、思考、出力は日本語で記述してください)\"}", [Role, Persona, Objective, WinCondition, Strategy]),
         send(Self, PlayerPid, RoleMsg)
     end, lists:seq(1, 5)),
 
@@ -188,7 +211,7 @@ main() ->
 
     FinalState = game_loop(Self, StateAfterNight0),
 
-    %% Game end - request summaries from all players
+    %% Game end - request thought timelines from all players
     io:format("~n=== ゲーム終了 ===~n"),
     Winner = maps:get(winner, FinalState),
     io:format("勝者: ~s~n~n", [Winner]),
@@ -198,27 +221,28 @@ main() ->
         send(Self, PlayerPid, EndMsg)
     end, PlayerPids),
 
-    %% Collect player summaries
-    io:format("--- プレイヤー総括 ---~n"),
+    %% Collect player thought timelines
+    io:format("--- プレイヤー思考タイムライン収集 ---~n"),
     LogDir = maps:get(log_dir, FinalState),
-    lists:foreach(fun(PlayerPid) ->
-        Summary = receive_msg(Self, PlayerPid, 30),
-        io:format("~s: ~s~n", [PlayerPid, Summary]),
-
-        %% Append summary to player's log file using append_log script
-        LogFilename = io_lib:format("~s.log", [PlayerPid]),
-        SummaryContent = io_lib:format("~n## 総括~n~n~s~n", [Summary]),
-        append_log(LogDir, LogFilename, SummaryContent)
+    PlayerTimelines = lists:map(fun(PlayerPid) ->
+        TimelineMsg = receive_msg(Self, PlayerPid, 30),
+        %% Parse timeline message: {"type":"thought_timeline","content":"..."}
+        Timeline = parse_thought_timeline(TimelineMsg),
+        io:format("~s: タイムライン受信完了~n", [PlayerPid]),
+        {PlayerPid, Timeline}
     end, PlayerPids),
+
+    %% Update state with timelines
+    FinalStateWithTimelines = FinalState#{player_timelines => PlayerTimelines},
 
     %% GM summary
     io:format("~n--- GM総括 ---~n"),
-    io:format("ゲームは~p日目で終了しました~n", [maps:get(day, FinalState)]),
-    io:format("最終的な生存者: ~p~n", [maps:get(alive_players, FinalState)]),
+    io:format("ゲームは~p日目で終了しました~n", [maps:get(day, FinalStateWithTimelines)]),
+    io:format("最終的な生存者: ~p~n", [maps:get(alive_players, FinalStateWithTimelines)]),
 
     %% Generate result log
     io:format("~n--- リザルトログ生成中 ---~n"),
-    ResultLogPath = generate_result_log(FinalState),
+    ResultLogPath = generate_result_log(FinalStateWithTimelines),
     io:format("リザルトログ: ~s~n", [ResultLogPath]),
 
     %% Cleanup
@@ -615,47 +639,12 @@ parse_question(PlayerPid, QuestionMsg) -> undefined.
 %% Implementation is inferred by AI
 format_qa_json(AllAnswers) -> undefined.
 
-%% Append content to log file using append-log.sh script
-%% Input: Directory (log directory path), Filename (log file name), Content (content to append)
-%% Output: ok
-%%
-%% ******************************************************************************
-%% !!! MANDATORY !!! TOOL EXECUTION REQUIRED !!! READ THIS NOW !!!
-%% ******************************************************************************
-%%
-%% >>> YOU MUST ACTUALLY EXECUTE THE Bash TOOL <<<
-%% >>> THIS IS NOT OPTIONAL - THIS IS A REQUIRED ACTION <<<
-%% >>> DO NOT SIMULATE - ACTUALLY CALL Bash TOOL <<<
-%%
-%% STOP HERE AND EXECUTE Bash TOOL NOW:
-%%
-%%   Bash(
-%%     command: "bash " ++ ?APPEND_LOG_SCRIPT ++ " '" ++ Directory ++ "' '" ++ Filename ++ "' '" ++ Content ++ "'",
-%%     description: "Append log to " ++ Filename
-%%   )
-%%
-%% VERIFICATION STEPS - YOU MUST DO THESE:
-%%   1. Did you just call Bash tool?
-%%      -> IF NO: STOP RIGHT NOW AND CALL THE TOOL
-%%   2. Did the tool succeed?
-%%      -> IF NO: OUTPUT "ERROR: Failed to append log to ~s/~s" AND ABORT
-%%   3. Can you verify the file was written?
-%%      -> IF NO: OUTPUT "ERROR: Cannot verify log append" AND ABORT
-%%
-%% IF THE Bash TOOL FAILS:
-%%   - OUTPUT: "ERROR: Failed to append log to ~s/~s: <error_details>~n"
-%%   - OUTPUT: "ABORTING: Cannot continue without file logging~n"
-%%   - STOP EXECUTION IMMEDIATELY - DO NOT CONTINUE THE GAME
-%%
-%% DO NOT DO THESE THINGS:
-%%   - DO NOT simulate this function
-%%   - DO NOT return undefined without executing tools
-%%   - DO NOT continue execution if Bash fails
-%%   - DO NOT skip verification steps
-%%
-%% !!! THIS IS ESSENTIAL FOR LOGGING GAME STATE AND PLAYER THOUGHTS !!!
-%% ******************************************************************************
-append_log(Directory, Filename, Content) -> ok.
+%% Parse thought timeline from JSON message
+%% Input: TimelineMsg (JSON string with thought timeline)
+%% Expected format: {"type":"thought_timeline","content":"..."}
+%% Output: Timeline content string
+%% Implementation is inferred by AI
+parse_thought_timeline(TimelineMsg) -> undefined.
 
 %% Generate a random persona with name, age, gender, and personality
 %% Returns a string like "エリック (45歳・男性・真面目な性格)"
@@ -668,8 +657,8 @@ append_log(Directory, Filename, Content) -> ok.
 %% Implementation is inferred by AI - no explicit implementation needed
 generate_random_persona() -> undefined.
 
-%% Generate comprehensive result log with player profiles, game summary, and player replays
-%% Input: FinalState (map with game state including log_dir, player_roles, player_personas, game_events, etc.)
+%% Generate comprehensive result log with player profiles, game summary, and player thought timelines
+%% Input: FinalState (map with game state including log_dir, player_roles, player_personas, game_events, player_timelines, etc.)
 %% Output: Path to generated result.md file
 %%
 %% The result log should include:
@@ -678,16 +667,20 @@ generate_random_persona() -> undefined.
 %%    - Discussion highlights
 %%    - Vote results (who voted for whom)
 %%    - Night events (who was attacked, who was protected, divination results)
-%% 3. Player Replays section - For each player, a chronological narrative including:
-%%    - Their internal thoughts (read from player log files)
-%%    - Their actions (statements, votes, night actions)
-%%    - How their role influenced their decisions
+%% 3. Player Thought Timelines section - For each player, their complete thought timeline including:
+%%    - Role assignment and objectives
+%%    - Internal thoughts during discussions
+%%    - Decision-making process for votes and night actions
+%%    - How their role and strategy influenced their behavior
 %%
 %% Implementation steps:
-%% 1. Read all player log files from log_dir
-%% 2. Parse game_events to extract discussion, votes, and night events
-%% 3. Combine player thoughts with game events to create detailed replays
-%% 4. Format everything as Markdown
+%% 1. Get player_timelines from FinalState (format: [{PlayerPid, Timeline}, ...])
+%% 2. Get player_roles and player_personas from FinalState
+%% 3. Parse game_events to extract discussion, votes, and night events
+%% 4. Format everything as Markdown:
+%%    - Section 1: Player profiles with role and persona
+%%    - Section 2: Game summary by day
+%%    - Section 3: Each player's thought timeline
 %% 5. Write to result.md in log_dir
 %% 6. Return the path to result.md
 %%
