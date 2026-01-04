@@ -83,7 +83,6 @@ main() ->
     %% Create log directory with timestamp
     Timestamp = os:cmd("date +%Y%m%d-%H%M%S"),
     LogDir = io_lib:format(".claude/tmp/werewolf-~s", [string:trim(Timestamp)]),
-    os:cmd(io_lib:format("mkdir -p ~s", [LogDir])),
     io:format("ログディレクトリ: ~s~n", [LogDir]),
 
     %% Define available roles (one will be randomly excluded)
@@ -128,7 +127,7 @@ main() ->
 
         %% Assign role and persona with log file path
         LogFilePath = io_lib:format("~s/~s", [LogDir, LogFilename]),
-        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\"}", [Role, Persona, LogFilePath]),
+        RoleMsg = io_lib:format("{\"type\":\"role_assign\",\"role\":\"~s\",\"persona\":\"~s\",\"log_file\":\"~s\",\"instruction\":\"All logs, thoughts, and outputs must be written in Japanese (すべてのログ、思考、出力は日本語で記述してください)\"}", [Role, Persona, LogFilePath]),
         send(Self, PlayerPid, RoleMsg)
     end, lists:seq(1, 5)),
 
@@ -195,15 +194,21 @@ main() ->
     io:format("勝者: ~s~n~n", [Winner]),
 
     lists:foreach(fun(PlayerPid) ->
-        EndMsg = io_lib:format("{\"type\":\"game_end\",\"winner\":\"~s\"}", [Winner]),
+        EndMsg = io_lib:format("{\"type\":\"game_end\",\"winner\":\"~s\",\"instruction\":\"Provide your game summary in Japanese (ゲームの総括を日本語で提供してください)\"}", [Winner]),
         send(Self, PlayerPid, EndMsg)
     end, PlayerPids),
 
     %% Collect player summaries
     io:format("--- プレイヤー総括 ---~n"),
+    LogDir = maps:get(log_dir, FinalState),
     lists:foreach(fun(PlayerPid) ->
         Summary = receive_msg(Self, PlayerPid, 30),
-        io:format("~s: ~s~n", [PlayerPid, Summary])
+        io:format("~s: ~s~n", [PlayerPid, Summary]),
+
+        %% Append summary to player's log file using append_log script
+        LogFilename = io_lib:format("~s.log", [PlayerPid]),
+        SummaryContent = io_lib:format("~n## 総括~n~n~s~n", [Summary]),
+        append_log(LogDir, LogFilename, SummaryContent)
     end, PlayerPids),
 
     %% GM summary
@@ -249,12 +254,15 @@ game_loop(Self, State) ->
     %% Step 1: Collect initial statements from all players simultaneously
     io:format("--- 初回発言収集 ---~n"),
     lists:foreach(fun(PlayerPid) ->
-        %% On day 1, encourage CO (Coming Out) with role claims and divination results
+        %% On day 1, encourage CO (Coming Out) based on personality
+        %% - Cautious personality: Real seer may hide, werewolf/madman won't claim
+        %% - Bold personality: Real seer may come out, werewolf/madman may fake claim
+        %% Players should consider their role and personality when deciding whether to CO
         InitialRequestMsg = if
             Day == 1 ->
-                "{\"type\":\"initial_statement_request\",\"encourage_co\":true}";
+                "{\"type\":\"initial_statement_request\",\"encourage_co\":true,\"instruction\":\"Consider your personality when deciding whether to come out as fortune teller. Cautious players may hide, bold players may claim. Respond in Japanese. (真占い師・騙り占い師問わず、性格に応じて占い師COするかを判断してください。慎重な性格なら隠す、大胆な性格なら名乗り出る・騙ることを検討してください。回答は日本語で行ってください)\"}";
             true ->
-                "{\"type\":\"initial_statement_request\"}"
+                "{\"type\":\"initial_statement_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}"
         end,
         send(Self, PlayerPid, InitialRequestMsg)
     end, AlivePlayers),
@@ -275,9 +283,15 @@ game_loop(Self, State) ->
     end, AlivePlayers),
 
     %% Step 3: Request questions from each player (to 1 other player)
+    %% Focus on fortune teller CO and divination results
     io:format("~n--- 質問収集 ---~n"),
     lists:foreach(fun(PlayerPid) ->
-        QuestionRequestMsg = "{\"type\":\"question_request\"}",
+        QuestionRequestMsg = if
+            Day == 1 ->
+                "{\"type\":\"question_request\",\"instruction\":\"Focus your question on fortune teller claims (CO) and divination results. Ask about who claimed to be the seer, what they divined, or question suspicious claims. Respond in Japanese. (占い師CO・占い結果に関する質問を中心にしてください。誰が占い師を名乗ったか、何を占ったか、怪しい主張について質問してください。回答は日本語で行ってください)\"}";
+            true ->
+                "{\"type\":\"question_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}"
+        end,
         send(Self, PlayerPid, QuestionRequestMsg)
     end, AlivePlayers),
 
@@ -294,7 +308,7 @@ game_loop(Self, State) ->
     io:format("~n--- 質問・回答 ---~n"),
     AllAnswers = lists:map(fun({FromPid, {ToPid, Question}}) ->
         %% Send question to target player
-        AnswerRequestMsg = io_lib:format("{\"type\":\"answer_request\",\"from\":\"~s\",\"question\":\"~s\"}",
+        AnswerRequestMsg = io_lib:format("{\"type\":\"answer_request\",\"from\":\"~s\",\"question\":\"~s\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}",
                                         [FromPid, Question]),
         send(Self, ToPid, AnswerRequestMsg),
 
@@ -439,7 +453,7 @@ game_loop(Self, State) ->
 %% Collect votes from all alive players
 collect_votes(Self, AlivePlayers) ->
     lists:foreach(fun(PlayerPid) ->
-        VoteRequestMsg = "{\"type\":\"vote_request\"}",
+        VoteRequestMsg = "{\"type\":\"vote_request\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}",
         send(Self, PlayerPid, VoteRequestMsg)
     end, AlivePlayers),
 
@@ -499,7 +513,7 @@ collect_night_actions(Self, AlivePlayers, State, NightType) ->
                 if
                     ShouldAct ->
                         %% Request night action
-                        ActionRequestMsg = io_lib:format("{\"type\":\"night_action_request\",\"role\":\"~s\"}", [Role]),
+                        ActionRequestMsg = io_lib:format("{\"type\":\"night_action_request\",\"role\":\"~s\",\"instruction\":\"Respond in Japanese (回答は日本語で行ってください)\"}", [Role]),
                         send(Self, PlayerPid, ActionRequestMsg),
 
                         %% Receive action
@@ -643,14 +657,13 @@ format_qa_json(AllAnswers) -> undefined.
 %% ******************************************************************************
 append_log(Directory, Filename, Content) -> ok.
 
-%% Generate a random persona with name, age, gender, occupation, and personality
-%% Returns a string like "エリック (45歳・男性・鍛冶屋・真面目な性格)"
+%% Generate a random persona with name, age, gender, and personality
+%% Returns a string like "エリック (45歳・男性・真面目な性格)"
 %%
 %% - Name: Randomly generated Western fantasy-style name in katakana (e.g., エリック、アリシア、トーマス、イザベラ、etc.)
 %% - Age: Random age between 20-70
 %% - Gender: Randomly selected from "男性" or "女性"
-%% - Occupation: Randomly selected medieval fantasy occupation (e.g., 農民、鍛冶屋、牧師、商人、狩人、薬師、吟遊詩人、騎士、etc.)
-%% - Personality: Randomly selected personality trait (e.g., 真面目、明るい、冷静、熱血、慎重、直感的、etc.)
+%% - Personality: Randomly selected personality trait (e.g., 真面目、明るい、冷静、熱血、慎重、大胆、直感的、etc.)
 %%
 %% Implementation is inferred by AI - no explicit implementation needed
 generate_random_persona() -> undefined.
