@@ -181,6 +181,15 @@
       "response_size": 1870,
       "stream": true,
       "status_code": 200
+    },
+    "835d884f94dbaa61c94a98d233e696acd98d099e1ecdc23f7225c3f04f19e255": {
+      "cache_key": "835d884f94dbaa61c94a98d233e696acd98d099e1ecdc23f7225c3f04f19e255",
+      "model": "claude-haiku-4-5-20251001",
+      "recorded_at": "2026-01-05T23:19:53.604169",
+      "request_size": 96757,
+      "response_size": 1860,
+      "stream": true,
+      "status_code": 200
     }
   }
 }

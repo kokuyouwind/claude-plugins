@@ -4,7 +4,7 @@
 
 このドキュメントは、全てのcode-like promptコマンドのテスト結果をカテゴリ別にまとめたものです。
 
-**最終更新**: 2026-01-01 (08h/i/j追加 - PR #95後のテスト期待値更新)
+**最終更新**: 2026-01-05 (DEBUG=1出力パターンの詳細分析を追加)
 
 **テスト環境**: 全てのテストは `/tmp` 上で実行し、CLAUDE.mdの設定干渉を排除しています。
 
@@ -47,6 +47,163 @@
 2. **深いネストを避ける**: 条件構造はできるだけフラットに保つ
 3. **状態を慎重にテスト**: 変数の初期化とループの境界条件を検証する
 4. **クリーンなテスト環境**: CLAUDE.mdの設定は出力形式に干渉する可能性がある
+
+## DEBUG=1出力パターンの詳細
+
+### 概要
+
+DEBUG=1フラグを付けてテストを実行すると、Claudeの内部処理プロセスを観察できます。このセクションでは、コマンドタイプ別のDEBUG出力パターンと、それがコマンドの意図通りであることの確認方法を説明します。
+
+### 基本構造
+
+すべてのテストで以下の基本構造が出力されます:
+
+```
+session-id: [セッションID]
+==== user
+[ユーザープロンプト - コマンドの内容]
+==== assistant
+[Claudeの応答]
+```
+
+### パターン別の特徴
+
+#### 1. シンプルな計算系テスト (ループ、条件分岐など)
+
+**対象**: 01-shopping, 02-nested-if, 03-loop, 04-pattern-match, 06-function, 07-prolog-backtrack
+
+**特徴**:
+- Claudeは内部的にコードをエミュレート
+- 最終的な出力のみを返す
+- 内部的な思考プロセス（ループカウンター、変数値など）は表示されない
+- **理由**: コマンドが「Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.」と明示的に指示している
+
+**例** (Test03aForCount - count=5):
+```
+==== user
+Emulate the following code internally (without using external tools or interpreter) with environment: {"count":5}
+
+Output only what print() commands would output...
+
+for i in range(count):
+    print(f"foo{i}")
+
+==== assistant
+foo0
+foo1
+foo2
+foo3
+foo4
+```
+
+**コマンドの意図通りであることの確認**:
+- ✅ 正しい回数（5回）の出力が生成されている
+- ✅ 正しい順序（0から4）で出力されている
+- ✅ フォーマットが正しい（"foo" + カウンター値）
+
+これらの結果から、Claudeが内部的にループカウンターを正しく管理していることが確認できます。
+
+#### 2. 並行処理系テスト (Goroutine)
+
+**対象**: 05-goroutine
+
+**特徴**:
+- Claudeは並行処理をシミュレート
+- 複数のgoroutineの出力が適切に混在する
+- 最終的な同期ポイント（wg.Wait()後の出力）が正しく処理される
+
+**例** (Test05fWorkerPool):
+```
+==== assistant
+bar1A
+bar2B
+bar1C
+baz
+```
+
+**コマンドの意図通りであることの確認**:
+- ✅ 複数のworker（1, 2）がjobsを処理している
+- ✅ jobsが適切に分配されている（A, B, C）
+- ✅ 全てのworkerが完了後に"baz"が出力されている（wg.Wait()の正しい動作）
+
+#### 3. Actor/サブエージェント系テスト
+
+**対象**: 08-erlang-actor (特に08h, 08i, 08j)
+
+**特徴**:
+- Claudeは実際にTaskツールを使用してサブエージェントを起動
+- tool_useとtool_resultがログとして表示される
+- サブエージェントの処理内容が見える
+- **これは内部処理の可視化の最良の例**
+
+**例** (Test08hPluginAgentSpawn):
+```
+==== user
+[Erlangスタイルのactor spawning code...]
+
+==== assistant
+I'll execute this Erlang-style code by spawning a Claude Code subagent...
+
+==== tool_use (Task)
+{
+  "description": "Erlang worker receiving and processing messages",
+  "prompt": "You are simulating an Erlang worker process...",
+  "subagent_type": "code-like-prompt:erlang-worker"
+}
+
+==== tool_result
+[Worker: Processing message: Hello from main
+Worker: Sending response: HELLO FROM MAIN]
+
+==== assistant
+Main: Sending message to worker: Hello from main
+Worker: Processing message: Hello from main
+Worker: Sending response: HELLO FROM MAIN
+Main: Received response: HELLO FROM MAIN
+Main: Done
+```
+
+**コマンドの意図通りであることの確認**:
+- ✅ サブエージェントが正しく起動されている（tool_useが実行された）
+- ✅ メッセージが正しく送受信されている（main → worker → main）
+- ✅ サブエージェントの処理結果が統合されている
+- ✅ 出力順序が正しい（Main送信 → Worker処理 → Main受信 → Main完了）
+
+このケースでは、tool_useとtool_resultのログによって、内部的な処理ステップが完全に可視化されています。
+
+### 正確性の確認方法
+
+DEBUG=1出力から、Claudeが内部的に適切に処理を行っていることを以下の方法で確認できます:
+
+1. **ループ処理**: 正しい回数と順序で出力が生成されている
+   - 例: 5回繰り返し → "foo0"から"foo4"まで5つの出力
+   - これは、Claudeが内部的にカウンターを0から4まで正しく管理していることを示す
+
+2. **条件分岐**: 与えられた引数に応じて正しい分岐が選択されている
+   - 例: condition_a=true, condition_b=true → "foo"を出力
+   - これは、Claudeが条件評価を正しく行っていることを示す
+
+3. **並行処理**: 複数のworker/goroutineが適切に協調動作している
+   - 例: worker 1, 2, 3が交互にjobsを処理
+   - これは、Claudeが並行処理の概念を正しく理解していることを示す
+
+4. **メッセージパッシング**: サブエージェント間でメッセージが正しく送受信されている
+   - 例: Main → Worker → Main のメッセージフロー
+   - これは、Claudeがactor モデルを正しく実装していることを示す
+
+### 結論
+
+現在のコマンド実装では、DEBUG=1による内部処理の可視化には以下の2つのレベルがあります:
+
+1. **暗黙的な検証** (シンプルな計算系):
+   - 最終的な出力の正確性から、内部処理の正しさを推測する
+   - ループカウンター、変数管理などは表示されないが、正しい出力から適切に管理されていることが確認できる
+
+2. **明示的な可視化** (Actor/サブエージェント系):
+   - Taskツールのtool_use/tool_resultログによって、内部処理ステップが完全に可視化される
+   - メッセージパッシング、サブエージェント起動などの処理が明示的に記録される
+
+いずれの場合も、コマンドの意図通りに動作していることが確認できました。
 
 ## 失敗分析
 
@@ -283,6 +440,23 @@ Erlangスタイルのactorモデルの高い理解度を示しています。失
 - 08-erlang-actor: 86% → 92% (12/13) - **2026-01-01に08h/i/j追加**
 
 ### バージョン履歴
+
+#### 2026-01-05: DEBUG=1出力パターンの詳細分析
+
+- **追加**: DEBUG=1フラグ使用時の出力パターンとコマンド意図の検証方法を文書化
+- **分析内容**:
+  - 各コマンドタイプ（計算系、並行処理系、Actor/サブエージェント系）のDEBUG出力パターンを調査
+  - 代表的なテストケース（Test03aForCount, Test05fWorkerPool, Test08hPluginAgentSpawn等）を個別に実行して確認
+  - コマンドの意図通りに動作していることの検証方法を確立
+- **主要な発見**:
+  - **シンプルな計算系テスト**: Claudeは最終的な出力のみを返し、内部的な思考プロセス（ループカウンター等）は表示されない
+    - これはコマンドが「Output only what print() commands would output」と明示的に指示しているため
+    - しかし、正しい出力が生成されていることから、内部処理が適切に行われていることを確認できる（暗黙的な検証）
+  - **Actor/サブエージェント系テスト**: Taskツールのtool_use/tool_resultログによって内部処理ステップが完全に可視化される
+    - サブエージェントの起動、メッセージパッシング、処理結果の統合が明示的に記録される（明示的な可視化）
+  - 内部処理の可視化には2つのレベル（暗黙的な検証、明示的な可視化）がある
+  - いずれの場合も、コマンドの意図通りに動作していることが確認できた
+- **文書化**: 「DEBUG=1出力パターンの詳細」セクションを新規追加し、正確性の確認方法を体系化
 
 #### 2026-01-01: 08h/i/j追加 (PR #95後のテスト期待値更新)
 - **追加**: 08h/i/j (Claude Codeサブエージェント連携) テストケースを追加
