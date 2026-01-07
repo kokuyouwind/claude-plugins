@@ -16,6 +16,3 @@ connected(X, Y) :- path(X, Z), connected(Z, Y).
 
 ?- connected(a, X), write(X), write(' '), fail.
 ```
-
-Expected output (all reachable nodes from 'a'):
-b c c d d

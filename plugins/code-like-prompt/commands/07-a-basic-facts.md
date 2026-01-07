@@ -16,7 +16,3 @@ quux(baz, grault).
 % Query
 ?- foo(X), quux(X, Y), write(Y), nl, fail.
 ```
-
-Expected output:
-corge
-grault
