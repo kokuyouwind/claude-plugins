@@ -1,44 +1,33 @@
 ---
 description: コード風プロンプト例4f 網羅的なenumマッチング
-argument-hint: '{"color": string, "r": number, "g": number, "b": number}'
+argument-hint: '{"color": string}'
 ---
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what println!() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```rust
-// Validate required arguments
-if color.is_none() {
-    panic!("Required argument 'color' is missing");
-}
+```haskell
+-- Color data type definition
+data Color = Red
+           | Green
+           | Blue
+           | RGB Int Int Int
+           deriving (Show, Eq)
 
-enum Color {
-    Red,
-    Green,
-    Blue,
-    Custom(u8, u8, u8),
-}
+-- Assume color :: Color is directly provided as Haskell data type
+-- Example: Red, Green, Blue, or RGB 255 100 50
 
-// Parse color
-let c = match color.as_str() {
-    "Red" => Color::Red,
-    "Green" => Color::Green,
-    "Blue" => Color::Blue,
-    _ => {
-        if r.is_none() || g.is_none() || b.is_none() {
-            panic!("Required arguments 'r', 'g', 'b' are missing for Custom color");
-        }
-        Color::Custom(r, g, b)
-    }
-};
+main :: IO ()
+main = do
+    -- color argument is provided as Color type
+    let color = getColor "color"
 
-// Exhaustive matching
-match c {
-    Color::Red => println!("foo"),
-    Color::Green => println!("bar"),
-    Color::Blue => println!("baz"),
-    Color::Custom(r, _, _) if r > 200 => println!("qux"),
-    Color::Custom(r, g, b) => println!("quux{}{}{}", r, g, b),
-}
+    -- Exhaustive pattern matching
+    case color of
+        Red -> putStrLn "red"
+        Green -> putStrLn "green"
+        Blue -> putStrLn "blue"
+        RGB r _ _ | r > 200 -> putStrLn "bright"
+        RGB r g b -> putStrLn $ "rgb:" ++ show r ++ "," ++ show g ++ "," ++ show b
 ```
