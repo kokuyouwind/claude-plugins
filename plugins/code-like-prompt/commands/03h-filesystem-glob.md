@@ -3,7 +3,7 @@ description: コード風プロンプト例3h ファイルシステムのglob検
 argument-hint: '{"pattern": string}'
 ---
 
-Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
+Emulate the following code internally (without using external interpreter) with environment: $ARGUMENTS
 
 Output only what puts() commands would output. Do not show any explanations, code, variables, or other messages.
 

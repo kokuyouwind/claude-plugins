@@ -53,7 +53,7 @@
       "name": "code-like-prompt",
       "source": "./plugins/code-like-prompt",
       "description": "Collection of commands that execute code-like prompts demonstrating programming concepts including logic programming and backtracking",
-      "version": "0.7.13",
+      "version": "0.7.14",
       "author": {
         "name": "kokuyouwind",
         "url": "https://github.com/kokuyouwind"
