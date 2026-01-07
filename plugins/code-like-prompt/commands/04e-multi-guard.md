@@ -5,23 +5,23 @@ argument-hint: '{"x": number, "y": number}'
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```python
-# Validate required arguments
-if x is None:
-    raise ValueError("Required argument 'x' is missing")
-if y is None:
-    raise ValueError("Required argument 'y' is missing")
+```haskell
+main :: IO ()
+main = do
+    -- Validate required arguments
+    let x = case lookupArg "x" of
+            Nothing -> error "Required argument 'x' is missing"
+            Just v -> read v :: Int
+    let y = case lookupArg "y" of
+            Nothing -> error "Required argument 'y' is missing"
+            Just v -> read v :: Int
 
-# Pattern matching with guards
-match (x, y):
-    case (a, b) if a > 0 and b > 0:
-        print("foo")
-    case (a, b) if a > 0 or b > 0:
-        print("bar")
-    case (0, 0):
-        print("baz")
-    case _:
-        print("qux")
+    -- Pattern matching with guards
+    case (x, y) of
+        (a, b) | a > 0 && b > 0 -> putStrLn "foo"
+               | a > 0 || b > 0 -> putStrLn "bar"
+        (0, 0) -> putStrLn "baz"
+        _ -> putStrLn "qux"
 ```

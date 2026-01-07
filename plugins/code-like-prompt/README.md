@@ -190,43 +190,60 @@ Tests complex 5-level nesting with mixed patterns.
 /code-like-prompt:02a-dangling-else-outer-block --condition-a=true --condition-b=false
 ```
 
-### 04-series: Pattern Matching
+### 04-series: Pattern Matching (Haskell-style)
+
+All 04-series commands use Haskell pseudo-code to demonstrate functional pattern matching. Commands take Haskell data types as direct arguments (e.g., `Record "foo" 5`, `["a","b","c"]`, `Branch (Leaf "x") (Leaf "y")`), allowing you to test how Claude interprets pattern matching on complex algebraic data types.
 
 #### `/code-like-prompt:04a-regex-match`
 
-**Description**: コード風プロンプト例4a パターンマッチ:基本的な文字列パターンマッチング
+**Description**: コード風プロンプト例4a 正規表現マッチング
 
-Tests basic string pattern matching with regex-like patterns.
+Tests basic string pattern matching with regex guards.
 
 **Arguments**: `--text`
 
 #### `/code-like-prompt:04b-structural-match`
 
-**Description**: コード風プロンプト例4b パターンマッチ:構造的パターンマッチングとガード
+**Description**: コード風プロンプト例4b 構造的パターンマッチング
 
-Tests structural pattern matching with dict destructuring and guards.
+Tests structural pattern matching with record type destructuring and guards.
 
-**Arguments**: `--type`, `--value`
+**Arguments**: `--record` (Record type, e.g., `Record "foo" 5`)
+
+**Example**:
+```bash
+/code-like-prompt:04b-structural-match --record='Record "bar" 15'
+```
 
 #### `/code-like-prompt:04c-list-destructure`
 
-**Description**: コード風プロンプト例4c パターンマッチ:リスト/配列の分解
+**Description**: コード風プロンプト例4c リスト分解パターンマッチング
 
-Tests sequence pattern matching with list destructuring.
+Tests list pattern matching with cons patterns (`:` operator).
 
-**Arguments**: `--item1`, `--item2`, `--item3`
+**Arguments**: `--list` (List type, e.g., `["foo","bar"]`)
+
+**Example**:
+```bash
+/code-like-prompt:04c-list-destructure --list='["foo","bar"]'
+```
 
 #### `/code-like-prompt:04d-nested-match`
 
-**Description**: コード風プロンプト例4d パターンマッチ:ネストした構造のマッチング
+**Description**: コード風プロンプト例4d ネストした構造のパターンマッチング
 
-Tests deep pattern matching on nested tree-like structures.
+Tests deep pattern matching on nested tree data types.
 
-**Arguments**: `--left`, `--right-left`, `--right-right`
+**Arguments**: `--tree` (Tree type, e.g., `Branch (Leaf "foo") (Leaf "bar")`)
+
+**Example**:
+```bash
+/code-like-prompt:04d-nested-match --tree='Branch (Leaf "foo") (Leaf "bar")'
+```
 
 #### `/code-like-prompt:04e-multi-guard`
 
-**Description**: コード風プロンプト例4e パターンマッチ:複数のガード条件
+**Description**: コード風プロンプト例4e 複数ガード条件のパターンマッチング
 
 Tests pattern matching with complex guard conditions.
 
@@ -234,11 +251,54 @@ Tests pattern matching with complex guard conditions.
 
 #### `/code-like-prompt:04f-exhaustive`
 
-**Description**: コード風プロンプト例4f パターンマッチ:網羅的パターンマッチング(Rust風)
+**Description**: コード風プロンプト例4f 網羅的なenumマッチング
 
-Tests exhaustive pattern matching in Rust-style enum matching.
+Tests exhaustive pattern matching on algebraic data types.
 
-**Arguments**: `--color`, `--r`, `--g`, `--b`
+**Arguments**: `--color` (Color type, e.g., `Red`, `Green`, `Blue`, or `RGB 255 100 50`)
+
+**Example**:
+```bash
+/code-like-prompt:04f-exhaustive --color='RGB 255 100 50'
+```
+
+#### `/code-like-prompt:04g-maybe-pattern`
+
+**Description**: コード風プロンプト例4g Maybeのパターンマッチングとdo記法
+
+Tests Maybe type (Just/Nothing) with two processing styles: pattern matching and do notation.
+
+**Arguments**:
+- `--maybe-value`: Maybe value ("Nothing" or "Just:value")
+- `--style`: Processing style ("pattern" or "do", default: "pattern")
+
+**Examples**:
+```bash
+# Pattern matching style
+/code-like-prompt:04g-maybe-pattern --maybe-value=Just:hello --style=pattern
+
+# Do notation style
+/code-like-prompt:04g-maybe-pattern --maybe-value=Just:test --style=do
+```
+
+#### `/code-like-prompt:04h-either-pattern`
+
+**Description**: コード風プロンプト例4h Eitherのパターンマッチングとdo記法
+
+Tests Either type (Left/Right) with two processing styles: pattern matching and do notation (Either monad).
+
+**Arguments**:
+- `--either-value`: Either value ("Left:error" or "Right:value")
+- `--style`: Processing style ("pattern" or "do", default: "pattern")
+
+**Examples**:
+```bash
+# Pattern matching style
+/code-like-prompt:04h-either-pattern --either-value=Right:success --style=pattern
+
+# Do notation style (Either monad)
+/code-like-prompt:04h-either-pattern --either-value=Right:data --style=do
+```
 
 ### 07-series: Prolog-style Backtracking
 
@@ -519,9 +579,29 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.13
+0.7.16
 
 ### Changelog
+
+#### 0.7.16
+- Migrated 04-series pattern matching commands from Python/Rust to Haskell pseudo-code
+- All 04-series commands now take Haskell data types as direct arguments:
+  - 04b-structural-match: Takes Record type directly (e.g., `Record "foo" 5`)
+  - 04c-list-destructure: Takes list type directly (e.g., `["foo","bar"]`)
+  - 04d-nested-match: Takes Tree type directly (e.g., `Branch (Leaf "foo") (Leaf "bar")`)
+  - 04f-exhaustive: Takes Color type directly (e.g., `Red`, `RGB 255 100 50`)
+- Added new Haskell-specific pattern matching commands:
+  - 04g-maybe-pattern: Maybe type with pattern matching and do notation (>>=)
+  - 04h-either-pattern: Either type with pattern matching and do notation (Either monad)
+- Each new command demonstrates both traditional pattern matching and Haskell's do notation
+- Simplified command specifications to focus on testing pattern matching behavior
+- Added comprehensive test cases for all command variations
+
+#### 0.7.15
+- (Internal version - no public release)
+
+#### 0.7.14
+- (Internal version - no public release)
 
 #### 0.7.13
 - Improved 02c-deep-nesting-* commands:

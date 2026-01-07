@@ -1,37 +1,32 @@
 ---
 description: コード風プロンプト例4d ネストした構造のパターンマッチング
-argument-hint: '{"left": string, "right_left": string, "right_right": string}'
+argument-hint: '{"tree": string}'
 ---
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```python
-# Validate required arguments
-if left is None:
-    raise ValueError("Required argument 'left' is missing")
-if right_left is None:
-    raise ValueError("Required argument 'right_left' is missing")
-if right_right is None:
-    raise ValueError("Required argument 'right_right' is missing")
+```haskell
+-- Tree data type definition
+data Tree = Leaf String
+          | Branch Tree Tree
+          deriving (Show, Eq)
 
-# Nested structure matching
-tree = {
-    "left": {"value": left},
-    "right": {
-        "left": {"value": right_left},
-        "right": {"value": right_right}
-    }
-}
+-- Assume tree :: Tree is directly provided as Haskell data type
+-- Example: Branch (Leaf "foo") (Leaf "bar")
 
-match tree:
-    case {"left": {"value": "foo"}, "right": {"left": {"value": "bar"}, "right": _}}:
-        print("qux")
-    case {"left": {"value": v1}, "right": {"left": {"value": v2}, "right": {"value": v2}}}:
-        print(f"quux{v1}")
-    case {"left": {"value": v}, "right": _}:
-        print(f"corge{v}")
-    case _:
-        print("grault")
+main :: IO ()
+main = do
+    -- tree argument is provided as Tree type
+    let tree = getTree "tree"
+
+    -- Pattern matching on nested tree structure
+    case tree of
+        Leaf x -> putStrLn $ "leaf:" ++ x
+        Branch (Leaf "foo") (Leaf "bar") -> putStrLn "foo-bar"
+        Branch (Leaf "foo") _ -> putStrLn "foo-any"
+        Branch _ (Leaf "bar") -> putStrLn "any-bar"
+        Branch (Branch _ _) _ -> putStrLn "nested"
+        Branch _ _ -> putStrLn "other"
 ```

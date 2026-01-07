@@ -5,20 +5,21 @@ argument-hint: '{"text": string}'
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```python
-import re
+```haskell
+import Text.Regex.Posix ((=~))
 
-# Validate required arguments
-if text is None:
-    raise ValueError("Required argument 'text' is missing")
+main :: IO ()
+main = do
+    -- Validate required arguments
+    let text = case lookupArg "text" of
+            Nothing -> error "Required argument 'text' is missing"
+            Just t -> t
 
-# Pattern matching
-if re.match(r"^foo.*bar$", text):
-    print("qux")
-elif re.match(r"^baz", text):
-    print("quux")
-else:
-    print("corge")
+    -- Pattern matching with guards
+    case text of
+        _ | text =~ "^foo.*bar$" -> putStrLn "qux"
+          | text =~ "^baz" -> putStrLn "quux"
+          | otherwise -> putStrLn "corge"
 ```

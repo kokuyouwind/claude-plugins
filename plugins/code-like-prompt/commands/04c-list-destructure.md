@@ -1,31 +1,27 @@
 ---
 description: コード風プロンプト例4c リスト分解パターンマッチング
-argument-hint: '{"item1": string, "item2": string, "item3": string}'
+argument-hint: '{"list": string}'
 ---
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```python
-# Validate required arguments
-if item1 is None:
-    raise ValueError("Required argument 'item1' is missing")
-if item2 is None:
-    raise ValueError("Required argument 'item2' is missing")
-if item3 is None:
-    raise ValueError("Required argument 'item3' is missing")
+```haskell
+-- Assume list :: [String] is directly provided as Haskell data type
+-- Example: ["foo", "bar", "baz"]
 
-# List destructuring
-items = [item1, item2, item3]
+main :: IO ()
+main = do
+    -- list argument is provided as [String] type
+    let list = getList "list"
 
-match items:
-    case ["foo", second, "bar"]:
-        print(f"qux{second}")
-    case ["foo", *rest]:
-        print(f"quux{len(rest)}")
-    case [first, *_]:
-        print(f"corge{first}")
-    case []:
-        print("grault")
+    -- List pattern matching with destructuring
+    case list of
+        [] -> putStrLn "empty"
+        [x] -> putStrLn $ "single:" ++ x
+        ["foo", "bar"] -> putStrLn "foo-bar"
+        ["foo", x, "baz"] -> putStrLn $ "foo-x-baz:" ++ x
+        (x:y:_) -> putStrLn $ "multi:" ++ x ++ "," ++ y
+        _ -> putStrLn "other"
 ```
