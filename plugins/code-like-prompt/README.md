@@ -519,9 +519,13 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.12
+0.7.13
 
 ### Changelog
+
+#### 0.7.13
+- Improved 02c-deep-nesting-* commands:
+  - Added instruction to output () when there is nothing to output
 
 #### 0.7.12
 - Improved 08k-werewolf command:
