@@ -479,3 +479,198 @@ func Test07gConstraints(t *testing.T) {
 
 	RunTestCases(t, tests)
 }
+
+// Test04gMaybePattern tests 04g-maybe-pattern command
+func Test04gMaybePattern(t *testing.T) {
+	tests := []TestCase{
+		{
+			Name:    "JustFoo",
+			Command: "/code-like-prompt:04g-maybe-pattern",
+			Args: map[string]interface{}{
+				"has_value": true,
+				"value":     "foo",
+			},
+			ExpectedOutputs: []string{
+				"bar",
+			},
+		},
+		{
+			Name:    "JustBaz",
+			Command: "/code-like-prompt:04g-maybe-pattern",
+			Args: map[string]interface{}{
+				"has_value": true,
+				"value":     "baz",
+			},
+			ExpectedOutputs: []string{
+				"qux",
+			},
+		},
+		{
+			Name:    "JustOther",
+			Command: "/code-like-prompt:04g-maybe-pattern",
+			Args: map[string]interface{}{
+				"has_value": true,
+				"value":     "hello",
+			},
+			ExpectedOutputs: []string{
+				"quux",
+			},
+		},
+		{
+			Name:    "Nothing",
+			Command: "/code-like-prompt:04g-maybe-pattern",
+			Args: map[string]interface{}{
+				"has_value": false,
+			},
+			ExpectedOutputs: []string{
+				"corge",
+			},
+		},
+	}
+
+	RunTestCases(t, tests)
+}
+
+// Test04hEitherPattern tests 04h-either-pattern command
+func Test04hEitherPattern(t *testing.T) {
+	tests := []TestCase{
+		{
+			Name:    "LeftTimeout",
+			Command: "/code-like-prompt:04h-either-pattern",
+			Args: map[string]interface{}{
+				"is_error": true,
+				"message":  "timeout",
+			},
+			ExpectedOutputs: []string{
+				"foo",
+			},
+		},
+		{
+			Name:    "LeftOtherError",
+			Command: "/code-like-prompt:04h-either-pattern",
+			Args: map[string]interface{}{
+				"is_error": true,
+				"message":  "connection failed",
+			},
+			ExpectedOutputs: []string{
+				"bar",
+			},
+		},
+		{
+			Name:    "RightSuccess",
+			Command: "/code-like-prompt:04h-either-pattern",
+			Args: map[string]interface{}{
+				"is_error": false,
+				"message":  "success",
+			},
+			ExpectedOutputs: []string{
+				"baz",
+			},
+		},
+		{
+			Name:    "RightOther",
+			Command: "/code-like-prompt:04h-either-pattern",
+			Args: map[string]interface{}{
+				"is_error": false,
+				"message":  "completed",
+			},
+			ExpectedOutputs: []string{
+				"qux",
+			},
+		},
+	}
+
+	RunTestCases(t, tests)
+}
+
+// Test04iAdtPattern tests 04i-adt-pattern command
+func Test04iAdtPattern(t *testing.T) {
+	tests := []TestCase{
+		{
+			Name:    "Success200",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "Success",
+				"status_code":   200,
+				"body":          "OK",
+			},
+			ExpectedOutputs: []string{
+				"fooOK",
+			},
+		},
+		{
+			Name:    "Success201",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "Success",
+				"status_code":   201,
+				"body":          "Created",
+			},
+			ExpectedOutputs: []string{
+				"bar",
+			},
+		},
+		{
+			Name:    "Redirect301",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "Redirect",
+				"status_code":   301,
+				"body":          "/new-location",
+			},
+			ExpectedOutputs: []string{
+				"baz",
+			},
+		},
+		{
+			Name:    "Redirect302",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "Redirect",
+				"status_code":   302,
+				"body":          "/temp-location",
+			},
+			ExpectedOutputs: []string{
+				"qux",
+			},
+		},
+		{
+			Name:    "ClientError404",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "ClientError",
+				"status_code":   404,
+				"body":          "Not Found",
+			},
+			ExpectedOutputs: []string{
+				"quux",
+			},
+		},
+		{
+			Name:    "ClientError400",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "ClientError",
+				"status_code":   400,
+				"body":          "Bad Request",
+			},
+			ExpectedOutputs: []string{
+				"corge",
+			},
+		},
+		{
+			Name:    "ServerError500",
+			Command: "/code-like-prompt:04i-adt-pattern",
+			Args: map[string]interface{}{
+				"response_type": "ServerError",
+				"status_code":   500,
+				"body":          "",
+			},
+			ExpectedOutputs: []string{
+				"grault",
+			},
+		},
+	}
+
+	RunTestCases(t, tests)
+}

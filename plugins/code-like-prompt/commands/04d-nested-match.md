@@ -5,33 +5,39 @@ argument-hint: '{"left": string, "right_left": string, "right_right": string}'
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```python
-# Validate required arguments
-if left is None:
-    raise ValueError("Required argument 'left' is missing")
-if right_left is None:
-    raise ValueError("Required argument 'right_left' is missing")
-if right_right is None:
-    raise ValueError("Required argument 'right_right' is missing")
+```haskell
+-- Tree data type definition
+data Node = Node { value :: String }
+data Tree = Tree { left :: Node, right :: SubTree }
+data SubTree = SubTree { subLeft :: Node, subRight :: Node }
 
-# Nested structure matching
-tree = {
-    "left": {"value": left},
-    "right": {
-        "left": {"value": right_left},
-        "right": {"value": right_right}
-    }
-}
+main :: IO ()
+main = do
+    -- Validate required arguments
+    let leftVal = case lookupArg "left" of
+            Nothing -> error "Required argument 'left' is missing"
+            Just v -> v
+    let rightLeftVal = case lookupArg "right_left" of
+            Nothing -> error "Required argument 'right_left' is missing"
+            Just v -> v
+    let rightRightVal = case lookupArg "right_right" of
+            Nothing -> error "Required argument 'right_right' is missing"
+            Just v -> v
 
-match tree:
-    case {"left": {"value": "foo"}, "right": {"left": {"value": "bar"}, "right": _}}:
-        print("qux")
-    case {"left": {"value": v1}, "right": {"left": {"value": v2}, "right": {"value": v2}}}:
-        print(f"quux{v1}")
-    case {"left": {"value": v}, "right": _}:
-        print(f"corge{v}")
-    case _:
-        print("grault")
+    -- Nested structure matching
+    let tree = Tree
+            (Node leftVal)
+            (SubTree (Node rightLeftVal) (Node rightRightVal))
+
+    case tree of
+        Tree (Node "foo") (SubTree (Node "bar") _) ->
+            putStrLn "qux"
+        Tree (Node v1) (SubTree (Node v2) (Node v2')) | v2 == v2' ->
+            putStrLn $ "quux" ++ v1
+        Tree (Node v) _ ->
+            putStrLn $ "corge" ++ v
+        _ ->
+            putStrLn "grault"
 ```

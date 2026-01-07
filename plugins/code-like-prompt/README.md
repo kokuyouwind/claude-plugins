@@ -190,43 +190,45 @@ Tests complex 5-level nesting with mixed patterns.
 /code-like-prompt:02a-dangling-else-outer-block --condition-a=true --condition-b=false
 ```
 
-### 04-series: Pattern Matching
+### 04-series: Pattern Matching (Haskell-style)
+
+All 04-series commands now use Haskell pseudo-code to demonstrate functional pattern matching.
 
 #### `/code-like-prompt:04a-regex-match`
 
-**Description**: コード風プロンプト例4a パターンマッチ:基本的な文字列パターンマッチング
+**Description**: コード風プロンプト例4a 正規表現マッチング
 
-Tests basic string pattern matching with regex-like patterns.
+Tests basic string pattern matching with regex guards.
 
 **Arguments**: `--text`
 
 #### `/code-like-prompt:04b-structural-match`
 
-**Description**: コード風プロンプト例4b パターンマッチ:構造的パターンマッチングとガード
+**Description**: コード風プロンプト例4b 構造的パターンマッチング
 
-Tests structural pattern matching with dict destructuring and guards.
+Tests structural pattern matching with record type destructuring and guards.
 
 **Arguments**: `--type`, `--value`
 
 #### `/code-like-prompt:04c-list-destructure`
 
-**Description**: コード風プロンプト例4c パターンマッチ:リスト/配列の分解
+**Description**: コード風プロンプト例4c リスト分解パターンマッチング
 
-Tests sequence pattern matching with list destructuring.
+Tests list pattern matching with cons patterns (`:` operator).
 
 **Arguments**: `--item1`, `--item2`, `--item3`
 
 #### `/code-like-prompt:04d-nested-match`
 
-**Description**: コード風プロンプト例4d パターンマッチ:ネストした構造のマッチング
+**Description**: コード風プロンプト例4d ネストした構造のパターンマッチング
 
-Tests deep pattern matching on nested tree-like structures.
+Tests deep pattern matching on nested algebraic data types.
 
 **Arguments**: `--left`, `--right-left`, `--right-right`
 
 #### `/code-like-prompt:04e-multi-guard`
 
-**Description**: コード風プロンプト例4e パターンマッチ:複数のガード条件
+**Description**: コード風プロンプト例4e 複数ガード条件のパターンマッチング
 
 Tests pattern matching with complex guard conditions.
 
@@ -234,11 +236,35 @@ Tests pattern matching with complex guard conditions.
 
 #### `/code-like-prompt:04f-exhaustive`
 
-**Description**: コード風プロンプト例4f パターンマッチ:網羅的パターンマッチング(Rust風)
+**Description**: コード風プロンプト例4f 網羅的なenumマッチング
 
-Tests exhaustive pattern matching in Rust-style enum matching.
+Tests exhaustive pattern matching on algebraic data types.
 
 **Arguments**: `--color`, `--r`, `--g`, `--b`
+
+#### `/code-like-prompt:04g-maybe-pattern`
+
+**Description**: コード風プロンプト例4g Maybeのパターンマッチング
+
+Tests pattern matching on Maybe type (Just/Nothing).
+
+**Arguments**: `--has-value`, `--value`
+
+#### `/code-like-prompt:04h-either-pattern`
+
+**Description**: コード風プロンプト例4h Eitherのパターンマッチング
+
+Tests pattern matching on Either type (Left/Right) for error handling.
+
+**Arguments**: `--is-error`, `--message`
+
+#### `/code-like-prompt:04i-adt-pattern`
+
+**Description**: コード風プロンプト例4i 複雑な代数的データ型のパターンマッチング
+
+Tests pattern matching on complex ADT (HTTP response types).
+
+**Arguments**: `--response-type`, `--status-code`, `--body`
 
 ### 07-series: Prolog-style Backtracking
 
@@ -519,9 +545,20 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.13
+0.7.15
 
 ### Changelog
+
+#### 0.7.15
+- Migrated 04-series pattern matching commands from Python/Rust to Haskell pseudo-code
+- Added new Haskell-specific pattern matching commands:
+  - 04g-maybe-pattern: Maybe type pattern matching (Just/Nothing)
+  - 04h-either-pattern: Either type pattern matching (Left/Right)
+  - 04i-adt-pattern: Complex ADT pattern matching (HTTP response types)
+- Added comprehensive test cases for all new commands
+
+#### 0.7.14
+- (Internal version - no public release)
 
 #### 0.7.13
 - Improved 02c-deep-nesting-* commands:

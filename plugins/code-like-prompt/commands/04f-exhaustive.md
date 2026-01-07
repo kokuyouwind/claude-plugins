@@ -5,40 +5,44 @@ argument-hint: '{"color": string, "r": number, "g": number, "b": number}'
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what println!() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
-```rust
-// Validate required arguments
-if color.is_none() {
-    panic!("Required argument 'color' is missing");
-}
+```haskell
+-- Color data type definition
+data Color = Red
+           | Green
+           | Blue
+           | Custom Int Int Int
+           deriving (Show, Eq)
 
-enum Color {
-    Red,
-    Green,
-    Blue,
-    Custom(u8, u8, u8),
-}
+main :: IO ()
+main = do
+    -- Validate required arguments
+    let colorStr = case lookupArg "color" of
+            Nothing -> error "Required argument 'color' is missing"
+            Just c -> c
 
-// Parse color
-let c = match color.as_str() {
-    "Red" => Color::Red,
-    "Green" => Color::Green,
-    "Blue" => Color::Blue,
-    _ => {
-        if r.is_none() || g.is_none() || b.is_none() {
-            panic!("Required arguments 'r', 'g', 'b' are missing for Custom color");
-        }
-        Color::Custom(r, g, b)
-    }
-};
+    -- Parse color
+    let c = case colorStr of
+            "Red" -> Red
+            "Green" -> Green
+            "Blue" -> Blue
+            _ -> let r = case lookupArg "r" of
+                        Nothing -> error "Required arguments 'r', 'g', 'b' are missing for Custom color"
+                        Just v -> read v :: Int
+                     g = case lookupArg "g" of
+                        Nothing -> error "Required arguments 'r', 'g', 'b' are missing for Custom color"
+                        Just v -> read v :: Int
+                     b = case lookupArg "b" of
+                        Nothing -> error "Required arguments 'r', 'g', 'b' are missing for Custom color"
+                        Just v -> read v :: Int
+                 in Custom r g b
 
-// Exhaustive matching
-match c {
-    Color::Red => println!("foo"),
-    Color::Green => println!("bar"),
-    Color::Blue => println!("baz"),
-    Color::Custom(r, _, _) if r > 200 => println!("qux"),
-    Color::Custom(r, g, b) => println!("quux{}{}{}", r, g, b),
-}
+    -- Exhaustive matching
+    case c of
+        Red -> putStrLn "foo"
+        Green -> putStrLn "bar"
+        Blue -> putStrLn "baz"
+        Custom r _ _ | r > 200 -> putStrLn "qux"
+        Custom r g b -> putStrLn $ "quux" ++ show r ++ show g ++ show b
 ```
