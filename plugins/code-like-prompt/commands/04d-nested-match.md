@@ -1,6 +1,6 @@
 ---
 description: コード風プロンプト例4d ネストした構造のパターンマッチング
-argument-hint: '{"left": string, "right_left": string, "right_right": string}'
+argument-hint: '{"tree": string}'
 ---
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
@@ -9,35 +9,24 @@ Output only what putStrLn commands would output. Do not show any explanations, c
 
 ```haskell
 -- Tree data type definition
-data Node = Node { value :: String }
-data Tree = Tree { left :: Node, right :: SubTree }
-data SubTree = SubTree { subLeft :: Node, subRight :: Node }
+data Tree = Leaf String
+          | Branch Tree Tree
+          deriving (Show, Eq)
+
+-- Assume tree :: Tree is directly provided as Haskell data type
+-- Example: Branch (Leaf "foo") (Leaf "bar")
 
 main :: IO ()
 main = do
-    -- Validate required arguments
-    let leftVal = case lookupArg "left" of
-            Nothing -> error "Required argument 'left' is missing"
-            Just v -> v
-    let rightLeftVal = case lookupArg "right_left" of
-            Nothing -> error "Required argument 'right_left' is missing"
-            Just v -> v
-    let rightRightVal = case lookupArg "right_right" of
-            Nothing -> error "Required argument 'right_right' is missing"
-            Just v -> v
+    -- tree argument is provided as Tree type
+    let tree = getTree "tree"
 
-    -- Nested structure matching
-    let tree = Tree
-            (Node leftVal)
-            (SubTree (Node rightLeftVal) (Node rightRightVal))
-
+    -- Pattern matching on nested tree structure
     case tree of
-        Tree (Node "foo") (SubTree (Node "bar") _) ->
-            putStrLn "qux"
-        Tree (Node v1) (SubTree (Node v2) (Node v2')) | v2 == v2' ->
-            putStrLn $ "quux" ++ v1
-        Tree (Node v) _ ->
-            putStrLn $ "corge" ++ v
-        _ ->
-            putStrLn "grault"
+        Leaf x -> putStrLn $ "leaf:" ++ x
+        Branch (Leaf "foo") (Leaf "bar") -> putStrLn "foo-bar"
+        Branch (Leaf "foo") _ -> putStrLn "foo-any"
+        Branch _ (Leaf "bar") -> putStrLn "any-bar"
+        Branch (Branch _ _) _ -> putStrLn "nested"
+        Branch _ _ -> putStrLn "other"
 ```

@@ -192,7 +192,7 @@ Tests complex 5-level nesting with mixed patterns.
 
 ### 04-series: Pattern Matching (Haskell-style)
 
-All 04-series commands now use Haskell pseudo-code to demonstrate functional pattern matching.
+All 04-series commands use Haskell pseudo-code to demonstrate functional pattern matching. Commands take Haskell data types as direct arguments (e.g., `Record "foo" 5`, `["a","b","c"]`, `Branch (Leaf "x") (Leaf "y")`), allowing you to test how Claude interprets pattern matching on complex algebraic data types.
 
 #### `/code-like-prompt:04a-regex-match`
 
@@ -208,7 +208,12 @@ Tests basic string pattern matching with regex guards.
 
 Tests structural pattern matching with record type destructuring and guards.
 
-**Arguments**: `--type`, `--value`
+**Arguments**: `--record` (Record type, e.g., `Record "foo" 5`)
+
+**Example**:
+```bash
+/code-like-prompt:04b-structural-match --record='Record "bar" 15'
+```
 
 #### `/code-like-prompt:04c-list-destructure`
 
@@ -216,15 +221,25 @@ Tests structural pattern matching with record type destructuring and guards.
 
 Tests list pattern matching with cons patterns (`:` operator).
 
-**Arguments**: `--item1`, `--item2`, `--item3`
+**Arguments**: `--list` (List type, e.g., `["foo","bar"]`)
+
+**Example**:
+```bash
+/code-like-prompt:04c-list-destructure --list='["foo","bar"]'
+```
 
 #### `/code-like-prompt:04d-nested-match`
 
 **Description**: コード風プロンプト例4d ネストした構造のパターンマッチング
 
-Tests deep pattern matching on nested algebraic data types.
+Tests deep pattern matching on nested tree data types.
 
-**Arguments**: `--left`, `--right-left`, `--right-right`
+**Arguments**: `--tree` (Tree type, e.g., `Branch (Leaf "foo") (Leaf "bar")`)
+
+**Example**:
+```bash
+/code-like-prompt:04d-nested-match --tree='Branch (Leaf "foo") (Leaf "bar")'
+```
 
 #### `/code-like-prompt:04e-multi-guard`
 
@@ -240,7 +255,12 @@ Tests pattern matching with complex guard conditions.
 
 Tests exhaustive pattern matching on algebraic data types.
 
-**Arguments**: `--color`, `--r`, `--g`, `--b`
+**Arguments**: `--color` (Color type, e.g., `Red`, `Green`, `Blue`, or `RGB 255 100 50`)
+
+**Example**:
+```bash
+/code-like-prompt:04f-exhaustive --color='RGB 255 100 50'
+```
 
 #### `/code-like-prompt:04g-maybe-pattern`
 
@@ -565,11 +585,17 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 #### 0.7.15
 - Migrated 04-series pattern matching commands from Python/Rust to Haskell pseudo-code
+- All 04-series commands now take Haskell data types as direct arguments:
+  - 04b-structural-match: Takes Record type directly (e.g., `Record "foo" 5`)
+  - 04c-list-destructure: Takes list type directly (e.g., `["foo","bar"]`)
+  - 04d-nested-match: Takes Tree type directly (e.g., `Branch (Leaf "foo") (Leaf "bar")`)
+  - 04f-exhaustive: Takes Color type directly (e.g., `Red`, `RGB 255 100 50`)
 - Added new Haskell-specific pattern matching commands:
   - 04g-maybe-pattern: Maybe type with pattern matching and do notation (>>=)
   - 04h-either-pattern: Either type with pattern matching and do notation (Either monad)
 - Each new command demonstrates both traditional pattern matching and Haskell's do notation
-- Added comprehensive test cases for all command variations (pattern/do styles)
+- Simplified command specifications to focus on testing pattern matching behavior
+- Added comprehensive test cases for all command variations
 
 #### 0.7.14
 - (Internal version - no public release)

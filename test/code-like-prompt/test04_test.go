@@ -59,47 +59,43 @@ func Test04aRegexMatch(t *testing.T) {
 func Test04bStructuralMatch(t *testing.T) {
 	tests := []TestCase{
 		{
-			Name:    "FooType123Value",
+			Name:    "RecordFoo",
 			Command: "/code-like-prompt:04b-structural-match",
 			Args: map[string]interface{}{
-				"type":  "foo",
-				"value": "123",
+				"record": "Record \"foo\" 5",
 			},
 			ExpectedOutputs: []string{
-				"bar123",
+				"foo:5",
 			},
 		},
 		{
-			Name:    "BazType15ValueGuardTrue",
+			Name:    "RecordBarLarge",
 			Command: "/code-like-prompt:04b-structural-match",
 			Args: map[string]interface{}{
-				"type":  "baz",
-				"value": "15",
+				"record": "Record \"bar\" 15",
 			},
 			ExpectedOutputs: []string{
-				"qux15",
+				"bar-large",
 			},
 		},
 		{
-			Name:    "BazType5ValueGuardFalse",
+			Name:    "RecordBarSmall",
 			Command: "/code-like-prompt:04b-structural-match",
 			Args: map[string]interface{}{
-				"type":  "baz",
-				"value": "5",
+				"record": "Record \"bar\" 5",
 			},
 			ExpectedOutputs: []string{
-				"quux5",
+				"bar-small",
 			},
 		},
 		{
-			Name:    "OtherType",
+			Name:    "RecordOther",
 			Command: "/code-like-prompt:04b-structural-match",
 			Args: map[string]interface{}{
-				"type":  "other",
-				"value": "x",
+				"record": "Record \"baz\" 10",
 			},
 			ExpectedOutputs: []string{
-				"corge",
+				"other:baz",
 			},
 		},
 	}
@@ -111,41 +107,53 @@ func Test04bStructuralMatch(t *testing.T) {
 func Test04cListDestructure(t *testing.T) {
 	tests := []TestCase{
 		{
-			Name:    "FooXBar",
+			Name:    "EmptyList",
 			Command: "/code-like-prompt:04c-list-destructure",
 			Args: map[string]interface{}{
-				"item1": "foo",
-				"item2": "X",
-				"item3": "bar",
+				"list": "[]",
 			},
 			ExpectedOutputs: []string{
-				"quxX",
+				"empty",
 			},
 		},
 		{
-			Name:    "FooABRestPattern",
+			Name:    "SingleElement",
 			Command: "/code-like-prompt:04c-list-destructure",
 			Args: map[string]interface{}{
-				"item1": "foo",
-				"item2": "a",
-				"item3": "b",
+				"list": "[\"hello\"]",
 			},
 			ExpectedOutputs: []string{
-				"quux2",
+				"single:hello",
 			},
 		},
 		{
-			Name:    "OtherXY",
+			Name:    "FooBar",
 			Command: "/code-like-prompt:04c-list-destructure",
 			Args: map[string]interface{}{
-				"item1": "other",
-				"item2": "x",
-				"item3": "y",
+				"list": "[\"foo\",\"bar\"]",
 			},
-			CustomAssert: func(t *testing.T, output string) {
-				// Output has space: "corge other"
-				assert.Contains(t, output, "corge")
-				assert.Contains(t, output, "other")
+			ExpectedOutputs: []string{
+				"foo-bar",
+			},
+		},
+		{
+			Name:    "FooXBaz",
+			Command: "/code-like-prompt:04c-list-destructure",
+			Args: map[string]interface{}{
+				"list": "[\"foo\",\"test\",\"baz\"]",
+			},
+			ExpectedOutputs: []string{
+				"foo-x-baz:test",
+			},
+		},
+		{
+			Name:    "MultipleElements",
+			Command: "/code-like-prompt:04c-list-destructure",
+			Args: map[string]interface{}{
+				"list": "[\"a\",\"b\",\"c\"]",
+			},
+			ExpectedOutputs: []string{
+				"multi:a,b",
 			},
 		},
 	}
@@ -157,44 +165,63 @@ func Test04cListDestructure(t *testing.T) {
 func Test04dNestedMatch(t *testing.T) {
 	tests := []TestCase{
 		{
-			Name:    "FooBarMatch",
+			Name:    "LeafNode",
 			Command: "/code-like-prompt:04d-nested-match",
 			Args: map[string]interface{}{
-				"left":        "foo",
-				"right_left":  "bar",
-				"right_right": "X",
+				"tree": "Leaf \"hello\"",
 			},
 			ExpectedOutputs: []string{
-				"qux",
+				"leaf:hello",
 			},
 		},
 		{
-			Name:    "ValueMatchSame",
+			Name:    "FooBarBranch",
 			Command: "/code-like-prompt:04d-nested-match",
 			Args: map[string]interface{}{
-				"left":        "A",
-				"right_left":  "same",
-				"right_right": "same",
+				"tree": "Branch (Leaf \"foo\") (Leaf \"bar\")",
 			},
-			CustomAssert: func(t *testing.T, output string) {
-				// May request approval, but if it runs successfully should contain quuxA
-				hasQuuxA := strings.Contains(output, "quuxA")
-				hasApproval := strings.Contains(output, "approval") || strings.Contains(output, "permission")
-				assert.True(t, hasQuuxA || hasApproval, "Output should contain quuxA or approval request")
+			ExpectedOutputs: []string{
+				"foo-bar",
 			},
 		},
 		{
-			Name:    "DefaultCase",
+			Name:    "FooAnyBranch",
 			Command: "/code-like-prompt:04d-nested-match",
 			Args: map[string]interface{}{
-				"left":        "A",
-				"right_left":  "B",
-				"right_right": "C",
+				"tree": "Branch (Leaf \"foo\") (Leaf \"baz\")",
 			},
-			CustomAssert: func(t *testing.T, output string) {
-				// Output has space: "corge A"
-				assert.Contains(t, output, "corge")
-				assert.Contains(t, output, "A")
+			ExpectedOutputs: []string{
+				"foo-any",
+			},
+		},
+		{
+			Name:    "AnyBarBranch",
+			Command: "/code-like-prompt:04d-nested-match",
+			Args: map[string]interface{}{
+				"tree": "Branch (Leaf \"test\") (Leaf \"bar\")",
+			},
+			ExpectedOutputs: []string{
+				"any-bar",
+			},
+		},
+		{
+			Name:    "NestedBranch",
+			Command: "/code-like-prompt:04d-nested-match",
+			Args: map[string]interface{}{
+				"tree": "Branch (Branch (Leaf \"a\") (Leaf \"b\")) (Leaf \"c\")",
+			},
+			ExpectedOutputs: []string{
+				"nested",
+			},
+		},
+		{
+			Name:    "OtherBranch",
+			Command: "/code-like-prompt:04d-nested-match",
+			Args: map[string]interface{}{
+				"tree": "Branch (Leaf \"x\") (Leaf \"y\")",
+			},
+			ExpectedOutputs: []string{
+				"other",
 			},
 		},
 	}
@@ -275,7 +302,7 @@ func Test04fExhaustive(t *testing.T) {
 				"color": "Red",
 			},
 			ExpectedOutputs: []string{
-				"foo",
+				"red",
 			},
 		},
 		{
@@ -285,7 +312,7 @@ func Test04fExhaustive(t *testing.T) {
 				"color": "Green",
 			},
 			ExpectedOutputs: []string{
-				"bar",
+				"green",
 			},
 		},
 		{
@@ -295,33 +322,27 @@ func Test04fExhaustive(t *testing.T) {
 				"color": "Blue",
 			},
 			ExpectedOutputs: []string{
-				"baz",
+				"blue",
 			},
 		},
 		{
-			Name:    "CustomHighRed",
+			Name:    "RGBBright",
 			Command: "/code-like-prompt:04f-exhaustive",
 			Args: map[string]interface{}{
-				"color": "Custom",
-				"r":     255,
-				"g":     100,
-				"b":     50,
+				"color": "RGB 255 100 50",
 			},
 			ExpectedOutputs: []string{
-				"qux",
+				"bright",
 			},
 		},
 		{
-			Name:    "CustomRGB",
+			Name:    "RGBDark",
 			Command: "/code-like-prompt:04f-exhaustive",
 			Args: map[string]interface{}{
-				"color": "Custom",
-				"r":     100,
-				"g":     150,
-				"b":     200,
+				"color": "RGB 100 150 200",
 			},
 			ExpectedOutputs: []string{
-				"quux100150200",
+				"rgb:100,150,200",
 			},
 		},
 	}

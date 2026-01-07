@@ -1,6 +1,6 @@
 ---
 description: コード風プロンプト例4b 構造的パターンマッチング
-argument-hint: '{"type": string, "value": string}'
+argument-hint: '{"record": string}'
 ---
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
@@ -8,24 +8,22 @@ Emulate the following code internally (without using external tools or interpret
 Output only what putStrLn commands would output. Do not show any explanations, code, variables, or other messages.
 
 ```haskell
--- Data type definition
-data Data = Data { dataType :: String, dataValue :: String }
+-- Record data type definition
+data Record = Record { label :: String, value :: Int }
+            deriving (Show, Eq)
+
+-- Assume record :: Record is directly provided as Haskell data type
+-- Example: Record "foo" 5
 
 main :: IO ()
 main = do
-    -- Validate required arguments
-    let typ = case lookupArg "type" of
-            Nothing -> error "Required argument 'type' is missing"
-            Just t -> t
-    let val = case lookupArg "value" of
-            Nothing -> error "Required argument 'value' is missing"
-            Just v -> v
+    -- record argument is provided as Record type
+    let record = getRecord "record"
 
-    -- Structural pattern matching
-    let record = Data typ val
+    -- Structural pattern matching with guards
     case record of
-        Data "foo" v -> putStrLn $ "bar" ++ v
-        Data "baz" v | read v > 10 -> putStrLn $ "qux" ++ v
-        Data "baz" v -> putStrLn $ "quux" ++ v
-        _ -> putStrLn "corge"
+        Record "foo" v -> putStrLn $ "foo:" ++ show v
+        Record "bar" v | v > 10 -> putStrLn "bar-large"
+        Record "bar" v -> putStrLn "bar-small"
+        Record l _ -> putStrLn $ "other:" ++ l
 ```
