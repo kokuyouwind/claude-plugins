@@ -13,6 +13,3 @@ foo(quux, 2).
 
 ?- findall(X, foo(X, 2), L), write(L), nl.
 ```
-
-Expected output:
-[baz, quux]

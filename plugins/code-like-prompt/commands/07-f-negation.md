@@ -14,6 +14,3 @@ test(X) :- foo(X), \+ qux(X).
 
 ?- test(X), write(X), nl, fail.
 ```
-
-Expected output:
-bar

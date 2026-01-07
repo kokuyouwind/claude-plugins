@@ -22,11 +22,3 @@ coloring(R1, R2, R3) :-
 
 ?- coloring(A, B, C), write(A), write('-'), write(B), write('-'), write(C), nl, fail.
 ```
-
-Expected output (all valid 3-colorings of a triangle):
-foo-bar-baz
-foo-baz-bar
-bar-foo-baz
-bar-baz-foo
-baz-foo-bar
-baz-bar-foo

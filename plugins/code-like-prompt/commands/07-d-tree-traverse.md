@@ -18,5 +18,3 @@ leaf_value(node(_, _, R), V) :- leaf_value(R, V).
 
 ?- tree(T), leaf_value(T, V), write(V), write(' '), fail.
 ```
-
-Expected output: baz qux corge grault

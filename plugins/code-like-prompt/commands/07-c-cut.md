@@ -20,7 +20,3 @@ test(_, corge).
 % Second query - c doesn't match foo, tries second clause
 ?- test(c, R), write(R), nl, fail.
 ```
-
-Expected output:
-bar
-corge
