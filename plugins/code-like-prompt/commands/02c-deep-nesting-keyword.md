@@ -5,7 +5,7 @@ argument-hint: '{"level1": boolean, "level2": boolean, "level3": boolean, "level
 
 Emulate the following code internally (without using external tools or interpreter) with environment: $ARGUMENTS
 
-Output only what print() commands would output. Do not show any explanations, code, variables, or other messages.
+Output only what print() commands would output. Do not show any explanations, code, variables, or other messages. If there is nothing to output, output () instead.
 
 ```ruby
 # Validate required arguments
