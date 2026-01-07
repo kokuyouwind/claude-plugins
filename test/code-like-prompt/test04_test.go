@@ -483,47 +483,50 @@ func Test07gConstraints(t *testing.T) {
 // Test04gMaybePattern tests 04g-maybe-pattern command
 func Test04gMaybePattern(t *testing.T) {
 	tests := []TestCase{
+		// Pattern matching style tests
 		{
-			Name:    "JustFoo",
+			Name:    "PatternNothing",
 			Command: "/code-like-prompt:04g-maybe-pattern",
 			Args: map[string]interface{}{
-				"has_value": true,
-				"value":     "foo",
+				"maybe_value": "Nothing",
+				"style":       "pattern",
 			},
 			ExpectedOutputs: []string{
-				"bar",
+				"none",
 			},
 		},
 		{
-			Name:    "JustBaz",
+			Name:    "PatternJustValue",
 			Command: "/code-like-prompt:04g-maybe-pattern",
 			Args: map[string]interface{}{
-				"has_value": true,
-				"value":     "baz",
+				"maybe_value": "Just:hello",
+				"style":       "pattern",
 			},
 			ExpectedOutputs: []string{
-				"qux",
+				"value:hello",
+			},
+		},
+		// Do notation style tests
+		{
+			Name:    "DoNothing",
+			Command: "/code-like-prompt:04g-maybe-pattern",
+			Args: map[string]interface{}{
+				"maybe_value": "Nothing",
+				"style":       "do",
+			},
+			ExpectedOutputs: []string{
+				"empty",
 			},
 		},
 		{
-			Name:    "JustOther",
+			Name:    "DoJustValue",
 			Command: "/code-like-prompt:04g-maybe-pattern",
 			Args: map[string]interface{}{
-				"has_value": true,
-				"value":     "hello",
+				"maybe_value": "Just:test",
+				"style":       "do",
 			},
 			ExpectedOutputs: []string{
-				"quux",
-			},
-		},
-		{
-			Name:    "Nothing",
-			Command: "/code-like-prompt:04g-maybe-pattern",
-			Args: map[string]interface{}{
-				"has_value": false,
-			},
-			ExpectedOutputs: []string{
-				"corge",
+				"processed:test",
 			},
 		},
 	}
@@ -534,48 +537,50 @@ func Test04gMaybePattern(t *testing.T) {
 // Test04hEitherPattern tests 04h-either-pattern command
 func Test04hEitherPattern(t *testing.T) {
 	tests := []TestCase{
+		// Pattern matching style tests
 		{
-			Name:    "LeftTimeout",
+			Name:    "PatternLeft",
 			Command: "/code-like-prompt:04h-either-pattern",
 			Args: map[string]interface{}{
-				"is_error": true,
-				"message":  "timeout",
+				"either_value": "Left:timeout",
+				"style":        "pattern",
 			},
 			ExpectedOutputs: []string{
-				"foo",
+				"error:timeout",
 			},
 		},
 		{
-			Name:    "LeftOtherError",
+			Name:    "PatternRight",
 			Command: "/code-like-prompt:04h-either-pattern",
 			Args: map[string]interface{}{
-				"is_error": true,
-				"message":  "connection failed",
+				"either_value": "Right:success",
+				"style":        "pattern",
 			},
 			ExpectedOutputs: []string{
-				"bar",
+				"success:success",
+			},
+		},
+		// Do notation style tests
+		{
+			Name:    "DoLeft",
+			Command: "/code-like-prompt:04h-either-pattern",
+			Args: map[string]interface{}{
+				"either_value": "Left:error",
+				"style":        "do",
+			},
+			ExpectedOutputs: []string{
+				"failed:error",
 			},
 		},
 		{
-			Name:    "RightSuccess",
+			Name:    "DoRight",
 			Command: "/code-like-prompt:04h-either-pattern",
 			Args: map[string]interface{}{
-				"is_error": false,
-				"message":  "success",
+				"either_value": "Right:data",
+				"style":        "do",
 			},
 			ExpectedOutputs: []string{
-				"baz",
-			},
-		},
-		{
-			Name:    "RightOther",
-			Command: "/code-like-prompt:04h-either-pattern",
-			Args: map[string]interface{}{
-				"is_error": false,
-				"message":  "completed",
-			},
-			ExpectedOutputs: []string{
-				"qux",
+				"processed:data",
 			},
 		},
 	}
@@ -583,94 +588,3 @@ func Test04hEitherPattern(t *testing.T) {
 	RunTestCases(t, tests)
 }
 
-// Test04iAdtPattern tests 04i-adt-pattern command
-func Test04iAdtPattern(t *testing.T) {
-	tests := []TestCase{
-		{
-			Name:    "Success200",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "Success",
-				"status_code":   200,
-				"body":          "OK",
-			},
-			ExpectedOutputs: []string{
-				"fooOK",
-			},
-		},
-		{
-			Name:    "Success201",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "Success",
-				"status_code":   201,
-				"body":          "Created",
-			},
-			ExpectedOutputs: []string{
-				"bar",
-			},
-		},
-		{
-			Name:    "Redirect301",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "Redirect",
-				"status_code":   301,
-				"body":          "/new-location",
-			},
-			ExpectedOutputs: []string{
-				"baz",
-			},
-		},
-		{
-			Name:    "Redirect302",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "Redirect",
-				"status_code":   302,
-				"body":          "/temp-location",
-			},
-			ExpectedOutputs: []string{
-				"qux",
-			},
-		},
-		{
-			Name:    "ClientError404",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "ClientError",
-				"status_code":   404,
-				"body":          "Not Found",
-			},
-			ExpectedOutputs: []string{
-				"quux",
-			},
-		},
-		{
-			Name:    "ClientError400",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "ClientError",
-				"status_code":   400,
-				"body":          "Bad Request",
-			},
-			ExpectedOutputs: []string{
-				"corge",
-			},
-		},
-		{
-			Name:    "ServerError500",
-			Command: "/code-like-prompt:04i-adt-pattern",
-			Args: map[string]interface{}{
-				"response_type": "ServerError",
-				"status_code":   500,
-				"body":          "",
-			},
-			ExpectedOutputs: []string{
-				"grault",
-			},
-		},
-	}
-
-	RunTestCases(t, tests)
-}

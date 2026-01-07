@@ -244,27 +244,41 @@ Tests exhaustive pattern matching on algebraic data types.
 
 #### `/code-like-prompt:04g-maybe-pattern`
 
-**Description**: コード風プロンプト例4g Maybeのパターンマッチング
+**Description**: コード風プロンプト例4g Maybeのパターンマッチングとdo記法
 
-Tests pattern matching on Maybe type (Just/Nothing).
+Tests Maybe type (Just/Nothing) with two processing styles: pattern matching and do notation.
 
-**Arguments**: `--has-value`, `--value`
+**Arguments**:
+- `--maybe-value`: Maybe value ("Nothing" or "Just:value")
+- `--style`: Processing style ("pattern" or "do", default: "pattern")
+
+**Examples**:
+```bash
+# Pattern matching style
+/code-like-prompt:04g-maybe-pattern --maybe-value=Just:hello --style=pattern
+
+# Do notation style
+/code-like-prompt:04g-maybe-pattern --maybe-value=Just:test --style=do
+```
 
 #### `/code-like-prompt:04h-either-pattern`
 
-**Description**: コード風プロンプト例4h Eitherのパターンマッチング
+**Description**: コード風プロンプト例4h Eitherのパターンマッチングとdo記法
 
-Tests pattern matching on Either type (Left/Right) for error handling.
+Tests Either type (Left/Right) with two processing styles: pattern matching and do notation (Either monad).
 
-**Arguments**: `--is-error`, `--message`
+**Arguments**:
+- `--either-value`: Either value ("Left:error" or "Right:value")
+- `--style`: Processing style ("pattern" or "do", default: "pattern")
 
-#### `/code-like-prompt:04i-adt-pattern`
+**Examples**:
+```bash
+# Pattern matching style
+/code-like-prompt:04h-either-pattern --either-value=Right:success --style=pattern
 
-**Description**: コード風プロンプト例4i 複雑な代数的データ型のパターンマッチング
-
-Tests pattern matching on complex ADT (HTTP response types).
-
-**Arguments**: `--response-type`, `--status-code`, `--body`
+# Do notation style (Either monad)
+/code-like-prompt:04h-either-pattern --either-value=Right:data --style=do
+```
 
 ### 07-series: Prolog-style Backtracking
 
@@ -552,10 +566,10 @@ Coordinator process agent that aggregates results from multiple workers and send
 #### 0.7.15
 - Migrated 04-series pattern matching commands from Python/Rust to Haskell pseudo-code
 - Added new Haskell-specific pattern matching commands:
-  - 04g-maybe-pattern: Maybe type pattern matching (Just/Nothing)
-  - 04h-either-pattern: Either type pattern matching (Left/Right)
-  - 04i-adt-pattern: Complex ADT pattern matching (HTTP response types)
-- Added comprehensive test cases for all new commands
+  - 04g-maybe-pattern: Maybe type with pattern matching and do notation (>>=)
+  - 04h-either-pattern: Either type with pattern matching and do notation (Either monad)
+- Each new command demonstrates both traditional pattern matching and Haskell's do notation
+- Added comprehensive test cases for all command variations (pattern/do styles)
 
 #### 0.7.14
 - (Internal version - no public release)
