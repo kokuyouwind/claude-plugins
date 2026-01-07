@@ -579,11 +579,11 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.15
+0.7.16
 
 ### Changelog
 
-#### 0.7.15
+#### 0.7.16
 - Migrated 04-series pattern matching commands from Python/Rust to Haskell pseudo-code
 - All 04-series commands now take Haskell data types as direct arguments:
   - 04b-structural-match: Takes Record type directly (e.g., `Record "foo" 5`)
@@ -596,6 +596,9 @@ Coordinator process agent that aggregates results from multiple workers and send
 - Each new command demonstrates both traditional pattern matching and Haskell's do notation
 - Simplified command specifications to focus on testing pattern matching behavior
 - Added comprehensive test cases for all command variations
+
+#### 0.7.15
+- (Internal version - no public release)
 
 #### 0.7.14
 - (Internal version - no public release)
