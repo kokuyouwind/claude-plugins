@@ -13,11 +13,16 @@ Worker goroutine that reverses strings using Go-style channel notation.
 
 **Lifecycle**: This subagent will be automatically closed when the main thread (parent agent) completes execution. Continue running until that happens.
 
-**Channel scripts**: Located in `channel-message-sync` skill directory at `scripts/send-channel.sh` and `scripts/receive-channel.sh`. Use `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/` to construct the full path.
+**Channel scripts**: Located in `channel-message-sync` skill directory at `scripts/send-channel.sh` and `scripts/receive-channel.sh`.
+
+Set the script path at the beginning:
+```bash
+SCRIPT_DIR="$HOME/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-like-prompt/skills/channel-message-sync/scripts"
+```
 
 **Channel operations**:
-- `msg := <-inputChan` means: Run `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/receive-channel.sh` to get the message
-- `outputChan <- msg` means: Run `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/send-channel.sh` to send the message
+- `msg := <-inputChan` means: Run `bash "${SCRIPT_DIR}/receive-channel.sh" <channel-name> <timeout>` to get the message
+- `outputChan <- msg` means: Run `bash "${SCRIPT_DIR}/send-channel.sh" <from-goroutine> <to-channel> <message>` to send the message
 
 ```go
 package reverser
