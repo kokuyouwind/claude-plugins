@@ -1,6 +1,6 @@
 {
   "name": "code-like-prompt",
-  "version": "0.7.16",
+  "version": "0.7.17",
   "description": "Collection of commands that execute code-like prompts demonstrating programming concepts including logic programming and backtracking",
   "author": {
     "name": "kokuyouwind",
