@@ -3,35 +3,38 @@ description: コード風プロンプト例5l Goのgoroutine:サブエージェ�
 argument-hint: ""
 ---
 
-Emulate the following Haskell-style code. Output only what `print` commands would output. Do not show explanations, code, variables, or other messages.
+Emulate the following Go-style code. Output only what `fmt.Println` commands would output. Do not show explanations, code, variables, or other messages.
 
-**Subagent**: Spawn "code-like-prompt:goroutine-reverse-worker" using Task tool to execute `reverser.worker 1 ch1 ch2`.
+**Subagent**: Spawn "code-like-prompt:goroutine-reverse-worker" using Task tool to execute `reverser.worker(1, ch1, ch2)`.
 
-**Channel operations**: `ch <- msg` (send) and `msg <- ch` (receive) use `channel-message-sync` skill scripts (send-channel.sh, receive-channel.sh). Locate scripts via Claude's skill directory resolution.
+**Channel operations**:
+- `ch <- msg` (send) uses `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/send-channel.sh`
+- `msg := <-ch` (receive) uses `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/receive-channel.sh`
 
 **Setup/Cleanup**: Before execution, run `rm -rf /tmp/go-channels` to clean state. After execution, run `rm -rf /tmp/go-channels` to cleanup.
 
-```haskell
-module Main where
+```go
+package main
 
-import Control.Concurrent
-import Control.Concurrent.Chan
+import (
+	"fmt"
+)
 
-main :: IO ()
-main = do
-    ch1 <- newChan
-    ch2 <- newChan
+func main() {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
 
-    forkIO $ Reverser.worker 1 ch1 ch2
+	go reverser.worker(1, ch1, ch2)
 
-    ch1 <- "foo"
-    ch1 <- "bar"
+	ch1 <- "foo"
+	ch1 <- "bar"
 
-    msg1 <- ch2
-    print msg1
+	msg1 := <-ch2
+	fmt.Println(msg1)
 
-    msg2 <- ch2
-    print msg2
+	msg2 := <-ch2
+	fmt.Println(msg2)
 
-    print "baz"
+	fmt.Println("baz")
+}
 ```

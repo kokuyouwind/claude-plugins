@@ -579,9 +579,14 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.18
+0.7.19
 
 ### Changelog
+
+#### 0.7.19
+- Migrated 05l-channel-messaging and 05m-multi-goroutine-channel from Haskell-style to Go-style code
+- Updated goroutine worker agents (goroutine-reverse-worker, goroutine-repeat-worker) to use Go syntax
+- Explicitly use `${CLAUDE_PLUGIN_ROOT}` in channel operation script paths
 
 #### 0.7.18
 - Fixed goroutine worker agents (goroutine-reverse-worker, goroutine-repeat-worker) to actually execute channel scripts using Bash tool
