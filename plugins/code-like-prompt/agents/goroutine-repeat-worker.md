@@ -22,7 +22,7 @@ SCRIPT_DIR="$HOME/.claude/plugins/marketplaces/kokuyouwind-plugins/plugins/code-
 
 **Channel operations**:
 - `msg := <-inputChan` means: Run `bash "${SCRIPT_DIR}/receive-channel.sh" <channel-name> <timeout>` to get the message
-- `outputChan <- msg` means: Run `bash "${SCRIPT_DIR}/send-channel.sh" <from-goroutine> <to-channel> <message>` to send the message
+- `outputChan <- msg` means: Run `bash "${SCRIPT_DIR}/send-channel.sh" <to-channel> <message>` to send the message
 
 ```go
 package repeater
