@@ -5,9 +5,11 @@ argument-hint: "[MESSAGE1] [MESSAGE2]"
 
 Emulate the following Go-style code. Output only what `fmt.Println` commands would output. Do not show explanations, code, variables, or other messages.
 
-**Subagents**: Spawn two workers using Task tool:
+**Subagents**: Spawn two workers using Task tool with `run_in_background=true`:
 - "code-like-prompt:goroutine-reverse-worker" to execute `reverser.worker(1, ch1, ch2)`
 - "code-like-prompt:goroutine-repeat-worker" to execute `repeater.worker(2, ch2, ch3)`
+
+**Note**: These subagents run in infinite loops processing messages from their input channels. They will be automatically closed when this main thread completes execution (after printing both results).
 
 **Channel operations**:
 - `ch <- msg` (send) uses `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/send-channel.sh`

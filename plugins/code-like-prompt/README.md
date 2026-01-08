@@ -579,9 +579,14 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.19
+0.7.20
 
 ### Changelog
+
+#### 0.7.20
+- Updated goroutine worker agents to run in infinite loops processing messages continuously
+- Added lifecycle annotations indicating subagents are closed when main thread completes
+- Updated 05m-multi-goroutine-channel command documentation to clarify infinite loop behavior
 
 #### 0.7.19
 - Migrated 05l-channel-messaging and 05m-multi-goroutine-channel from Haskell-style to Go-style code

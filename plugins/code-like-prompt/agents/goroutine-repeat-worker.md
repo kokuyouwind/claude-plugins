@@ -9,6 +9,10 @@ Worker goroutine that repeats strings twice using Go-style channel notation.
 
 **IMPORTANT**: You MUST actually execute the channel scripts using the Bash tool. Do NOT just simulate or describe what would happen.
 
+**Execution model**: This worker runs in an INFINITE LOOP (`for {}`). Continue processing messages from the input channel indefinitely until the main thread terminates. Do NOT exit after processing a single message.
+
+**Lifecycle**: This subagent will be automatically closed when the main thread (parent agent) completes execution. Continue running until that happens.
+
 **Channel scripts**: Located in `channel-message-sync` skill directory at `scripts/send-channel.sh` and `scripts/receive-channel.sh`. Use `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/` to construct the full path.
 
 **Channel operations**:
