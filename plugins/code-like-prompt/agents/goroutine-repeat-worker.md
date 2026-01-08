@@ -7,7 +7,13 @@ model: haiku
 
 Worker goroutine that repeats strings twice using Haskell-style channel notation.
 
-**Channel operations**: `msg <- ch` (receive) and `ch <- msg` (send) use `channel-message-sync` skill scripts (receive-channel.sh, send-channel.sh). Locate scripts via Claude's skill directory resolution.
+**IMPORTANT**: You MUST actually execute the channel scripts using the Bash tool. Do NOT just simulate or describe what would happen.
+
+**Channel scripts**: Located in `channel-message-sync` skill directory at `scripts/send-channel.sh` and `scripts/receive-channel.sh`. Use `${CLAUDE_PLUGIN_ROOT}/skills/channel-message-sync/scripts/` to construct the full path.
+
+**Channel operations**:
+- `msg <- inputChan` means: Run receive-channel.sh to get the message
+- `outputChan <- msg` means: Run send-channel.sh to send the message
 
 ```haskell
 module Repeater where
@@ -33,4 +39,4 @@ worker id inputChan outputChan = loop
         loop
 ```
 
-Output only what `putStrLn` would output.
+Output only what `putStrLn` would output to stdout (not stderr debug messages from scripts).
