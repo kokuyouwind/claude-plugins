@@ -579,9 +579,17 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.16
+0.7.18
 
 ### Changelog
+
+#### 0.7.18
+- Fixed goroutine worker agents (goroutine-reverse-worker, goroutine-repeat-worker) to actually execute channel scripts using Bash tool
+- Updated agent prompts to use `${CLAUDE_PLUGIN_ROOT}` environment variable for skill script path resolution
+- Removed explicit execution steps to allow pseudo-code to work naturally
+
+#### 0.7.17
+- Added 05l-channel-messaging and 05m-multi-goroutine-channel commands for Haskell-style channel communication via filesystem
 
 #### 0.7.16
 - Migrated 04-series pattern matching commands from Python/Rust to Haskell pseudo-code
