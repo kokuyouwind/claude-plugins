@@ -579,9 +579,19 @@ Coordinator process agent that aggregates results from multiple workers and send
 
 ## Version
 
-0.7.20
+0.7.23
 
 ### Changelog
+
+#### 0.7.23
+- Added no-fail versions of 07-series Prolog commands (first solution only):
+  - 07-a-basic-facts-no-fail: Returns first solution without backtracking
+  - 07-b-multi-clause-no-fail: Returns first path without exploring all solutions
+  - 07-c-cut-no-fail: Tests cut behavior with first solution only
+  - 07-d-tree-traverse-no-fail: Returns first leaf value without exhaustive traversal
+  - 07-f-negation-no-fail: Returns first solution satisfying negation constraint
+  - 07-g-constraints-no-fail: Returns first valid coloring without exploring all permutations
+- Removed comments from Prolog pseudo-code
 
 #### 0.7.20
 - Updated goroutine worker agents to run in infinite loops processing messages continuously
