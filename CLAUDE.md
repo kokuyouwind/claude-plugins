@@ -207,16 +207,15 @@ This workflow is necessary because Claude Code loads plugin commands at session 
 
 When implementing features, bug fixes, or adding commands, keep the existing version number unchanged unless told otherwise.
 
-**IMPORTANT**: When updating plugin versions, you must update version numbers in THREE places:
+**IMPORTANT**: When updating plugin versions, you must update version numbers in TWO places:
 
 1. **`plugins/<plugin-name>/.claude-plugin/plugin.json`** - The `version` field
 2. **`plugins/<plugin-name>/README.md`** - The version information and documentation
-3. **`.claude-plugin/marketplace.json`** - The `plugins[].version` field (at repository root)
 
-**CRITICAL**: All three must be kept in sync for consistency. The marketplace.json update is often forgotten but is REQUIRED for users to see and install the latest version.
+**NOTE**: `marketplace.json` にはバージョンを記載しない。`plugin.json` の `version` が正規のバージョン情報として使われる。
 
 **Additional considerations when updating versions**:
-- If plugin functionality or skills have changed significantly, update `description` fields in both `plugin.json` and `marketplace.json` to reflect the changes
+- If plugin functionality or skills have changed significantly, update `description` fields in `plugin.json` to reflect the changes
 - If skill names or count have changed, update README.md to reflect the current skills
 - Review and update README.md documentation to match current functionality
 
@@ -233,7 +232,6 @@ When implementing features, bug fixes, or adding commands, keep the existing ver
 - `name`: Plugin name (must match plugin.json)
 - `source`: Path to plugin directory (e.g., "./plugins/plugin-name")
 - `description`: Brief description
-- `version`: Plugin version (must match plugin.json)
 - `author`: Author information
 - `license`: License type (e.g., "MIT")
 - `keywords`: Array of relevant keywords
