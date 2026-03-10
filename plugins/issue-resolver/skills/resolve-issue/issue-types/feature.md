@@ -10,7 +10,7 @@
 
 ### 2. Plan Implementation
 
-Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exist:
+Use **`dev-guidelines-design:design-alternatives`** skill when multiple approaches exist:
 - Check existing codebase architecture
 - Evaluate pros/cons of each approach
 - Present options to Issue author if needed
@@ -18,7 +18,7 @@ Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exis
 
 ### 3. Implement
 
-Follow **`dev-guidelines:git-repository-workflow`** skill:
+Follow **`dev-guidelines-git-workflow:git-repository-workflow`** skill:
 - Follow coding conventions
 - Reuse existing components/utilities
 - Implement proper error handling
@@ -26,7 +26,7 @@ Follow **`dev-guidelines:git-repository-workflow`** skill:
 
 ### 4. Create PR
 
-Use **`dev-guidelines:pr-description-format`** skill. Include:
+Use **`dev-guidelines-pr-format:pr-description-format`** skill. Include:
 - Feature overview
 - Implementation approach
 - Usage/configuration (if applicable)

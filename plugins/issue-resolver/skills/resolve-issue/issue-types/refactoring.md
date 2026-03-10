@@ -10,7 +10,7 @@
 
 ### 2. Plan Approach
 
-Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exist:
+Use **`dev-guidelines-design:design-alternatives`** skill when multiple approaches exist:
 - Clarify refactoring goal (readability, maintainability, performance, etc.)
 - Evaluate impact of each approach
 - Align with existing codebase patterns/style
@@ -18,7 +18,7 @@ Use **`dev-guidelines:design-alternatives`** skill when multiple approaches exis
 
 ### 3. Implement
 
-Follow **`dev-guidelines:git-repository-workflow`** skill:
+Follow **`dev-guidelines-git-workflow:git-repository-workflow`** skill:
 - Don't change external behavior (API, interfaces)
 - Verify all existing tests pass
 - Add/improve tests as needed
@@ -26,7 +26,7 @@ Follow **`dev-guidelines:git-repository-workflow`** skill:
 
 ### 4. Create PR
 
-Use **`dev-guidelines:pr-description-format`** skill. Include:
+Use **`dev-guidelines-pr-format:pr-description-format`** skill. Include:
 - Refactoring purpose
 - Change summary
 - Confirmation of no functional changes

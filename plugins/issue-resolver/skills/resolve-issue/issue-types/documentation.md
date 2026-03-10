@@ -32,7 +32,7 @@
 
 ### 5. Create PR
 
-Use **`dev-guidelines:pr-description-format`** skill. Include:
+Use **`dev-guidelines-pr-format:pr-description-format`** skill. Include:
 - Update purpose
 - Main changes
 - Before/After comparison (if applicable)

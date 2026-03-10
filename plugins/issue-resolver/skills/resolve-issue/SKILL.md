@@ -39,10 +39,10 @@ This skill works with the following dev-guidelines skills:
 
 | Skill | When to Use |
 |-------|-------------|
-| `dev-guidelines:git-repository-workflow` | Git branch management and testing |
-| `dev-guidelines:pr-description-format` | Creating PRs with `gh pr create` |
-| `dev-guidelines:debugging-process` | Investigating bugs and tracing errors |
-| `dev-guidelines:design-alternatives` | Evaluating implementation approaches |
+| `dev-guidelines-git-workflow:git-repository-workflow` | Git branch management and testing |
+| `dev-guidelines-pr-format:pr-description-format` | Creating PRs with `gh pr create` |
+| `dev-guidelines-debugging:debugging-process` | Investigating bugs and tracing errors |
+| `dev-guidelines-design:design-alternatives` | Evaluating implementation approaches |
 
 ### Notes
 
