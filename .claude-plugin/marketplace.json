@@ -22,15 +22,51 @@
       "category": "development"
     },
     {
-      "name": "dev-guidelines",
-      "source": "./plugins/dev-guidelines",
-      "description": "Development workflow guidelines with skills for Git repository workflow, debugging/investigation, architecture decisions, and PR descriptions",
+      "name": "dev-guidelines-git-workflow",
+      "source": "./plugins/dev-guidelines-git-workflow",
+      "description": "Git repository workflow guidelines including branch management, testing practices (TDD), Docker environment handling, and PR workflow",
       "author": {
         "name": "kokuyouwind",
         "url": "https://github.com/kokuyouwind"
       },
       "license": "MIT",
-      "keywords": ["development", "workflow", "guidelines", "best-practices"],
+      "keywords": ["development", "git", "workflow", "tdd", "docker"],
+      "category": "development"
+    },
+    {
+      "name": "dev-guidelines-debugging",
+      "source": "./plugins/dev-guidelines-debugging",
+      "description": "Systematic debugging methodology for thorough root cause analysis with evidence-based investigation",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["development", "debugging", "investigation", "root-cause-analysis"],
+      "category": "development"
+    },
+    {
+      "name": "dev-guidelines-design",
+      "source": "./plugins/dev-guidelines-design",
+      "description": "Structured evaluation of design options with trade-off analysis for architecture and implementation decisions",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["development", "design", "architecture", "trade-off-analysis"],
+      "category": "development"
+    },
+    {
+      "name": "dev-guidelines-pr-format",
+      "source": "./plugins/dev-guidelines-pr-format",
+      "description": "PR description format and workflow requirements for GitHub pull requests",
+      "author": {
+        "name": "kokuyouwind",
+        "url": "https://github.com/kokuyouwind"
+      },
+      "license": "MIT",
+      "keywords": ["development", "github", "pull-request", "pr-description"],
       "category": "development"
     },
     {

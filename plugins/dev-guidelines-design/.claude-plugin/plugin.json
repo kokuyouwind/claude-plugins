@@ -1,0 +1,8 @@
+{
+  "name": "dev-guidelines-design",
+  "version": "1.0.0",
+  "description": "Structured evaluation of design options with trade-off analysis for architecture and implementation decisions",
+  "author": {
+    "name": "kokuyouwind"
+  }
+}
