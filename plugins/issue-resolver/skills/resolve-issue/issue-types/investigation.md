@@ -10,7 +10,7 @@
 
 ### 2. Investigate
 
-Use **`dev-guidelines:debugging-process`** skill for systematic investigation:
+Use **`dev-guidelines-debugging:debugging-process`** skill for systematic investigation:
 - Read related source code
 - Understand background from commit/PR history
 - Check existing documentation and comments

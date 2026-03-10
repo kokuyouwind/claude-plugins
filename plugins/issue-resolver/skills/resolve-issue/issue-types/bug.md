@@ -9,7 +9,7 @@
 
 ### 2. Investigate Root Cause
 
-Use **`dev-guidelines:debugging-process`** skill for systematic investigation:
+Use **`dev-guidelines-debugging:debugging-process`** skill for systematic investigation:
 - Trace from error messages/stack traces
 - Analyze conditions that trigger the bug
 - Add debug logs if needed
@@ -22,7 +22,7 @@ Use **`dev-guidelines:debugging-process`** skill for systematic investigation:
 
 ### 4. Create PR
 
-Use **`dev-guidelines:pr-description-format`** skill. Include:
+Use **`dev-guidelines-pr-format:pr-description-format`** skill. Include:
 - Bug symptoms
 - Root cause explanation
 - Fix description
