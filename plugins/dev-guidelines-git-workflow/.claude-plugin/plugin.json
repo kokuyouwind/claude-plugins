@@ -1,0 +1,8 @@
+{
+  "name": "dev-guidelines-git-workflow",
+  "version": "1.0.0",
+  "description": "Git repository workflow guidelines including branch management, testing practices (TDD), Docker environment handling, and PR workflow",
+  "author": {
+    "name": "kokuyouwind"
+  }
+}

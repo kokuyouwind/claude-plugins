@@ -1,0 +1,8 @@
+{
+  "name": "dev-guidelines-pr-format",
+  "version": "1.0.0",
+  "description": "PR description format and workflow requirements for GitHub pull requests",
+  "author": {
+    "name": "kokuyouwind"
+  }
+}
